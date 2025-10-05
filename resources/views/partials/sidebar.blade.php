@@ -1,75 +1,100 @@
-<div class="d-flex flex-column flex-shrink-0 p-3 bg-light shadow mh-100 vh-100" style="width: 280px;">
-    <a href="{{ route('dashboard') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto p-2 link-dark text-decoration-none">
-       <img src="{{ asset('storage/images/logo v2.png') }}" alt="Logo" id="sidebarLogo">
+<div id="sidebar"
+     class="d-flex vh-100 flex-column flex-shrink-0 p-3 bg-light shadow mb-2 rounded-4 position-fixed sidebar-full"
+     style="width: 280px; transition: width 0.3s;">
+    <div class="d-flex align-items-center justify-content-between mb-3 position-relative">
+        <div class="d-flex align-items-center">
+            <img src="{{ asset('storage/images/logo v1.png') }}"
+                class="d-flex align-items-center ms-2 p-1"
+                alt="Logo Kecil"
+                id="sidebarLogoSmall"
+                style="width:36px;">
+
+            <!-- Logo besar (muncul saat expanded) -->
+            <img src="{{ asset('storage/images/logo v2.png') }}"
+                alt="Logo Besar"
+                id="sidebarLogoBig"
+                style="width:120px;">
+        </div>
+        <!-- Tombol toggle -->
+        <button id="toggleBtn" class="btn btn-light ms-2">
+            <i class="ph-bold ph-sidebar-simple"></i>
+        </button>
+    </div>
+    <!-- Tombol Upload -->
+    <a href="{{ route('dashboard') }}"
+       class="shadow mt-4 p-2 text-decoration-none text-dark border rounded-4 d-flex align-items-center mb-2">
+        <i class="ph ph-bold ph-plus fs-3 me-2"></i>
+        <span class="sidebar-text fw-normal">Upload</span>
     </a>
-    <ul class="nav nav-pills flex-column mb-auto mt-4">
-        <li class="nav-item">
-            <a href="{{ route('dashboard') }}" class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                <i class="ph ph-house me-2 fs-5"></i>
-                <span class="sidebar-text">Home</span>
+
+    <!-- Menu -->
+    <ul class="nav nav-pills mt-2">
+        <li class="nav-item  w-100 ">
+            <a href="{{ route('dashboard') }}"
+               class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                <i class="ph ph-house pe-2 fs-5"></i>
+                <span class="sidebar-text fw-normal">Home</span>
             </a>
         </li>
-        <li>
-            <a href="{{ route('last') }}" class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('last') ? 'active' : '' }}">
+        <li class="nav-item w-100">
+            <a href="{{ route('last') }}"
+               class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('last') ? 'active' : '' }}">
                 <i class="ph ph-clock-counter-clockwise me-2 fs-5"></i>
                 <span class="sidebar-text">Last Opened</span>
             </a>
         </li>
-        <li>
-            <a href="{{ route('myspace') }}" class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('myspace') ? 'active' : '' }}">
+        <li class="nav-item w-100">
+            <a href="{{ route('myspace') }}"
+               class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('myspace') ? 'active' : '' }}">
                 <i class="ph ph-folder-user me-2 fs-5"></i>
                 <span class="sidebar-text">My Space</span>
             </a>
         </li>
-        <li class="border-top border-1 border-dark my-2"></li>
-        <li>
-            <a href="{{ route('shared') }}" class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('shared') ? 'active' : '' }}">
+        <li class="nav-item w-100">
+                <hr>
+        </li>
+        <li class="nav-item w-100">
+            <a href="{{ route('shared') }}"
+               class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('shared') ? 'active' : '' }}">
                 <i class="ph ph-users-three me-2 fs-5"></i>
                 <span class="sidebar-text">Shared With Me</span>
             </a>
         </li>
     </ul>
-    <hr>
-    <div>
-        <a href="#" class="d-flex align-items-center link-dark text-decoration-none ">
-            <p><strong>Log Out</strong></p>
+
+    <!-- Footer -->
+    <div class="mt-auto">
+        <a href="#" class="d-flex align-items-center link-dark text-decoration-none">
+            <i class="ph ph-sign-out me-2 fs-5"></i>
+            <span class="sidebar-text">Log Out</span>
         </a>
     </div>
 </div>
 
 
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('toggleBtn');
+            const contentArea = document.querySelector('.sidebar-collapse-content');
+            const texts = document.querySelectorAll('.sidebar-text');
 
+            toggleBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                contentArea.classList.toggle('collapsed');
 
-<!-- Bootstrap + JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-const sidebar = document.getElementById('sidebar');
-const logo = document.getElementById('sidebarLogo');
-const toggleBtn = document.getElementById('toggleBtn');
-const texts = document.querySelectorAll('.sidebar-text');
-
-toggleBtn.addEventListener('click', function() {
-  sidebar.classList.toggle('collapsed');
-
-  if (sidebar.classList.contains('collapsed')) {
-    // Logo kecil
-    logo.src = "{{ asset('storage/images/logo v1.png') }}";
-    logo.width = 40;
-
-    // Sembunyikan text menu
-    texts.forEach(t => t.style.display = "none");
-
-    sidebar.style.width = "80px";
-  } else {
-    // Logo besar
-    logo.src = "{{ asset('storage/images/logo v2.png') }}";
-    logo.width = 120;
-
-    // Tampilkan kembali text menu
-    texts.forEach(t => t.style.display = "inline");
-
-    sidebar.style.width = "280px";
-  }
-});
-
-</script>
+                if (sidebar.classList.contains('collapsed')) {
+                    texts.forEach(t => {
+                        t.classList.add('opacity-0');
+                        setTimeout(() => t.classList.add('d-none'), 200);
+                    });
+                } else {
+                    texts.forEach(t => {
+                        t.classList.remove('d-none');
+                        setTimeout(() => t.classList.remove('opacity-0'), 50);
+                    });
+                }
+            });
+        });
+    </script>
+    

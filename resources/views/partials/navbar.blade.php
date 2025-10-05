@@ -1,6 +1,6 @@
 <div class="search-container d-flex flex-row align-items-center w-100 mb-4 ">
   <!-- Search Box -->
-    <div class="search-box input-group me-2 shadow">
+    <div class="search-box input-group me-2 shadow rounded-4">
         <span class="input-group-text bg-white border-0">
             <i class="ph ph-magnifying-glass"></i>
         </span>
