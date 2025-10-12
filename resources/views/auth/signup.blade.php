@@ -15,7 +15,7 @@
             </div>
 
             <!-- Form Login -->
-            <form method="POST" class="px-4" action="{{ route('login') }}">
+            <form method="POST" class="px-4" action="{{ route('register') }}">
                 @csrf
                 <div class="mb-3">
                     <div class="input-group">
@@ -51,9 +51,9 @@
                         <span class="input-group-text">
                             <i class="ph ph-lock icon-gray"></i>
                         </span>
-                        <input type="confirmPassword" id="confirmPassword" name="confirmPassword" class="form-control"
+                        <input type="password" id="confirmPassword" name="password_confirmation" class="form-control"
                             placeholder="Password Confirmation" required>
-                        <span class="input-group-text" id="togglePassword" style="cursor: pointer;">
+                        <span class="input-group-text" id="toggleConfirmPassword" style="cursor: pointer;">
                             <i class="ph ph-eye icon-gray"></i>
                         </span>
                     </div>
@@ -64,7 +64,7 @@
 
             <div class="text-center mt-2">
                 <small class="text-muted">Already Have an Account?
-                    <a href="/" class="text-orange no-underline">Sign In</a>
+                    <a href="/signin" class="text-orange no-underline">Sign In</a>
                 </small>
             </div>
         </div>
@@ -75,6 +75,20 @@
     <script>
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                icon.classList.remove("ph-eye");
+                icon.classList.add("ph-eye-slash");
+            } else {
+                passwordInput.type = "password";
+                icon.classList.remove("ph-eye-slash");
+                icon.classList.add("ph-eye");
+            }
+        });
+        document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('confirmPassword');
             const icon = this.querySelector('i');
 
             if (passwordInput.type === "password") {

@@ -1,26 +1,28 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 
-
-Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/', function () {
+    return redirect()->route('signin');
+});
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/last-opened', [DashboardController::class, 'lastOpen'])->name('last');
 Route::get('/myspace', [DashboardController::class, 'myspace'])->name('myspace');
 Route::get('/shared-with-me', [DashboardController::class, 'sharedWithMe'])->name('shared');
 
-Route::get('/', function () {
-    return view('auth.signin');
-});
-Route::get('/signup', function () {
-    return view('auth.signup');
-});
-Route::get('/forgot-password', function () {
-    return view('auth.forgot');
-});
-Route::post('/send-code', function () {
-    return view('auth.input-code');
-});
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
+Route::get('/signin', fn() => view('auth.signin'))->name('signin');
+Route::post('/signin', [AuthController::class, 'login'])->name('signin.process');
+
+Route::get('/signup', [AuthController::class, 'showSignup'])->name('signup');
+Route::post('/register', [AuthController::class, 'register'])->name('register');
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::get('/forgot-password', fn() => view('auth.forgot'))->name('forgot');
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot.process');
+Route::get('/input-code', [AuthController::class, 'showInputCode'])->name('input.code');
+Route::get('/resend-code', [AuthController::class, 'resendCode'])->name('resend.code');
+Route::get('/new-password', [AuthController::class, 'showNewPassword'])->name('new.password');
+Route::post('/new-password', [AuthController::class, 'setNewPassword'])->name('set.new.password');

@@ -4,14 +4,21 @@
     <div class="d-flex justify-content-center align-items-center vh-100 bg-light">
         <div class="card shadow-sm p-4 rounded-4" style="max-width: 400px; width: 100%;">
             <div class="text-center mb-3 px-4">
+                @if (session('success'))
+                    <div class="alert alert-success text-center">{{ session('success') }}</div>
+                @endif
+                @if (session('error'))
+                    <div class="alert alert-danger text-center">{{ session('error') }}</div>
+                @endif
+
                 <img src="/images/logo.png" alt="Logo" class="img-fluid mb-2" style="max-width: 80px">
                 <h4 class="welcome-text py-3">Input The Code</h4>
                 <p class="desc-text">
-                    We've sent a 6-digit confirmation code to your email address.
+                    We've sent a 4-digit confirmation code to your email address.
                 </p>
             </div>
 
-            <form method="POST" class="px-4" action="/reset-password">
+            <form method="POST" class="px-4" action="/new-password">
                 @csrf
                 <div class="mb-4">
                     <div class="input-group">

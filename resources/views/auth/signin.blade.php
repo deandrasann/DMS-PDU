@@ -10,12 +10,12 @@
                 </div>
                 <h4 class="welcome-text py-3">Welcome Back!</h4>
                 <p class="desc-text">
-                    Log in to your PT PDU Document  Management System.
+                    Log in to your PT PDU Document Management System.
                 </p>
             </div>
 
             <!-- Form Login -->
-            <form method="POST" class="px-4" action="{{ route('login') }}">
+            <form method="POST" class="px-4" action="{{ route('signin.process') }}">
                 @csrf
                 <div class="mb-3">
                     <div class="input-group">
@@ -45,7 +45,11 @@
 
                 <button type="submit" class="btn btn-orange w-100">Sign In</button>
             </form>
-
+            @if ($errors->any())
+                <div class="text-danger text-center mt-2">
+                    {{ $errors->first() }}
+                </div>
+            @endif
             <div class="text-center mt-1">
                 <small class="text-muted">Didn't Have Account?
                     <a href="/signup" class="text-orange no-underline">Sign Up</a>
