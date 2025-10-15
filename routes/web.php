@@ -23,6 +23,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/forgot-password', fn() => view('auth.forgot'))->name('forgot');
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot.process');
 Route::get('/input-code', [AuthController::class, 'showInputCode'])->name('input.code');
+Route::post('/input-code', [AuthController::class, 'verifyCode'])->name('verify.code');
 Route::get('/resend-code', [AuthController::class, 'resendCode'])->name('resend.code');
 Route::get('/new-password', [AuthController::class, 'showNewPassword'])->name('new.password');
 Route::post('/new-password', [AuthController::class, 'setNewPassword'])->name('set.new.password');

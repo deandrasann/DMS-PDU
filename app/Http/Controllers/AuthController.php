@@ -52,10 +52,11 @@ class AuthController extends Controller
         ]);
 
         if ($response->successful()) {
-            $data = $response->json();
-            session(['token' => $data['token'] ?? null]);
-            return redirect()->route('dashboard');
+            dd('Login API Status:', $response->status(), 'Login API Body:', $response->body());
         }
+        $data = $response->json();
+        session(['token' => $data['token'] ?? null]);
+        return redirect()->route('dashboard');
 
         return back()->withErrors([
             'email' => 'Invalid credentials or server error.',
@@ -100,7 +101,7 @@ class AuthController extends Controller
         }
 
         // Kirim ulang kode ke API eksternal
-        $response = Http::post('https://api-anda.com/api/forgot-password', [
+        $response = Http::post('http://pdu-dms.my.id/api/forgot-password', [
             'email' => $email,
         ]);
 
@@ -129,6 +130,7 @@ class AuthController extends Controller
             ]);
 
             if ($response->successful()) {
+                session(['reset_token' => $request->token]);
                 return redirect('/new-password')->with('success', 'Token verified! Please set your new password.');
             }
 
@@ -153,16 +155,21 @@ class AuthController extends Controller
         ]);
 
         $email = session('reset_email');
+        $token = session('reset_token');
+        if (!$email) {
+            return redirect('/forgot-password')->with('error', 'Session expired. Please start the process again.');
+        }
 
         try {
             $response = Http::post('http://pdu-dms.my.id/api/reset-password', [
                 'email' => $email,
+                'token' => $token,
                 'password' => $request->password,
                 'password_confirmation' => $request->password_confirmation,
             ]);
 
             if ($response->successful()) {
-                session()->forget('reset_email');
+                session()->forget(['reset_email', 'reset_token']);
                 return redirect('/signin')->with('success', 'Password reset successfully. Please log in.');
             }
 

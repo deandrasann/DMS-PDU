@@ -18,14 +18,14 @@
                 </p>
             </div>
 
-            <form method="POST" class="px-4" action="/new-password">
+            <form method="POST" class="px-4" action="{{ route('verify.code') }}">
                 @csrf
                 <div class="mb-4">
                     <div class="input-group">
                         <span class="input-group-text">
                             <i class="ph ph-keyboard icon-gray"></i>
                         </span>
-                        <input type="text" name="code" class="form-control" placeholder="Code" required>
+                        <input type="text" name="token" class="form-control" placeholder="Code" required>
                     </div>
                 </div>
 
