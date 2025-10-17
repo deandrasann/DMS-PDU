@@ -1,9 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard')
+@section('title', 'Shared with Me')
 
 @section('content')
-@include('partials.navbar')
 <div class="d-flex flex-column flex-shrink-0 p-3 bg-light shadow  rounded-2 ">
     <h4 class="fw-semibold mb-4">Shared with Me</h4>
         <div class="container vh-100 d-flex flex-column justify-content-center align-items-center text-center">

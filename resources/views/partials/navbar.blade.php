@@ -1,11 +1,53 @@
-<div class="search-container d-flex flex-row align-items-center w-100 mb-4 ">
+<div class="search-container d-flex flex-row align-items-center w-100 mb-2 ">
   <!-- Search Box -->
-    <div class="search-box input-group me-2 shadow rounded-4">
-        <span class="input-group-text bg-white border-0">
-            <i class="ph ph-magnifying-glass"></i>
-        </span>
-        <input type="text" class="form-control border-0" placeholder="Search in DMS PDU">
+<div class="position-relative w-100">
+    <!-- Search Box -->
+    <div class="input-group shadow-sm rounded-4 bg-white">
+      <span class="input-group-text bg-white border-0">
+        <i class="ph ph-magnifying-glass"></i>
+      </span>
+      <input type="text" class="form-control border-0" placeholder="Search in DMS PDU">
+      <span class="input-group-text bg-white border-0 filter-toggle" style="cursor:pointer;">
+        <i class="ph ph-sliders-horizontal fs-5"></i>
+      </span>
     </div>
+
+    <!-- Floating Filter Panel -->
+    <div class="filter-panel mt-3" id="filterPanel">
+      <div class="card card-body rounded-4 border-0 shadow-sm">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label fw-semibold mb-1">Date Modified</label>
+            <select class="form-select">
+              <option>Any Time</option>
+              <option>Today</option>
+              <option>Last Week</option>
+              <option>Last Month</option>
+              <option>Last Year</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold mb-1">Owner</label>
+            <select class="form-select">
+              <option>Anyone</option>
+              <option>Owned by Me</option>
+              <option> Not Owned by Me</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold mb-1">Type</label>
+            <select class="form-select">
+              <option>Any Type</option>
+              <option>Document</option>
+              <option>Spreadsheet</option>
+              <option>PDF</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Notification -->
   <div class="notif-box mx-2">
@@ -21,3 +63,20 @@
     </button>
   </div>
 </div>
+
+<script>
+     const filterToggle = document.querySelector('.filter-toggle');
+    const filterPanel = document.getElementById('filterPanel');
+
+    filterToggle.addEventListener('click', () => {
+      const isVisible = filterPanel.style.display === 'block';
+      filterPanel.style.display = isVisible ? 'none' : 'block';
+    });
+
+    // Klik di luar area -> tutup panel
+    document.addEventListener('click', (e) => {
+      if (!filterPanel.contains(e.target) && !filterToggle.contains(e.target)) {
+        filterPanel.style.display = 'none';
+      }
+    });
+</script>

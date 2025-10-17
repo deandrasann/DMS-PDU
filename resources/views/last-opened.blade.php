@@ -1,9 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard')
+@section('title', 'Last Opened')
 
 @section('content')
-@include('partials.navbar')
 <div class="d-flex flex-column flex-shrink-0 vh-50 p-3 bg-light shadow w-100 mb-4 rounded-4 ">
     <h4 class="fw-semibold mb-4">Last Opened Folders</h4>
         <div class="container  d-flex flex-column justify-content-center align-items-center text-center p-4">

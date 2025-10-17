@@ -3,7 +3,6 @@
 @section('title', 'Dashboard')
 
 @section('content')
-@include('partials.navbar')
 {{-- <div class="d-flex flex-column flex-shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4 ">
     <h4 class="fw-semibold mb-4">Recomended Folders</h4>
     <!-- Grid Container -->

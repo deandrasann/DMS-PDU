@@ -1,10 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard')
+@section('title', 'My Space')
 
 @section('content')
-@include('partials.navbar')
-
 <div class="container-fluid ">
     <div class="d-flex flex-column flex-grow-1">
         <!-- Card Folders -->

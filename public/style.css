@@ -279,5 +279,22 @@ small {
     border:none;
 }
 
+.filter-panel {
+    position: absolute;
+    top: 100%; /* muncul di bawah search bar */
+    left: 0;
+    width: 100%;
+    z-index: 1050;
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+  .sidebar-collapse-content {
+    margin-left: 0 !important;
+  }
+    .content-wrapper {
+    margin-top: 150px !important; /* tinggi navbar mobile */
+    }
+}
 
 
