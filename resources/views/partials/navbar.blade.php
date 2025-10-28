@@ -2,15 +2,18 @@
   <!-- Search Box -->
 <div class="position-relative w-100">
     <!-- Search Box -->
-    <div class="input-group shadow-sm rounded-4 bg-white">
-      <span class="input-group-text bg-white border-0">
-        <i class="ph ph-magnifying-glass"></i>
-      </span>
-      <input type="text" class="form-control border-0" placeholder="Search in DMS PDU">
-      <span class="input-group-text bg-white border-0 filter-toggle" style="cursor:pointer;">
-        <i class="ph ph-sliders-horizontal fs-5"></i>
-      </span>
-    </div>
+<div class="search-box rounded-2">
+  <div class="input-group shadow-sm rounded-2 bg-white">
+    <span class="input-group-text bg-white border-0">
+      <i class="ph ph-magnifying-glass"></i>
+    </span>
+    <input type="text" class="form-control border-0 shadow-none" placeholder="Search in DMS PDU">
+    <span class="input-group-text bg-white border-0 filter-toggle" style="cursor:pointer;">
+      <i class="ph ph-sliders-horizontal fs-5"></i>
+    </span>
+  </div>
+</div>
+
 
     <!-- Floating Filter Panel -->
     <div class="filter-panel mt-3" id="filterPanel">

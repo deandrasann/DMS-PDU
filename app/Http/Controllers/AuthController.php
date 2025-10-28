@@ -45,23 +45,40 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
-    {
-        $response = Http::post('http://pdu-dms.my.id/api/login-user', [
-            'email' => $request->email,
-            'password' => $request->password,
-        ]);
+{
+    $response = Http::post('http://pdu-dms.my.id/api/login-user', [
+        'email' => $request->email,
+        'password' => $request->password,
+    ]);
 
-        if ($response->successful()) {
-            dd('Login API Status:', $response->status(), 'Login API Body:', $response->body());
-        }
+    if ($response->successful()) {
         $data = $response->json();
-        session(['token' => $data['token'] ?? null]);
-        return redirect()->route('dashboard');
 
-        return back()->withErrors([
-            'email' => 'Invalid credentials or server error.',
-        ]);
+        // Ambil token sesuai key yang benar
+        $token = $data['access_token'] ?? null;
+
+        if (!$token) {
+            return back()->withErrors(['login' => 'Token tidak ditemukan dalam respons API.']);
+        }
+
+        // ✅ Simpan token secara permanen ke session
+        session()->put('token', $token);
+
+        // (Opsional) simpan juga nama user biar mudah diakses di view
+        if (isset($data['user'])) {
+            session()->put('user', $data['user']);
+        }
+
+        // ✅ Redirect langsung tanpa flash data
+        return redirect()->route('dashboard');
     }
+
+    return back()->withErrors([
+        'email' => 'Invalid credentials or server error.',
+    ]);
+}
+
+
 
     public function forgotPassword(Request $request)
     {
@@ -178,7 +195,7 @@ class AuthController extends Controller
             return back()->with('error', 'Error connecting to API: ' . $e->getMessage());
         }
     }
-    
+
     public function logout(Request $request)
     {
         try {

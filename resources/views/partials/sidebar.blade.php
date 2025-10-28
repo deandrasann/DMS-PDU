@@ -11,14 +11,14 @@
                 style="width:120px;">
         </div>
         <!-- Tombol toggle -->
-        <button id="toggleBtn" class="btn btn-light ms-2">
+        <button id="toggleBtn" class="btn btn-light bg-white ms-2">
             <i class="ph-bold ph-sidebar-simple"></i>
         </button>
     </div>
     <!-- Tombol Upload -->
-    <a href="{{ route('dashboard') }}"
+    <a href="{{ route('upload') }}"
         class="shadow mt-4 p-2 text-decoration-none text-dark border rounded-4 d-flex align-items-center mb-2">
-        <i class="ph ph-bold ph-plus fs-3 me-2"></i>
+        <i class="ph ph-bold ph-plus fs-3 me-2 my-2"></i>
         <span class="sidebar-text fw-normal">Upload</span>
     </a>
 
