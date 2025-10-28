@@ -22,4 +22,8 @@ class DashboardController extends Controller
     {
         return view('shared');
     }
+        public function uploadFile()
+    {
+        return view('upload-file');
+    }
 }

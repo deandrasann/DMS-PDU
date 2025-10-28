@@ -1,121 +1,121 @@
 /* 100 - Thin / Hairline (kalau ada Var) */
 @font-face {
-    font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-Var.ttf') format('truetype');
-    font-weight: 100;
-    font-style: normal;
+font-family: 'SFT Schrifted Sans';
+src: url('fonts/SFTSchriftedSansTRIAL-Var.ttf') format('truetype');
+font-weight: 100;
+font-style: normal;
 }
 
 /* 200 - ExtraLight */
 @font-face {
-    font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-ExLight.ttf') format('truetype');
-    font-weight: 200;
-    font-style: normal;
+font-family: 'SFT Schrifted Sans';
+src: url('fonts/SFTSchriftedSansTRIAL-ExLight.ttf') format('truetype');
+font-weight: 200;
+font-style: normal;
 }
 @font-face {
-    font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-ExLightItalic.ttf') format('truetype');
-    font-weight: 200;
-    font-style: italic;
+font-family: 'SFT Schrifted Sans';
+src: url('fonts/SFTSchriftedSansTRIAL-ExLightItalic.ttf') format('truetype');
+font-weight: 200;
+font-style: italic;
 }
 
 /* 300 - Light */
 @font-face {
-    font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-Light.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
+font-family: 'SFT Schrifted Sans';
+src: url('fonts/SFTSchriftedSansTRIAL-Light.ttf') format('truetype');
+font-weight: 300;
+font-style: normal;
 }
 @font-face {
-    font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-LightItalic.ttf') format('truetype');
-    font-weight: 300;
-    font-style: italic;
+font-family: 'SFT Schrifted Sans';
+src: url('fonts/SFTSchriftedSansTRIAL-LightItalic.ttf') format('truetype');
+font-weight: 300;
+font-style: italic;
 }
 
 /* 400 - Regular */
 @font-face {
-    font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-Regular.ttf') format('truetype');
-    font-weight: 400;
-    font-style: normal;
+font-family: 'SFT Schrifted Sans';
+src: url('fonts/SFTSchriftedSansTRIAL-Regular.ttf') format('truetype');
+font-weight: 400;
+font-style: normal;
 }
 @font-face {
-    font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-Italic.ttf') format('truetype');
-    font-weight: 400;
-    font-style: italic;
+font-family: 'SFT Schrifted Sans';
+src: url('fonts/SFTSchriftedSansTRIAL-Italic.ttf') format('truetype');
+font-weight: 400;
+font-style: italic;
 }
 
 /* 500 - Medium */
 @font-face {
-    font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-Medium.ttf') format('truetype');
-    font-weight: 500;
-    font-style: normal;
+font-family: 'SFT Schrifted Sans';
+src: url('fonts/SFTSchriftedSansTRIAL-Medium.ttf') format('truetype');
+font-weight: 500;
+font-style: normal;
 }
 @font-face {
-    font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-MediumItalic.ttf') format('truetype');
-    font-weight: 500;
-    font-style: italic;
+font-family: 'SFT Schrifted Sans';
+src: url('fonts/SFTSchriftedSansTRIAL-MediumItalic.ttf') format('truetype');
+font-weight: 500;
+font-style: italic;
 }
 
 /* 600 - DemiBold / SemiBold */
 @font-face {
-    font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-DemiBold.ttf') format('truetype');
-    font-weight: 600;
-    font-style: normal;
+font-family: 'SFT Schrifted Sans';
+src: url('fonts/SFTSchriftedSansTRIAL-DemiBold.ttf') format('truetype');
+font-weight: 600;
+font-style: normal;
 }
 @font-face {
-    font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-DemiBoldItalic.ttf') format('truetype');
-    font-weight: 600;
-    font-style: italic;
+font-family: 'SFT Schrifted Sans';
+src: url('fonts/SFTSchriftedSansTRIAL-DemiBoldItalic.ttf') format('truetype');
+font-weight: 600;
+font-style: italic;
 }
 
 /* 700 - Bold */
 @font-face {
-    font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-Bold.ttf') format('truetype');
-    font-weight: 700;
-    font-style: normal;
+font-family: 'SFT Schrifted Sans';
+src: url('fonts/SFTSchriftedSansTRIAL-Bold.ttf') format('truetype');
+font-weight: 700;
+font-style: normal;
 }
 @font-face {
-    font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-BoldItalic.ttf') format('truetype');
-    font-weight: 700;
-    font-style: italic;
+font-family: 'SFT Schrifted Sans';
+src: url('fonts/SFTSchriftedSansTRIAL-BoldItalic.ttf') format('truetype');
+font-weight: 700;
+font-style: italic;
 }
 
 /* 800 - ExtraBold */
 @font-face {
-    font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-ExBold.ttf') format('truetype');
-    font-weight: 800;
-    font-style: normal;
+font-family: 'SFT Schrifted Sans';
+src: url('fonts/SFTSchriftedSansTRIAL-ExBold.ttf') format('truetype');
+font-weight: 800;
+font-style: normal;
 }
 @font-face {
-    font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-ExBoldItalic.ttf') format('truetype');
-    font-weight: 800;
-    font-style: italic;
+font-family: 'SFT Schrifted Sans';
+src: url('fonts/SFTSchriftedSansTRIAL-ExBoldItalic.ttf') format('truetype');
+font-weight: 800;
+font-style: italic;
 }
 
 /* 900 - Black */
 @font-face {
-    font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-Black.ttf') format('truetype');
-    font-weight: 900;
-    font-style: normal;
+font-family: 'SFT Schrifted Sans';
+src: url('fonts/SFTSchriftedSansTRIAL-Black.ttf') format('truetype');
+font-weight: 900;
+font-style: normal;
 }
 @font-face {
-    font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-BlackItalic.ttf') format('truetype');
-    font-weight: 900;
-    font-style: italic;
+font-family: 'SFT Schrifted Sans';
+src: url('fonts/SFTSchriftedSansTRIAL-BlackItalic.ttf') format('truetype');
+font-weight: 900;
+font-style: italic;
 }
 
 
@@ -123,161 +123,252 @@
 /* Typography */
 
 body {
-    font-family: 'SFT Schrifted Sans', Arial, sans-serif;
-    font-weight: 400; /* Regular*/
+font-family: 'SFT Schrifted Sans', Arial, sans-serif;
+font-weight: 400; /* Regular*/
 }
 
 h1 {
-    font-family: 'SFT Schrifted Sans', sans-serif;
-    font-weight: 900; /* Black */
+font-family: 'SFT Schrifted Sans', sans-serif;
+font-weight: 900; /* Black */
 }
 
 h2 {
-    font-family: 'SFT Schrifted Sans', sans-serif;
-    font-weight: 700; /* Bold */
+font-family: 'SFT Schrifted Sans', sans-serif;
+font-weight: 700; /* Bold */
 }
 
 h3 {
-    font-family: 'SFT Schrifted Sans', sans-serif;
-    font-weight: 500; /* Medium */
+font-family: 'SFT Schrifted Sans', sans-serif;
+font-weight: 500; /* Medium */
 }
 
 h4 {
-    font-family: 'SFT Schrifted Sans', sans-serif;
-    font-weight: 500; /* Medium */
-    font-size: 20px;
+font-family: 'SFT Schrifted Sans', sans-serif;
+font-weight: 500; /* Medium */
+font-size: 20px;
 }
 
 h4, h5, h6 {
-    font-family: 'SFT Schrifted Sans', sans-serif;
-    font-weight: 400; /* Regular */
+font-family: 'SFT Schrifted Sans', sans-serif;
+font-weight: 400; /* Regular */
 }
 
 p {
-    font-family: 'SFT Schrifted Sans', sans-serif;
-    font-weight: 300; /* Light */
+font-family: 'SFT Schrifted Sans', sans-serif;
+font-weight: 300; /* Light */
 }
 
 small {
-    font-family: 'Rubik', sans-serif;
-    font-weight: 100; /* Light */
-    font-size: 12px;
+font-family: 'Rubik', sans-serif;
+font-weight: 100; /* Light */
+font-size: 12px;
 }
 
 .sidebar-collapse-content {
-    margin-left: 280px;
-    transition: margin-left 0.3s ease;
+margin-left: 280px;
+transition: margin-left 0.3s ease;
 }
 .sidebar-collapse-content.collapsed {
-    margin-left: 80px;
+margin-left: 80px;
 }
 
+.text-orange{
+color: var(--P05, #F6602E);
+font-family: Rubik;
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+
+
+.bg-light-orange{
+background: var(--P01, #FFD2B9);
+}
 
 .nav-link.active {
-    border-radius: 16px !important;
-    border: 1px solid rgba(246, 96, 46, 0.10) !important;
-    background: linear-gradient(90deg, rgba(246, 96, 46, 0.50) 0%, rgba(255, 159, 101, 0.50) 100%) !important;
-    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25) !important;
-    padding-right: 4px;
+border-radius: 16px !important;
+border: 1px solid rgba(246, 96, 46, 0.10) !important;
+background: linear-gradient(90deg, rgba(246, 96, 46, 0.50) 0%, rgba(255, 159, 101, 0.50) 100%) !important;
+box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25) !important;
+padding-right: 4px;
 
 }
 
+.search-box {
+transition: all 0.25s ease-in-out;
+border-radius: 1rem;
+}
+
+/* Hilangkan efek biru dari Bootstrap */
 .search-box .form-control:focus {
-  box-shadow: none !important;   /* matiin shadow biru bawaan */
-  border-color: transparent !important; /* biar nggak ada garis biru tipis */
+box-shadow: none !important;
+border: none !important;
 }
 
+/* Warna muncul saat input aktif */
 .search-box:focus-within {
-  box-shadow: linear-gradient(90deg, #F6602E, #ffffff) !important;
-  border-radius: 0.375rem;
+box-shadow: 0 0 0 0.5px #F6602E; /* biar lebih tebal keliatan */
+border-radius: -1rem;
 }
+
+
 
 .btn-badge{
-    background-color: #FDDCD9;
-    color: #262625
+background-color: #FDDCD9;
+color: #262625
 }
 
 .pdf-inner-shadow {
-  background-color: #F2F2F0 !important;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.25) !important; /* arah bayangan ke dalam */
-  border-radius: 8px !important;
+background-color: #F2F2F0 !important;
+box-shadow: inset 0 2px 6px rgba(0,0,0,0.25) !important; /* arah bayangan ke dalam */
+border-radius: 8px !important;
 }
 
 .btn-primary{
-    background: linear-gradient(180deg, #FFB98F 0%, #FF9F65 100%);
-    border:none;
+background: linear-gradient(180deg, #FFB98F 0%, #FF9F65 100%);
+border:none;
 
 }
 
 .shadow{
-    background: rgba(255, 255, 255, 0.25) !important;
-    box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.15) !important;
-    backdrop-filter: blur(8px) !important;
-    }
+background: rgba(255, 255, 255, 0.25) !important;
+box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.15) !important;
+backdrop-filter: blur(8px) !important;
+}
 #sidebar {
-  transition: width 0.3s ease;
-  width: 280px;
-  overflow-x: hidden;
-  white-space: nowrap;
+transition: width 0.3s ease;
+width: 280px;
+overflow-x: hidden;
+white-space: nowrap;
 }
 
 /* LOGO BESAR & KECIL */
 #sidebarLogoBig {
-  display: block;
-  width: 120px;
-  transition: opacity 0.3s ease;
+display: block;
+width: 120px;
+transition: opacity 0.3s ease;
 }
 #sidebarLogoSmall {
-  width: 40px;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease;
+width: 40px;
+opacity: 0;
+visibility: hidden;
+transition: opacity 0.3s ease;
 }
 
 /* COLLAPSED MODE */
 #sidebar.collapsed {
-  width: 80px !important;
+width: 80px !important;
 }
 
 /* pas collapsed → logo besar ilang, logo kecil muncul */
 #sidebar.collapsed #sidebarLogoBig {
-  opacity: 0;
-  visibility: hidden;
+opacity: 0;
+visibility: hidden;
 }
 #sidebar.collapsed #sidebarLogoSmall {
-  opacity: 1;
-  visibility: visible;
+opacity: 1;
+visibility: visible;
 }
 
 /* TOGGLE BUTTON */
 #toggleBtn {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 0.3s ease;
+opacity: 1;
+visibility: visible;
+transition: opacity 0.3s ease;
 }
 
 /* collapsed → tombol hilang */
 #sidebar.collapsed #toggleBtn {
-  opacity: 0;
-  visibility: hidden;
-  position: absolute;
-  right: 10px;
+opacity: 0;
+visibility: hidden;
+position: absolute;
+right: 10px;
 }
 
 /* collapsed + hover → tombol muncul, logo kecil ilang */
 #sidebar.collapsed:hover #toggleBtn {
-  opacity: 1;
-  visibility: visible;
+opacity: 1;
+visibility: visible;
 }
 #sidebar.collapsed:hover #sidebarLogoSmall {
-  opacity: 0;
-  visibility: hidden;
+opacity: 0;
+visibility: hidden;
 }
 
 .btn-light:hover{
-    background: linear-gradient(90deg, rgba(246, 96, 46, 0.50) 0%, rgba(255, 159, 101, 0.50) 100%);
-    border:none;
+background: linear-gradient(90deg, rgba(246, 96, 46, 0.50) 0%, rgba(255, 159, 101, 0.50) 100%);
+border:none;
+}
+
+.filter-panel {
+position: absolute;
+top: 100%; /* muncul di bawah search bar */
+left: 0;
+width: 100%;
+z-index: 1020;
+display: none;
+}
+
+.dropdown-submenu > .dropdown-menu {
+top: 0;
+left: 100%;
+margin-left: 0.25rem;
+margin-top: -0.25rem;
+display: none;
+}
+
+.dropdown-submenu:hover > .dropdown-menu {
+display: block;
+}
+
+/* Gaya tambahan opsional biar halus dan rapi */
+.dropdown-menu {
+border-radius: 10px;
+}
+
+.dropdown-item:hover {
+background-color: #f8f9fa;
+border-radius: 8px;
+}
+
+/* HANYA ini yang diperlukan untuk fix backdrop
+.modal-backdrop {
+z-index: 1040 !important;
+}
+
+.modal {
+z-index: 1050 !important;
+} */
+
+.border-dashed {
+border-style: dashed !important;
+}
+
+.text-orange {
+color: #fd7e14 !important;
+}
+
+#uploadArea:hover {
+border-color: #fd7e14 !important;
+background-color: rgba(253, 126, 20, 0.05) !important;
 }
 
 
+.btn-blue{
+border-radius: 12px;
+background: #3B82F6;
+box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.10);
+backdrop-filter: blur(8px);
+color: white;
+}
 
+
+@media (max-width: 991.98px) {
+.sidebar-collapse-content {
+margin-left: 0 !important;
+}
+.content-wrapper {
+margin-top: 80px !important; /* tinggi navbar mobile */
+}
+}

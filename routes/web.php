@@ -3,14 +3,24 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MySpaceController;
 
 Route::get('/', function () {
     return redirect()->route('signin');
 });
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/last-opened', [DashboardController::class, 'lastOpen'])->name('last');
-Route::get('/myspace', [DashboardController::class, 'myspace'])->name('myspace');
+
+Route::get('/myspace', [MySpaceController::class, 'index'])->name('myspace');
+Route::get('/my-files', [MySpaceController::class, 'getFiles'])->name('my-files');
+Route::get('/files/{fileId}', [MySpaceController::class, 'proxyPdf'])->name('pdf.view');
+Route::get('/file-view/{fileId}', [MySpaceController::class, 'viewFile'])->name('file.view');
+
+
+
 Route::get('/shared-with-me', [DashboardController::class, 'sharedWithMe'])->name('shared');
+Route::get('/upload', [DashboardController::class, 'uploadFile'])->name('upload');
+
 
 Route::get('/signin', fn() => view('auth.signin'))->name('signin');
 Route::post('/signin', [AuthController::class, 'login'])->name('signin.process');
