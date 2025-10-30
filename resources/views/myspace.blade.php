@@ -101,6 +101,7 @@
                         card.style.width = "180px";
                         card.style.height = "220px";
                         card.style.backgroundColor = "#F2F2F0";
+                        card.style.cursor = "pointer"; // Tambahkan cursor pointer
 
                         // Tentukan ikon berdasarkan tipe file
                         let fileIcon = "ph-file";
@@ -114,7 +115,7 @@
                                 fileIcon = "ph-file-doc";
                                 fileType = "DOC";
                             } else if (file.mime.includes("xlsx") || file.mime.includes(
-                                "spreadsheet")) {
+                                    "spreadsheet")) {
                                 fileIcon = "ph-file-xls";
                                 fileType = "XLS";
                             } else if (file.mime.includes("ppt")) {
@@ -123,40 +124,69 @@
                             }
                         }
 
+                        // Tentukan URL untuk membuka file
+                        const openUrl = file.mime && file.mime.includes('pdf') ?
+                            `/files/${file.id}` :
+                            `/file-view/${file.id}`;
+
                         card.innerHTML = `
                     <div class="mt-3 mx-2 preview-container" style="height: 120px;">
                         <div id="preview-${file.id}" class="d-flex justify-content-center align-items-center h-100 w-100">
                             <i class="ph ${fileIcon} fs-1 text-muted"></i>
                         </div>
                     </div>
-                    <div class="card-body p-2">
-                        <div class="d-flex align-items-center mb-1">
-                            <i class="ph ${fileIcon} me-2 text-dark"></i>
-                            <span class="fw-semibold text-truncate small" title="${file.name}">${file.name}</span>
-                        </div>
-                        <div class="d-flex gap-2 align-items-center">
-                            <span class="badge bg-secondary rounded-2 px-2"><small>${fileType}</small></span>
-                            <span class="text-muted small">${file.size}</span>
-                            <button class="btn btn-link ms-auto text-dark p-0" data-bs-toggle="dropdown">
-                                <i class="ph ph-dots-three-vertical fs-6 text-muted"></i>
-                            </button>
-                            <ul class="dropdown-menu shadow rounded-3 border-0 p-2">
-                            <li>
-                            <a class="dropdown-item d-flex align-items-center gap-2"
-                                href="${file.mime && file.mime.includes('pdf')
-                                ? `/files/${file.id}`
-                                : `/file-view/${file.id}`}"
-                                target="_blank">
-                                <i class="ph ph-arrow-up-right fs-5"></i> Open
-                            </a>
-                            </li>
-
-                                <li><a class="dropdown-item d-flex align-items-center gap-2" href="${file.url}" download><i class="ph ph-download fs-5"></i> Download</a></li>
-                                <li><a class="dropdown-item text-danger d-flex align-items-center gap-2" href="#"><i class="ph ph-trash fs-5"></i> Delete</a></li>
-                            </ul>
-                        </div>
-                    </div>
+                   <div class="card-body p-2">
+    <div class="d-flex align-items-center mb-1">
+        <i class="ph ${fileIcon} me-2 text-dark"></i>
+        <span class="fw-semibold text-truncate small" title="${file.name}">${file.name}</span>
+    </div>
+    <div class="d-flex gap-2 align-items-center">
+        <span class="badge bg-secondary rounded-2 px-2"><small>${fileType}</small></span>
+        <span class="text-muted small">${file.size}</span>
+        <div class="dropdown">
+            <button class="btn btn-link ms-auto text-dark p-0 "
+                    data-bs-toggle="dropdown"
+                    data-bs-display="static">
+                <i class="ph ph-dots-three-vertical fs-6 text-muted"></i>
+            </button>
+            <ul class="dropdown-menu shadow rounded-3 border-0 p-2">
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2"
+                       href="${openUrl}"
+                       target="_blank">
+                        <i class="ph ph-arrow-up-right fs-5"></i> Open
+                    </a>
+                </li>
+                <li>
+                    <a href="#"
+                    class="dropdown-item d-flex align-items-center gap-2 download-btn"
+                    data-id="${file.id}"
+                    data-name="${file.name}">
+                    <i class="ph ph-download fs-5"></i> Download
+                    </a>
+                </li>
+                <li>
+                    <a href="#"
+                    class="dropdown-item text-danger d-flex align-items-center gap-2 delete-btn"
+                    data-id="${file.id}">
+                    <i class="ph ph-trash fs-5"></i> Delete
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
                 `;
+
+                        // Tambahkan event listener untuk klik card
+                        card.addEventListener('click', (e) => {
+                            // Cegah event bubbling jika yang diklik adalah dropdown
+                            if (e.target.closest('.dropdown') || e.target.closest(
+                                    '.dropdown-menu')) {
+                                return;
+                            }
+                            window.open(openUrl, '_blank');
+                        });
 
                         fileContainer.appendChild(card);
 
@@ -228,6 +258,95 @@
                 container.innerHTML = '<i class="ph ph-file-pdf fs-1 text-muted"></i>';
             }
         }
+        document.addEventListener("click", async function(e) {
+            const btn = e.target.closest(".delete-btn");
+            if (!btn) return;
+
+            e.preventDefault();
+            const fileId = btn.getAttribute("data-id");
+            const token = localStorage.getItem("token");
+
+            if (!confirm("Yakin mau hapus file ini?")) return;
+
+            try {
+                const response = await fetch("http://pdu-dms.my.id/api/delete-file", {
+                    method: "DELETE",
+                    headers: {
+                        "Accept": "application/json",
+                        "Authorization": "Bearer " + token,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        all: "",
+                        ids: [parseInt(fileId)]
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert("✅ File berhasil dihapus!");
+                    btn.closest(".file-card").remove(); // hapus dari tampilan
+                } else {
+                    alert("Gagal menghapus: " + (result.message || "Unknown error"));
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert("Terjadi kesalahan saat menghapus file.");
+            }
+        });
+
+        document.addEventListener("click", async function(e) {
+            const btn = e.target.closest(".download-btn");
+            if (!btn) return;
+
+            e.preventDefault();
+
+            const fileId = btn.getAttribute("data-id");
+            const fileName = btn.getAttribute("data-name");
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                alert("⚠️ Token tidak ditemukan. Silakan login ulang.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://pdu-dms.my.id/api/view-file/${fileId}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": "Bearer " + token,
+                        "Accept": "application/octet-stream"
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error("Gagal mengunduh file. Status: " + response.status);
+                }
+
+                // Konversi ke blob untuk bisa diunduh
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+
+                // Buat link download sementara
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = fileName || "downloaded_file";
+                document.body.appendChild(a);
+                a.click();
+
+                // Bersihkan URL sementara
+                a.remove();
+                window.URL.revokeObjectURL(url);
+
+                console.log("✅ File berhasil diunduh:", fileName);
+
+            } catch (error) {
+                console.error(error);
+                alert("❌ Gagal mengunduh file: " + error.message);
+            }
+        });
     </script>
 
     </style>
