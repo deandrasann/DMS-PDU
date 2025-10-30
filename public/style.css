@@ -173,7 +173,7 @@ margin-left: 80px;
 }
 
 .text-orange{
-color: var(--P05, #F6602E);
+color: #F6602E;
 font-family: Rubik;
 font-size: 16px;
 font-style: normal;
@@ -306,9 +306,29 @@ position: absolute;
 top: 100%; /* muncul di bawah search bar */
 left: 0;
 width: 100%;
-z-index: 1020;
+z-index: 1065;
 display: none;
 }
+
+.modal-backdrop.show {
+  opacity: 0.5 !important;
+  backdrop-filter: blur(0px) !important;
+}
+
+.modal.show {
+  z-index: 9999 !important; /* Pastikan di atas semua elemen */
+}
+
+.modal-dialog {
+  z-index: 10000 !important;
+  filter: none !important; /* Hapus efek blur/gelap dari parent */
+}
+
+body.modal-open .sidebar-collapse-content {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
 
 .dropdown-submenu > .dropdown-menu {
 top: 0;
@@ -332,15 +352,16 @@ background-color: #f8f9fa;
 border-radius: 8px;
 }
 
-/* HANYA ini yang diperlukan untuk fix backdrop
-.modal-backdrop {
-z-index: 1040 !important;
+.modal-backdrop.show {
+  opacity: 0.5 !important; /* Background abu-abu transparan normal */
+  backdrop-filter: blur(0px) !important;
 }
 
-.modal {
-z-index: 1050 !important;
-} */
 
+body.modal-open .sidebar-collapse-content {
+  filter: none !important;
+  opacity: 1 !important;
+}
 .border-dashed {
 border-style: dashed !important;
 }
@@ -389,6 +410,10 @@ color: white;
     100% {
         left: 100%;
     }
+}
+.dropdown:hover .dropdown-menu {
+    display: block;
+    margin-top: 0;
 }
 
 @media (max-width: 991.98px) {
