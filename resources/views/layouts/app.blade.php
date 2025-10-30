@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ asset('style.css') }}">
     <link rel="icon" href="{{ asset('favicon.png') }}" type="image/x-icon">
 </head>
+
 @if (session('token'))
     <script>
         localStorage.setItem('token', '{{ session('token') }}');
@@ -45,6 +46,17 @@
 
 
     <!-- JS -->
+
+<body class="d-flex vh-100 overflow-hidden">
+    {{-- <div class="position-fixed h-100 z-3">
+        @include('partials.sidebar')
+    </div> --}}
+
+
+    {{-- <div class="d-flex flex-column flex-grow-1 sidebar-collapse-content h-100 overflow-auto p-4">
+        @yield('content')
+    </div> --}}
+    <!--Icons-->
     <script src="https://cdn.jsdelivr.net/npm/phosphor-icons@1.4.2/src/index.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

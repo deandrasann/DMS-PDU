@@ -37,3 +37,10 @@ Route::post('/input-code', [AuthController::class, 'verifyCode'])->name('verify.
 Route::get('/resend-code', [AuthController::class, 'resendCode'])->name('resend.code');
 Route::get('/new-password', [AuthController::class, 'showNewPassword'])->name('new.password');
 Route::post('/new-password', [AuthController::class, 'setNewPassword'])->name('set.new.password');
+Route::get('/profile', function () {
+    return response()->json([
+        'fullname' => 'gojo',
+        'email' => 'gojo@examplecom',
+        'avatar_url' => asset('storage/images/default-avatar.png'),
+    ]);
+})->name('user.profile');
