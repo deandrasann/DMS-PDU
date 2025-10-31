@@ -285,7 +285,6 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    alert("✅ File berhasil dihapus!");
                     btn.closest(".file-card").remove(); // hapus dari tampilan
                 } else {
                     alert("Gagal menghapus: " + (result.message || "Unknown error"));
@@ -293,7 +292,6 @@
 
             } catch (err) {
                 console.error(err);
-                alert("Terjadi kesalahan saat menghapus file.");
             }
         });
 

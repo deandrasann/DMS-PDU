@@ -18,7 +18,7 @@
     <!-- Tombol Upload dengan Dropdown -->
     <div class="dropdown mt-4 mb-2">
     <a href="#"
-       class="shadow p-2 text-decoration-none text-dark border rounded-4 d-flex align-items-center dropdown-toggle"
+       class="shadow p-2 text-decoration-none text-dark border rounded-4 d-flex align-items-center"
        id="uploadDropdown"
        data-bs-toggle="dropdown"
        aria-expanded="false">
@@ -88,7 +88,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true"   data-bs-backdrop="false" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 rounded-4 shadow-lg">
             <div class="modal-header">
