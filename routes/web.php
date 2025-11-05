@@ -2,8 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MySpaceController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return redirect()->route('signin');
@@ -37,10 +38,8 @@ Route::post('/input-code', [AuthController::class, 'verifyCode'])->name('verify.
 Route::get('/resend-code', [AuthController::class, 'resendCode'])->name('resend.code');
 Route::get('/new-password', [AuthController::class, 'showNewPassword'])->name('new.password');
 Route::post('/new-password', [AuthController::class, 'setNewPassword'])->name('set.new.password');
-Route::get('/profile', function () {
-    return response()->json([
-        'fullname' => 'gojo',
-        'email' => 'gojo@examplecom',
-        'avatar_url' => asset('storage/images/default-avatar.png'),
-    ]);
-})->name('user.profile');
+
+Route::patch('/profile/update', [HomeController::class, 'update'])->name('profile.update');
+Route::patch('/profile/password', [HomeController::class, 'updatePassword'])
+    ->name('password.update');
+    

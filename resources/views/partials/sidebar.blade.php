@@ -76,19 +76,19 @@
 
     <!-- Footer -->
     <div class="mt-auto">
-        <a href="#" class="d-flex align-items-center link-dark text-decoration-none"
-            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            <i class="ph ph-sign-out me-2 fs-5"></i>
-            <span class="sidebar-text">Log Out</span>
-        </a>
-        <!-- Hidden Logout Form -->
-        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-            @csrf
-        </form>
+        <a href="#" class="d-flex align-items-center link-dark text-decoration-none" id="logoutLink">
+    <i class="ph ph-sign-out me-2 fs-5"></i>
+    <span class="sidebar-text">Log Out</span>
+</a>
+
+<!-- Hidden Logout Form -->
+<form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+    @csrf
+</form>
     </div>
 </div>
 
-<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" data-bs-backdrop="false" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 rounded-4 shadow-lg">
             <div class="modal-header">
@@ -140,7 +140,47 @@
         </div>
     </div>
 </div>
+<!-- Logout Confirmation Modal -->
+<div class="modal fade" id="logoutConfirmationModal" tabindex="-1" data-bs-backdrop="false" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg" style="background-color: #fff; max-width: 500px;">
+            
+            <!-- Close Button (Kanan Atas) -->
+            <button type="button" 
+                    class="btn-close position-absolute top-0 end-0 mt-3 me-3" 
+                    data-bs-dismiss="modal" aria-label="Close"
+                    style="z-index: 10; font-size: 1.1rem; opacity: 0.7;">
+            </button>
 
+            <div class="modal-body py-4 px-4">
+                <!-- Teks Rata Kiri + Padding Kiri -->
+                <div style="padding-left: 1.75rem;">
+                    <h5 class="fw-bold mb-2 text-start" style="font-size: 1.25rem;">
+                        Are you sure want to leave?
+                    </h5>
+                    <p class="text-muted small mb-4 text-start" style="font-family: Rubik; line-height: 1.5; font-size: 0.875rem;">
+                        You must log in again to access this dashboard.
+                    </p>
+                </div>
+
+                <!-- Tombol: Cancel (kiri) + Log out (kanan) -->
+                <div class="d-flex justify-content-between align-items-center" style="padding-left: 1.75rem; padding-right: 1.5rem;">
+                    <button type="button" 
+                            class="btn btn-outline-secondary rounded-4 px-4 py-2"
+                            data-bs-dismiss="modal"
+                            style="min-width: 100px; font-size: 14px;border-color: #d1d5db; color: #6b7280;">
+                        Cancel
+                    </button>
+                    <button type="button" id="confirmLogoutBtn" 
+                            class="btn btn-danger rounded-4 px-4 py-2 text-white"
+                            style="min-width: 100px; font-size:14px; background-color: #dc3545; border: none;">
+                        Log out
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -166,4 +206,27 @@
             }
         });
     });
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const logoutLink = document.getElementById('logoutLink');
+    const logoutForm = document.getElementById('logout-form');
+    const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+
+    // Buka modal saat klik "Log Out"
+    logoutLink.addEventListener('click', function (e) {
+        e.preventDefault();
+        const modal = new bootstrap.Modal(document.getElementById('logoutConfirmationModal'));
+        modal.show();
+    });
+
+    // Konfirmasi logout → submit form
+    confirmLogoutBtn.addEventListener('click', function () {
+        logoutForm.submit();
+    });
+    document.getElementById('logoutConfirmationModal').addEventListener('click', function (e) {
+        if (e.target === this) {
+            bootstrap.Modal.getInstance(this).hide();
+        }
+    });
+});
 </script>

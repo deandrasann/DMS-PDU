@@ -4,7 +4,7 @@
 <div class="d-flex justify-content-center align-items-center vh-100 bg-light">
     <div class="card shadow-sm p-4 rounded-4" style="max-width: 400px; width: 100%;">
         <div class="text-center mb-3 px-4">
-            <img src="/images/logo.png" alt="Logo" class="img-fluid mb-2" style="max-width: 80px">
+            <img src="storage/images/logo v1.png" alt="Logo" class="img-fluid mb-2" style="max-width: 80px">
             <h4 class="welcome-text py-3">Set Your New Password</h4>
             <p class="desc-text">
                 Please enter and confirm your new password to continue.
