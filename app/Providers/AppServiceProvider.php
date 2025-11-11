@@ -41,34 +41,49 @@ class AppServiceProvider extends ServiceProvider
             $profile = [
                 'fullname' => 'User Default',
                 'email' => 'default@mail.com',
-                'photo' => asset('storage/images/profile-pict.jpg'), // fallback
+                'photo' => asset('storage/images/profile-pict.jpg'),
             ];
 
             if ($token) {
-                try {
-                    $response = Http::withToken($token)->get('http://pdu-dms.my.id/api/user');
+                // PRIORITASKAN SESSION FLASH (setelah update)
+                if (Session::has('new_profile_photo')) {
+                    $profile = [
+                        'photo' => Session::get('new_profile_photo'),
+                        'fullname' => Session::get('user.fullname', 'User'),
+                        'email' => Session::get('user.email', 'user@mail.com'),
+                    ];
+                } else {
+                    try {
+                        $response = Http::withToken($token)->get('http://pdu-dms.my.id/api/user');
+                        if ($response->successful()) {
+                            $data = $response->json('data') ?? $response->json();
 
-                    if ($response->successful()) {
-                        $data = $response->json('data') ?? $response->json();
+                            if (!empty($data['photo_profile_path'])) {
+                                $photoUrl = 'http://pdu-dms.my.id/storage/profile_photos/' . $data['photo_profile_path'];
+                                $photoUrl .= '?t=' . time(); // cache buster
 
-                        if (is_array($data) && !empty($data['photo_profile_path'])) {
-                            // Bangun URL dari path
-                            $photoPath = $data['photo_profile_path'];
-                            $photoUrl = 'http://pdu-dms.my.id/storage/profile_photos/' . $photoPath;
+                                $profile = [
+                                    'fullname' => $data['fullname'] ?? 'Unknown',
+                                    'email' => $data['email'] ?? 'noemail@mail.com',
+                                    'photo' => $photoUrl,
+                                ];
 
-                            // Tambahkan cache buster
-                            $photoUrl .= (strpos($photoUrl, '?') === false ? '?' : '&') . 't=' . time();
-
-                            $profile = [
-                                'fullname' => $data['fullname'] ?? 'Unknown User',
-                                'email' => $data['email'] ?? 'noemail@mail.com',
-                                'photo' => $photoUrl,
-                            ];
+                                // Simpan ke session
+                                Session::put('user', $profile);
+                            }
                         }
+                    } catch (\Exception $e) {
+                        Log::warning('API user profile failed', ['error' => $e->getMessage()]);
                     }
-                } catch (\Exception $e) {
-                    Log::warning('API user profile failed', ['error' => $e->getMessage()]);
                 }
+            }
+            
+            $defaultPhoto = asset('storage/images/profile-pict.jpg') . '?v=' . time();
+
+            if (empty($data['photo_profile_path'])) {
+                $profile['photo'] = $defaultPhoto;
+            } else {
+                $profile['photo'] = 'http://pdu-dms.my.id/storage/profile_photos/' . $data['photo_profile_path'] . '?v=' . time();
             }
 
             $view->with('profile', $profile);

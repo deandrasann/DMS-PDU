@@ -15,7 +15,7 @@
             </div>
 
             <!-- Form Login -->
-            <form method="POST" class="px-4" action="{{ route('signin.process') }}">
+            <form method="POST" class="px-4" action="{{ route('signin.process') }}" id="loginForm">
                 @csrf
                 <div class="mb-3">
                     <div class="input-group">
@@ -43,7 +43,8 @@
                     <a href="/forgot-password" class="small text-muted no-underline">Forgot Password?</a>
                 </div>
 
-                <button type="submit" class="btn btn-orange w-100">Sign In</button>
+                <button type="submit" class="btn btn-orange w-100" id="submitBtn">Sign In</button>
+
             </form>
             @if ($errors->any())
                 <div class="text-danger text-center mt-2">
@@ -61,18 +62,41 @@
 
 @push('scripts')
     <script>
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('password');
-            const icon = this.querySelector('i');
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('loginForm');
+            const submitBtn = document.getElementById('submitBtn');
 
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                icon.classList.remove("ph-eye");
-                icon.classList.add("ph-eye-slash");
-            } else {
-                passwordInput.type = "password";
-                icon.classList.remove("ph-eye-slash");
-                icon.classList.add("ph-eye");
+            if (form && submitBtn) {
+                form.addEventListener('submit', function(e) {
+                    // Cegah submit ganda
+                    if (submitBtn.disabled) return;
+
+                    // Ganti teks + tambah spinner kecil
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = `
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Signing In...
+                `;
+
+                    // Opsional: tambah kelas biar tombol tetap rapi
+                    submitBtn.classList.add('disabled');
+                });
+            }
+
+            // Toggle password (tetap ada)
+            const toggleBtn = document.getElementById('togglePassword');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    const passwordInput = document.getElementById('password');
+                    const icon = this.querySelector('i');
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        icon.classList.replace('ph-eye', 'ph-eye-slash');
+                    } else {
+                        passwordInput.type = 'password';
+                        icon.classList.replace('ph-eye-slash', 'ph-eye');
+                    }
+                });
             }
         });
     </script>

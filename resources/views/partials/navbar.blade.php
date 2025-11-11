@@ -1,4 +1,3 @@
-
 <div class="search-container d-flex flex-row align-items-center w-100 mb-2 ">
     <!-- Search Box -->
     <div class="position-relative w-100">
@@ -79,7 +78,8 @@
                             class="img-fluid w-100 h-100 object-fit-cover">
                     </div>
                     <div>
-                        <div style="font-weight: 500; font-size:20px;">{{ $profile['fullname'] }}</div>
+                        <div style="font-weight: 500; font-size:20px;" class="profile-fullname">
+                            {{ $profile['fullname'] }}</div>
                         <small style="font-size: 16px">{{ $profile['email'] }}</small>
                     </div>
                 </div>
@@ -182,8 +182,8 @@
                                     <div class="col-md-8">
                                         <div class="mb-3">
                                             <label class="form-label">Full Name</label>
-                                            <input type="text" class="form-control bg-light"
-                                                style="font-size: 14px" value="{{ $profile['fullname'] }}" readonly>
+                                            <input type="text" name="fullname" class="form-control bg-light"
+                                                style="font-size: 14px" value="{{ $profile['fullname'] }}" required>
                                         </div>
 
                                         <div class="mb-3">
@@ -222,14 +222,13 @@
 
                         <form id="changePasswordForm" action="{{ route('password.update') }}" method="POST">
                             @csrf
-                            @method('PATCH')
 
                             <!-- Header -->
                             <div class="modal-header border-0 pb-0">
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
+                                    aria-label="Close"></button>
                             </div>
-                            
+
                             <!-- Body -->
                             <div class="modal-body px-4" style="font-family: Rubik;">
                                 <h3 class="modal-title fw-semibold" id="changePasswordLabel">
@@ -246,15 +245,15 @@
                                 <!-- New Password -->
                                 <div class="mb-3" style="padding-left: 2rem;">
                                     <label class="form-label">New Password</label>
-                                    <input type="password" name="password" class="form-control bg-light rounded-3"
-                                        style="height: 44px; font-size: 14px;" placeholder="Enter new password"
-                                        required>
+                                    <input type="password" name="new_password"
+                                        class="form-control bg-light rounded-3" style="height: 44px; font-size: 14px;"
+                                        placeholder="Enter new password" required>
                                 </div>
 
                                 <!-- Confirm New Password -->
                                 <div class="mb-3" style="padding-left: 2rem;">
                                     <label class="form-label">Confirm New Password</label>
-                                    <input type="password" name="password_confirmation"
+                                    <input type="password" name="new_password_confirmation"
                                         class="form-control bg-light rounded-3" style="height: 44px; font-size: 14px;"
                                         placeholder="Confirm new password" required>
                                 </div>
@@ -274,14 +273,25 @@
                                     style="font-size: 14px" data-bs-dismiss="modal">
                                     Cancel
                                 </button>
-                                <button type="submit" class="btn btn-blue rounded-3" style="font-size: 14px">
+                                <button type="submit" id="submitChangePassword" class="btn btn-blue rounded-3"
+                                    style="font-size: 14px">
                                     Change Password
                                 </button>
                             </div>
                         </form>
+                        <form id="logoutForm" action="{{ route('logout') }}" method="POST" style="display:none;">
+                            @csrf
+                        </form>
+
                     </div>
                 </div>
             </div>
+            <!-- Loading Overlay for Auto Logout -->
+            <div id="autoLogoutLoader"
+                style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.35); backdrop-filter:blur(2px); z-index:9999; align-items:center; justify-content:center;">
+                <div class="spinner-border text-light" style="width:3rem; height:3rem;"></div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -380,37 +390,198 @@
     });
 
     // === Konfirmasi hapus setelah klik "Delete" di modal ===
-    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-        // Kosongkan input file
-        photoFileInput.value = '';
+    document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+        try {
+            const response = await fetch('/profile/delete-photo', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                        'content'),
+                    'Accept': 'application/json'
+                },
+                body: new FormData() // agar Laravel mengenali CSRF
+            });
 
-        // Kembali ke foto default
-        profilePreviewModal.src = defaultPhoto;
-        profilePreviewDropdown.src = defaultPhoto;
-        profilePreviewBtn.src = defaultPhoto;
+            const result = await response.json();
 
-        // Tutup modal konfirmasi
-        bootstrap.Modal.getInstance(document.getElementById('deleteConfirmationModal')).hide();
+            if (result.success) {
+                const finalUrl = result.photo_url + '&_=' + Date.now();
+
+                document.querySelectorAll(
+                        '#profilePreviewBtn, #profilePreviewDropdown, #profilePreviewModal')
+                    .forEach(img => img.src = finalUrl);
+
+                bootstrap.Modal.getInstance(
+                    document.getElementById('deleteConfirmationModal')
+                ).hide();
+
+                alert('Profile photo deleted!');
+            } else {
+                alert('Error: ' + result.message);
+            }
+        } catch (err) {
+            alert('Connection error. Try again.');
+            console.error(err);
+        }
     });
 
-    document.getElementById('accountSettingsModal')?.addEventListener('hidden.bs.modal', function () {
+
+    document.getElementById('accountSettingsModal')?.addEventListener('hidden.bs.modal', function() {
         const newUrl = @json(session('new_profile_photo'));
         if (newUrl) {
+            const finalUrl = newUrl + (newUrl.includes('?') ? '&' : '?') + '_=' + Date.now();
             document.querySelectorAll('#profilePreviewBtn, #profilePreviewDropdown, #profilePreviewModal')
-                .forEach(img => {
-                    img.src = newUrl;
-                });
+                .forEach(img => img.src = finalUrl);
         }
     });
 
     // Juga refresh saat halaman di-load (jika ada flash)
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const newUrl = @json(session('new_profile_photo'));
         if (newUrl) {
             document.querySelectorAll('#profilePreviewBtn, #profilePreviewDropdown, #profilePreviewModal')
                 .forEach(img => {
-                    img.src = newUrl;
+                    img.src = finalUrl + '&_=' + new Date().getTime();
                 });
         }
     });
+    document.getElementById('profileUpdateForm').addEventListener('submit', async function(e) {
+        e.preventDefault(); // Cegah submit biasa
+
+        const form = this;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+
+        // Disable tombol
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Saving...';
+
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                        'content'),
+                    'Accept': 'application/json',
+                },
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Update DOM secara real-time
+                document.querySelectorAll(
+                        '#profilePreviewBtn, #profilePreviewDropdown, #profilePreviewModal')
+                    .forEach(img => img.src = result.photo_url + '&_=' + Date.now());
+
+                document.querySelectorAll('.profile-fullname').forEach(el => {
+                    el.textContent = result.fullname;
+                });
+
+                // Tutup modal
+                bootstrap.Modal.getInstance(document.getElementById('accountSettingsModal')).hide();
+
+                // Optional: Tampilkan toast
+                alert('Profile updated successfully!');
+
+            } else {
+                alert('Error: ' + result.message);
+            }
+
+        } catch (error) {
+            console.error('Update failed:', error);
+            alert('Connection error. Please try again.');
+        } finally {
+            // Kembalikan tombol
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    });
+
+    document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const form = this;
+        const formData = new FormData(form);
+        const btn = document.getElementById('submitChangePassword');
+        const originalText = btn.innerHTML;
+
+        // Aktifkan loading
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Processing...`;
+
+        try {
+            const response = await fetch("{{ route('password.update') }}", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                    "Accept": "application/json"
+                },
+                body: formData
+            });
+
+            const result = await response.json();
+
+            // Kembalikan tombol
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+
+            if (result.success) {
+
+                afterPasswordChangedSuccessfully();
+
+            } else {
+                alert(result.message || "Failed to change password");
+            }
+
+        } catch (err) {
+            console.error(err);
+            alert("Server error. Try again.");
+
+            // Reset tombol setelah error
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    });
+
+    // Saat password berhasil diubah
+    function afterPasswordChangedSuccessfully() {
+        // Tutup modal
+        const modalEl = document.getElementById('changePasswordModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+
+        // Tampilkan loading overlay logout
+        const logoutLoader = document.getElementById('autoLogoutLoader');
+        logoutLoader.style.display = "flex";
+
+        // Delay sedikit agar modal benar-benar tertutup
+        setTimeout(() => {
+            autoLogout();
+        }, 600);
+    }
+
+    function autoLogout() {
+        fetch('/api/logout', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(() => {
+                // Bersihkan token
+                localStorage.removeItem('token');
+
+                // Redirect ke login
+                window.location.href = "/signin";
+
+            }).catch(() => {
+                alert("Logout gagal, coba manual.");
+                window.location.href = "/signin";
+            });
+    }
 </script>

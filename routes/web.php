@@ -40,6 +40,6 @@ Route::get('/new-password', [AuthController::class, 'showNewPassword'])->name('n
 Route::post('/new-password', [AuthController::class, 'setNewPassword'])->name('set.new.password');
 
 Route::patch('/profile/update', [HomeController::class, 'update'])->name('profile.update');
-Route::patch('/profile/password', [HomeController::class, 'updatePassword'])
+Route::post('/profile/delete-photo', [HomeController::class, 'deletePhoto'])->name('profile.delete.photo');
+Route::post('/change-password', [HomeController::class, 'updatePassword'])
     ->name('password.update');
-    

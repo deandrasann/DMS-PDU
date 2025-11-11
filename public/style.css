@@ -488,6 +488,11 @@ color: white;
   background-color: #dc3545;
   border: none;
 }
+#autoLogoutLoader {
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
 
 @keyframes shimmer {
     100% {
