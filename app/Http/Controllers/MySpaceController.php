@@ -7,18 +7,70 @@ use Illuminate\Support\Facades\Http;
 
 class MySpaceController extends Controller
 {
-    public function index()
-    {
-        $token = session('token');
+public function index($path = null)
+{
+    $currentPath = $path ?? '';
+    $token = session('token');
+
+    $url = $currentPath
+        ? "http://pdu-dms.my.id/api/my-files/{$currentPath}"
+        : "http://pdu-dms.my.id/api/my-files";
+
+    try {
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->get('http://pdu-dms.my.id/api/files');
+            'Accept' => 'application/json',
+        ])->timeout(30)->get($url);
 
-        $files = $response->json()['files'] ?? [];
+        if (!$response->successful()) {
+            abort($response->status(), 'Failed to fetch files');
+        }
 
-        // dd($files);
-        return view('myspace', compact('files'));
+        $data = $response->json();
+
+        $files = $data['files'] ?? [];
+        $folders = $data['folders'] ?? [];
+        $folder = $data['folder'] ?? null;
+        $ancestors = $data['ancestors'] ?? [];
+
+        // 🔧 Perbaikan breadcrumb:
+        // - Hapus root (biasanya email user)
+        // - Hindari duplikasi folder terakhir
+        $breadcrumb = [];
+
+        foreach ($ancestors as $ancestor) {
+            if (!isset($ancestor['name']) || str_contains($ancestor['name'], '@')) {
+                // skip root user (biasanya email)
+                continue;
+            }
+
+            $breadcrumb[] = [
+                'id' => $ancestor['id'],
+                'name' => $ancestor['name'],
+            ];
+        }
+
+        // Tambahkan folder sekarang hanya jika belum ada di ancestors
+        if (!empty($folder) && (empty($breadcrumb) || end($breadcrumb)['id'] !== $folder['id'])) {
+            $breadcrumb[] = [
+                'id' => $folder['id'],
+                'name' => $folder['name'],
+            ];
+        }
+
+        return view('myspace', [
+            'currentPath' => $currentPath,
+            'token' => $token,
+            'files' => $files,
+            'folders' => $folders,
+            'breadcrumb' => $breadcrumb,
+        ]);
+    } catch (\Exception $e) {
+        abort(500, 'API request failed: ' . $e->getMessage());
     }
+}
+
+
 
 
     public function getFiles(Request $request)
@@ -224,4 +276,5 @@ public function viewFile($fileId)
             ], 500);
         }
     }
+
 }

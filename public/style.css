@@ -164,6 +164,12 @@ font-weight: 100; /* Light */
 font-size: 12px;
 }
 
+.small {
+font-family: 'Rubik', sans-serif;
+font-weight: 100; /* Light */
+font-size: 12px;
+}
+
 .sidebar-collapse-content {
 margin-left: 280px;
 transition: margin-left 0.3s ease;
@@ -315,15 +321,6 @@ display: none;
   backdrop-filter: blur(0px) !important;
 }
 
-.modal.show {
-  z-index: 9999 !important; /* Pastikan di atas semua elemen */
-}
-
-.modal-dialog {
-  z-index: 10000 !important;
-  filter: none !important; /* Hapus efek blur/gelap dari parent */
-}
-
 body.modal-open .sidebar-collapse-content {
   filter: none !important;
   opacity: 1 !important;
@@ -396,4 +393,129 @@ margin-left: 0 !important;
 .content-wrapper {
 margin-top: 80px !important; /* tinggi navbar mobile */
 }
+
+.card {
+  overflow: visible;
 }
+
+/* FIX UNTUK DROPDOWN FOLDER */
+.folder-item {
+    position: relative !important;
+    z-index: 100;
+    overflow: visible !important;
+}
+
+.folder-card {
+    position: relative;
+    overflow: visible !important;
+    z-index: 1;
+}
+
+/* Dropdown menu styling */
+.folder-dropdown-menu {
+    position: absolute !important;
+    z-index: 9999 !important;
+    top: 100% !important;
+    right: 0 !important;
+    left: auto !important;
+    transform: none !important;
+    margin-top: 0.25rem !important;
+    display: none;
+}
+
+.folder-dropdown-menu.show {
+    display: block !important;
+}
+
+/* Pastikan container tidak memotong dropdown */
+#folderContainer {
+    position: relative;
+    z-index: 1;
+    overflow: visible !important;
+}
+
+#fileContainer {
+    position: relative;
+    z-index: 1; /* Turunkan z-index file container */
+}
+
+/* Hilangkan overflow hidden dari parent */
+.bg-light.shadow.rounded-4 {
+    overflow: visible !important;
+}
+
+.container.py-4 {
+    overflow: visible !important;
+    z-index: 1 !important;
+}
+
+.z-3 {
+  z-index: 9999 !important;
+}
+
+/* 1 */
+.text-accent-1 { color: #CB564A; }
+.bg-accent-1 { background-color: #FDDCD9; }
+
+/* 2 */
+.text-accent-2 { color: #763E1A; }
+.bg-accent-2 { background-color: #EBE0D9; }
+
+/* 3 */
+.text-accent-3 { color: #C2825D; }
+.bg-accent-3 { background-color: #FDE9DD; }
+
+/* 4 */
+.text-accent-4 { color: #7762BB; }
+.bg-accent-4 { background-color: #EFEAFF; }
+
+/* 5 */
+.text-accent-5 { color: #BDB470; }
+.bg-accent-5 { background-color: #FCF9DE; }
+
+/* 6 */
+.text-accent-6 { color: #5F92B6; }
+.bg-accent-6 { background-color: #E4F3FE; }
+
+/* 7 */
+.text-accent-7 { color: #CA8499; }
+.bg-accent-7 { background-color: #FCE7ED; }
+
+/* 8 */
+.text-accent-8 { color: #989797; }
+.bg-accent-8 { background-color: #E6E5E3; }
+
+/* 9 */
+.text-accent-9 { color: #8ABB93; }
+.bg-accent-9 { background-color: #EEFEF1; }
+
+/* 10 */
+.text-accent-10 { color: #729D9C; }
+.bg-accent-10 { background-color: #F0EFED; }
+
+/* 11 */
+.text-accent-11 { color: #617418; }
+.bg-accent-11 { background-color: #EEFEF1; }
+
+/* 12 */
+.text-accent-12 { color: #668F68; }
+.bg-accent-12 { background-color: #F3FFC3; }
+
+/* 13 */
+.text-accent-13 { color: #1F5780; }
+.bg-accent-13 { background-color: #DAEBF8; }
+
+}
+
+.dropdown-menu .label-badge {
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.1s ease;
+  border-radius: 50px;
+  font-weight: 500;
+}
+.dropdown-menu .label-badge:hover {
+  transform: scale(1.05);
+  opacity: 0.85;
+}
+
+

@@ -15,6 +15,12 @@ Route::get('/myspace', [MySpaceController::class, 'index'])->name('myspace');
 Route::get('/my-files', [MySpaceController::class, 'getFiles'])->name('my-files');
 Route::get('/files/{fileId}', [MySpaceController::class, 'proxyPdf'])->name('pdf.view');
 Route::get('/file-view/{fileId}', [MySpaceController::class, 'viewFile'])->name('file.view');
+Route::post('/myspace/upload', [MySpaceController::class, 'upload'])->name('myspace.upload');
+Route::get('/myspace/{path?}', [MySpaceController::class, 'index'])
+    ->where('path', '.*')
+    ->name('myspace');
+
+
 
 
 
