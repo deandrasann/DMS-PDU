@@ -161,9 +161,9 @@
 
                     <!-- Buttons -->
                     <div class="d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-light border rounded-3 px-4"
+                        <button type="button" class="btn btn-outline-secondary rounded-3  px-4"
                             data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold">Upload</button>
+                        <button type="submit" class="btn btn-blue rounded-3 px-4 fw-semibold">Upload</button>
                     </div>
                 </form>
             </div>
