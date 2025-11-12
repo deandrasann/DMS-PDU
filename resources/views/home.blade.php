@@ -41,8 +41,12 @@
             <div class="card rounded-4  border-dark-subtle border-1" style="width:200px; background-color:#F2F2F0;">
 
                 <!-- Preview -->
-                <div class="mt-3 mx-2">
-                    <canvas id="pdf-thumb" class="pdf-inner-shadow border rounded"
+                <div class="mt-3 mx-2 position-relative">
+                    <!-- Skeleton Loader -->
+                    <div id="pdf-skeleton" class="skeleton w-100 rounded-2" style="height:150px;"></div>
+
+                    <!-- Canvas PDF -->
+                    <canvas id="pdf-thumb" class="pdf-inner-shadow border rounded d-none"
                         style="border:1px solid #ddd; width:100%; max-width:300px;"></canvas>
                 </div>
                 <!-- Body -->
@@ -243,28 +247,32 @@
     </div>
 
     <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                const url = "{{ asset('storage/dummypdf/UTS PMLD_v2.pdf') }}"; // URL PDF dari storage link
-                const canvas = document.getElementById("pdf-thumb");
-                const context = canvas.getContext("2d");
+        document.addEventListener("DOMContentLoaded", function() {
+            const url = "{{ asset('storage/dummypdf/UTS PMLD_v2.pdf') }}"; // URL PDF dari storage link
+            const canvas = document.getElementById("pdf-thumb");
+            const context = canvas.getContext("2d");
 
-                pdfjsLib.getDocument(url).promise.then(pdf => {
-                    pdf.getPage(1).then(page => {
-                        const viewport = page.getViewport({
-                            scale: 1
-                        });
-                        canvas.width = viewport.width;
-                        canvas.height = viewport.height / 2;
-
-                        page.render({
-                            canvasContext: context,
-                            viewport: viewport
-                        });
+            pdfjsLib.getDocument(url).promise.then(pdf => {
+                pdf.getPage(1).then(page => {
+                    const viewport = page.getViewport({
+                        scale: 1
                     });
-                }).catch(err => {
-                    console.error("Gagal render PDF:", err);
-                    canvas.outerHTML = `<p style="color:red">PDF gagal dimuat</p>`;
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height / 2;
+
+                    page.render({
+                        canvasContext: context,
+                        viewport: viewport
+                    }).promise.then(() => {
+                        // Sembunyikan skeleton dan tampilkan PDF
+                        skeleton.classList.add("d-none");
+                        canvas.classList.remove("d-none");
+                    });
                 });
+            }).catch(err => {
+                console.error("Gagal render PDF:", err);
+                canvas.outerHTML = `<p style="color:red">PDF gagal dimuat</p>`;
             });
+        });
     </script>
 @endsection

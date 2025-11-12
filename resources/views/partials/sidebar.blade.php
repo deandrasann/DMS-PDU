@@ -75,15 +75,15 @@
 
     <!-- Footer -->
     <div class="mt-auto">
-        <a href="#" class="d-flex align-items-center link-dark text-decoration-none"
-            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            <i class="ph ph-sign-out me-2 fs-5"></i>
-            <span class="sidebar-text">Log Out</span>
-        </a>
-        <!-- Hidden Logout Form -->
-        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-            @csrf
-        </form>
+        <a href="#" class="d-flex align-items-center link-dark text-decoration-none" id="logoutLink">
+    <i class="ph ph-sign-out me-2 fs-5"></i>
+    <span class="sidebar-text">Log Out</span>
+</a>
+
+<!-- Hidden Logout Form -->
+<form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+    @csrf
+</form>
     </div>
 </div>
 
@@ -212,7 +212,47 @@
         </div>
     </div>
 </div>
+<!-- Logout Confirmation Modal -->
+<div class="modal fade" id="logoutConfirmationModal" tabindex="-1" data-bs-backdrop="false" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg" style="background-color: #fff; max-width: 500px;">
 
+            <!-- Close Button (Kanan Atas) -->
+            <button type="button"
+                    class="btn-close position-absolute top-0 end-0 mt-3 me-3"
+                    data-bs-dismiss="modal" aria-label="Close"
+                    style="z-index: 10; font-size: 1.1rem; opacity: 0.7;">
+            </button>
+
+            <div class="modal-body py-4 px-4">
+                <!-- Teks Rata Kiri + Padding Kiri -->
+                <div style="padding-left: 1.75rem;">
+                    <h5 class="fw-bold mb-2 text-start" style="font-size: 1.25rem;">
+                        Are you sure want to leave?
+                    </h5>
+                    <p class="text-muted small mb-4 text-start" style="font-family: Rubik; line-height: 1.5; font-size: 0.875rem;">
+                        You must log in again to access this dashboard.
+                    </p>
+                </div>
+
+                <!-- Tombol: Cancel (kiri) + Log out (kanan) -->
+                <div class="d-flex justify-content-between align-items-center" style="padding-left: 1.75rem; padding-right: 1.5rem;">
+                    <button type="button"
+                            class="btn btn-outline-secondary rounded-4 px-4 py-2"
+                            data-bs-dismiss="modal"
+                            style="min-width: 100px; font-size: 14px;border-color: #d1d5db; color: #6b7280;">
+                        Cancel
+                    </button>
+                    <button type="button" id="confirmLogoutBtn"
+                            class="btn btn-danger rounded-4 px-4 py-2 text-white"
+                            style="min-width: 100px; font-size:14px; background-color: #dc3545; border: none;">
+                        Log out
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     document.getElementById("openUploadFolderModal").addEventListener("click", function(e) {
@@ -250,386 +290,28 @@
             }
         });
     });
-    const uploadArea = document.getElementById("uploadArea");
-    const fileInput = document.getElementById("fileInput");
-    const fileNameDisplay = document.getElementById("fileName");
 
-    // Klik area upload → buka file picker
-    uploadArea.addEventListener("click", () => fileInput.click());
+    document.addEventListener("DOMContentLoaded", function () {
+    const logoutLink = document.getElementById('logoutLink');
+    const logoutForm = document.getElementById('logout-form');
+    const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
 
-    // Preview nama file
-    fileInput.addEventListener("change", () => {
-        if (fileInput.files.length > 0) {
-            const fileNames = Array.from(fileInput.files).map(f => f.name).join(", ");
-            fileNameDisplay.textContent = fileNames;
-        }
-    });
-
-    // Efek drag & drop
-    uploadArea.addEventListener("dragover", (e) => {
+    // Buka modal saat klik "Log Out"
+    logoutLink.addEventListener('click', function (e) {
         e.preventDefault();
-        uploadArea.style.borderColor = "#0d6efd";
-        uploadArea.style.backgroundColor = "rgba(13, 110, 253, 0.05)";
+        const modal = new bootstrap.Modal(document.getElementById('logoutConfirmationModal'));
+        modal.show();
     });
 
-    uploadArea.addEventListener("dragleave", () => {
-        uploadArea.style.borderColor = "#dee2e6";
-        uploadArea.style.backgroundColor = "transparent";
+    // Konfirmasi logout → submit form
+    confirmLogoutBtn.addEventListener('click', function () {
+        logoutForm.submit();
     });
-
-    uploadArea.addEventListener("drop", (e) => {
-        e.preventDefault();
-        uploadArea.style.borderColor = "#dee2e6";
-        uploadArea.style.backgroundColor = "transparent";
-
-        fileInput.files = e.dataTransfer.files;
-        const fileNames = Array.from(fileInput.files).map(f => f.name).join(", ");
-        fileNameDisplay.textContent = fileNames;
-    });
-
-    document.getElementById("uploadForm").addEventListener("submit", async function(e) {
-        e.preventDefault();
-
-        const formData = new FormData();
-        const files = fileInput.files;
-        const currentPath = "{{ $currentPath ?? '' }}";
-        const parentId = currentPath ? parseInt(currentPath) : null;
-
-        for (let file of files) {
-            formData.append("files[]", file);
-            formData.append("relative_paths[]", file.name);
-        }
-
-        if (parentId) formData.append("parent_id", parentId);
-
-        const token = localStorage.getItem("token");
-
-        try {
-            const res = await fetch("http://pdu-dms.my.id/api/upload-files", {
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer " + token
-                },
-                body: formData
-            });
-            const result = await res.json();
-            if (!res.ok) throw new Error(result.message);
-            alert(result.message);
-            location.reload();
-        } catch (err) {
-            alert(" Gagal upload: " + err.message);
+    document.getElementById('logoutConfirmationModal').addEventListener('click', function (e) {
+        if (e.target === this) {
+            bootstrap.Modal.getInstance(this).hide();
         }
     });
-
-document.addEventListener("DOMContentLoaded", async () => {
-    const token = localStorage.getItem("token");
-    const labelSelect = document.getElementById("labelSelect");
-    const addLabelBtn = document.getElementById("addLabelBtn");
-    const newLabelContainer = document.getElementById("newLabelContainer");
-    const newLabelInput = document.getElementById("newLabelInput");
-    const saveNewLabelBtn = document.getElementById("saveNewLabelBtn");
-    const labelPreview = document.getElementById("labelPreview");
-
-    // 🎨 Warna background random
-    const labelColors = [
-        "FDDCD9", "EBE0D9", "FDE9DD", "EFEAFF", "FCF9DE",
-        "E4F3FE", "FCE7ED", "E6E5E3", "EEFEF1", "F0EFED",
-        "EEFEF1", "F3FFC3", "DFF3E0", "DAEBF8"
-    ];
-    const getRandomColor = () => labelColors[Math.floor(Math.random() * labelColors.length)];
-
-    // 🟢 Ambil semua label dari API
-    async function loadLabels() {
-        try {
-            const res = await fetch("http://pdu-dms.my.id/api/labels", {
-                headers: { "Authorization": "Bearer " + token }
-            });
-            const data = await res.json();
-            labelSelect.innerHTML = '<option value="">Select Label</option>';
-
-            data.data.forEach(label => {
-                const option = document.createElement("option");
-                option.value = label.id;
-                option.textContent = label.name;
-                labelSelect.appendChild(option);
-            });
-
-            renderLabelPreview(data.data);
-        } catch (err) {
-            console.error("Gagal memuat label:", err);
-        }
-    }
-
-    // 🎨 Map background → text color
-    const colorMap = {
-        "FDDCD9": "#CB564A",
-        "EBE0D9": "#763E1A",
-        "FDE9DD": "#C2825D",
-        "EFEAFF": "#7762BB",
-        "FCF9DE": "#BDB470",
-        "E4F3FE": "#5F92B6",
-        "FCE7ED": "#CA8499",
-        "E6E5E3": "#989797",
-        "EEFEF1": "#8ABB93",
-        "F0EFED": "#729D9C",
-        "F3FFC3": "#668F68",
-        "DFF3E0": "#617418",
-        "DAEBF8": "#1F5780",
-    };
-
-    function renderLabelPreview(labels) {
-        labelPreview.innerHTML = "";
-        labels.forEach(label => {
-            const bgColor = label.color ? `#${label.color}` : "#E6E5E3"; // fallback
-            const textColor = colorMap[label.color] || "#333"; // ambil pasangan dari map
-
-            const div = document.createElement("span");
-            div.classList.add("badge", "rounded-pill", "px-3", "py-2", "small");
-            div.textContent = label.name;
-
-            // langsung apply style inline
-            div.style.backgroundColor = bgColor;
-            div.style.color = textColor;
-            div.style.border = "1px solid " + textColor + "22"; // sedikit border lembut
-
-            labelPreview.appendChild(div);
-        });
-    }
-
-
-
-    // 🔘 Klik tombol Add → tampilkan input label baru
-    addLabelBtn.addEventListener("click", () => {
-        addLabelBtn.classList.add("d-none");
-        newLabelContainer.classList.remove("d-none");
-        newLabelInput.focus();
-    });
-
-    // 💾 Simpan label baru
-    saveNewLabelBtn.addEventListener("click", async () => {
-        const name = newLabelInput.value.trim();
-        if (!name) return alert("Label name cannot be empty");
-
-        const color = getRandomColor();
-        try {
-            const res = await fetch("http://pdu-dms.my.id/api/create-label", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + token
-                },
-                body: JSON.stringify({ name, color })
-            });
-            const result = await res.json();
-
-            if (!res.ok) throw new Error(result.message || "Failed to create label");
-
-            // Refresh labels
-            await loadLabels();
-
-            // Reset input
-            newLabelInput.value = "";
-            newLabelContainer.classList.add("d-none");
-            addLabelBtn.classList.remove("d-none");
-
-            alert("Label added successfully!");
-        } catch (err) {
-            alert("Gagal membuat label: " + err.message);
-        }
-    });
-
-    // Jalankan load awal
-    loadLabels();
 });
-
-// Fungsi untuk mendapatkan parent_id dari URL
-function getParentIdFromUrl() {
-    const currentUrl = window.location.href;
-    const urlParts = currentUrl.split('/');
-
-    // Cari bagian 'myspace' dalam URL
-    const myspaceIndex = urlParts.indexOf('myspace');
-
-    if (myspaceIndex !== -1 && urlParts.length > myspaceIndex + 1) {
-        const potentialId = urlParts[myspaceIndex + 1];
-
-        // Validasi apakah ini angka (ID folder)
-        if (potentialId && !isNaN(potentialId) && potentialId.trim() !== '') {
-            return parseInt(potentialId);
-        }
-    }
-
-    // Jika tidak ada ID setelah 'myspace', return null (root folder)
-    return null;
-}
-
-// Fungsi untuk mendapatkan nama folder berdasarkan ID (opsional)
-async function getFolderNameById(folderId, token) {
-    if (!folderId) return "Root Folder";
-
-    try {
-        const res = await fetch(`http://pdu-dms.my.id/api/folders/${folderId}`, {
-            headers: {
-                "Authorization": "Bearer " + token,
-                "Content-Type": "application/json"
-            }
-        });
-
-        if (res.ok) {
-            const data = await res.json();
-            return data.data.name || `Folder ${folderId}`;
-        }
-    } catch (err) {
-        console.error("Gagal mengambil nama folder:", err);
-    }
-
-    return `Folder ${folderId}`;
-}
-
-// Fungsi untuk membuka modal create folder
-document.getElementById("openUploadFolderModal").addEventListener("click", async function(e) {
-    e.preventDefault();
-    const modal = new bootstrap.Modal(document.getElementById("uploadFolderModal"));
-    const token = localStorage.getItem("token");
-
-    // Reset form saat modal dibuka
-    document.getElementById("createFolderForm").reset();
-    document.getElementById("folderMessage").classList.add("d-none");
-
-    // Dapatkan parent_id dari URL
-    const parentId = getParentIdFromUrl();
-
-    // Update tampilan informasi lokasi
-    const currentLocationEl = document.getElementById("currentLocation");
-    const parentIdDisplayEl = document.getElementById("parentIdDisplay");
-
-    if (parentId) {
-        parentIdDisplayEl.textContent = parentId;
-
-        // Coba ambil nama folder untuk ditampilkan
-        const folderName = await getFolderNameById(parentId, token);
-        currentLocationEl.textContent = folderName;
-    } else {
-        parentIdDisplayEl.textContent = "- (Root)";
-        currentLocationEl.textContent = "Root Folder";
-    }
-
-    modal.show();
-});
-
-// Fungsi untuk membuat folder baru
-document.getElementById("createFolderBtn").addEventListener("click", async function() {
-    const folderName = document.getElementById("folderName").value.trim();
-    const messageDiv = document.getElementById("folderMessage");
-    const token = localStorage.getItem("token");
-
-    // Validasi input
-    if (!folderName) {
-        showMessage("Please enter a folder name", "danger");
-        return;
-    }
-
-    // Dapatkan parent_id dari URL
-    const parentId = getParentIdFromUrl();
-
-    // Siapkan data untuk API
-    const folderData = {
-        name: folderName
-    };
-
-    // Tambahkan parent_id jika ada
-    if (parentId) {
-        folderData.parent_id = parentId;
-    }
-
-    try {
-        // Tampilkan loading state
-        this.disabled = true;
-        this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
-
-        // Kirim request ke API
-        const res = await fetch("http://pdu-dms.my.id/api/create-folder", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token
-            },
-            body: JSON.stringify(folderData)
-        });
-
-        const result = await res.json();
-
-        if (res.ok) {
-            // Success
-            showMessage("Folder created successfully!", "success");
-
-            // Reset form setelah beberapa detik dan tutup modal
-            setTimeout(() => {
-                document.getElementById("createFolderForm").reset();
-                bootstrap.Modal.getInstance(document.getElementById("uploadFolderModal")).hide();
-
-                // Refresh halaman untuk menampilkan folder baru
-                location.reload();
-            }, 1500);
-        } else {
-            // Error dari server
-            throw new Error(result.message || "Failed to create folder");
-        }
-    } catch (err) {
-        console.error("Error creating folder:", err);
-        showMessage("Failed to create folder: " + err.message, "danger");
-    } finally {
-        // Reset button state
-        this.disabled = false;
-        this.innerHTML = "Create Folder";
-    }
-});
-
-// Fungsi untuk menampilkan pesan feedback
-function showMessage(message, type) {
-    const messageDiv = document.getElementById("folderMessage");
-    messageDiv.textContent = message;
-    messageDiv.className = `alert alert-${type} mt-3`;
-    messageDiv.classList.remove("d-none");
-
-    // Auto hide setelah 5 detik untuk pesan success
-    if (type === "success") {
-        setTimeout(() => {
-            messageDiv.classList.add("d-none");
-        }, 5000);
-    }
-}
-
-// Submit form dengan tombol Enter
-document.getElementById("folderName").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") {
-        e.preventDefault();
-        document.getElementById("createFolderBtn").click();
-    }
-});
-
-// Fungsi untuk menampilkan pesan feedback
-function showMessage(message, type) {
-    const messageDiv = document.getElementById("folderMessage");
-    messageDiv.textContent = message;
-    messageDiv.className = `alert alert-${type} mt-3`;
-    messageDiv.classList.remove("d-none");
-
-    // Auto hide setelah 5 detik untuk pesan success
-    if (type === "success") {
-        setTimeout(() => {
-            messageDiv.classList.add("d-none");
-        }, 5000);
-    }
-}
-
-// Submit form dengan tombol Enter
-document.getElementById("folderName").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") {
-        e.preventDefault();
-        document.getElementById("createFolderBtn").click();
-    }
-});
-
 </script>
 

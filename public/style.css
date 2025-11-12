@@ -372,7 +372,6 @@ border-color: #fd7e14 !important;
 background-color: rgba(253, 126, 20, 0.05) !important;
 }
 
-
 .btn-blue{
 border-radius: 12px;
 background: #3B82F6;
@@ -380,7 +379,123 @@ box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.10);
 backdrop-filter: blur(8px);
 color: white;
 }
+.modal-content {
+    background-color: #fff !important;
+    /* atau warna lain */
+    opacity: 1 !important;
+}
 
+/* Efek shimmer skeleton */
+.skeleton {
+    position: relative;
+    overflow: hidden;
+    background: #e0e0e0;
+}
+
+.skeleton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    animation: shimmer 1.5s infinite;
+}
+#logoutConfirmationModal {
+  z-index: 1060 !important;
+}
+.account-btn {
+  transition: background-color 0.2s ease;
+}
+
+.account-btn:hover, .account-btn:active {
+  background-color: #E6E6E4 !important;
+}
+.modal-backdrop.show {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  /* hanya latar belakang yang gelap */
+  opacity: 1 !important;
+  z-index: 1040 !important;
+  /* backdrop di bawah modal */
+}
+
+/* Pastikan modal selalu lebih tinggi dari backdrop */
+.modal {
+  z-index: 1050 !important;
+}
+
+/* Pastikan modal tetap cerah dan tidak ikut meredup */
+.modal-content {
+  background-color: #ffffff !important;
+  filter: none !important;
+  opacity: 1 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-radius: 1rem;
+}
+
+.modal-content {
+  padding-top: 0 !important;
+}
+
+.modal-body,
+.modal-footer {
+  padding-left: 1rem !important;
+  padding-right: 3rem !important;
+}
+
+.modal-title {
+  padding-left: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.modal-content .btn {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  outline: none !important;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+/* Efek saat hover */
+.modal-content .btn:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Efek saat ditekan */
+.modal-content .btn:active {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  transform: translateY(0);
+}
+#profilePreviewModal,
+#profilePreviewDropdown,
+#profilePreviewBtn {
+  transition: all 0.3s ease;
+}
+
+#deleteConfirmationModal .modal-content {
+  border-radius: 1rem;
+}
+
+#deleteConfirmationModal .btn {
+  min-width: 90px;
+}
+
+#deleteConfirmationModal .btn-danger {
+  background-color: #dc3545;
+  border: none;
+}
+#autoLogoutLoader {
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes shimmer {
+    100% {
+        left: 100%;
+    }
+}
 .dropdown:hover .dropdown-menu {
     display: block;
     margin-top: 0;

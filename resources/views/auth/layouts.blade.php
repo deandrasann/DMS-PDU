@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
         rel="stylesheet">
     <link rel="icon" href="{{ asset('favicon.png') }}" type="image/x-icon">
-    <link href="{{ asset('style.css') }}" rel="stylesheet">
+    {{-- <link href="{{ asset('style.css') }}" rel="stylesheet"> --}}
     <link href="{{ asset('css/auth.css') }}" rel="stylesheet">
 </head>
 
