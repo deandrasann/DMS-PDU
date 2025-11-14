@@ -17,7 +17,7 @@
                     </li>
                 @else
                     <li class="breadcrumb-item">
-                        <a href="{{ route('myspace-subfolder', ['path' => $crumb['id']]) }}" class="text-dark text-decoration-none">
+                        <a href="{{ route('myspace.subfolder', ['path' => $crumb['id']]) }}" class="text-dark text-decoration-none">
                             {{ $crumb['name'] }}
                         </a>
                     </li>
@@ -290,6 +290,7 @@
             }
         }
 
+        // Event listener untuk delete file
         document.addEventListener("click", async function(e) {
             const btn = e.target.closest(".delete-btn");
             if (!btn) return;
@@ -327,6 +328,7 @@
             }
         });
 
+        // Event listener untuk download file
         document.addEventListener("click", async function(e) {
             const btn = e.target.closest(".download-btn");
             if (!btn) return;

@@ -7,73 +7,70 @@ use Illuminate\Support\Facades\Http;
 
 class MySpaceController extends Controller
 {
-public function index($path = null)
-{
-    $currentPath = $path ?? '';
-    $token = session('token');
+ public function index($path = '')
+    {
+        $currentPath = $path;
+        $token = session('token');
 
-    $url = $currentPath
-        ? "http://pdu-dms.my.id/api/my-files/{$currentPath}"
-        : "http://pdu-dms.my.id/api/my-files";
+        // PERBAIKAN: Gunakan HTTPS dan handle path dengan benar
+        $url = $currentPath
+            ? "https://pdu-dms.my.id/api/my-files/{$currentPath}"
+            : "https://pdu-dms.my.id/api/my-files";
 
-    try {
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-            'Accept' => 'application/json',
-        ])->timeout(30)->get($url);
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/json',
+            ])->timeout(30)->get($url);
 
-        if (!$response->successful()) {
-            abort($response->status(), 'Failed to fetch files');
-        }
-
-        $data = $response->json();
-
-        $files = $data['files'] ?? [];
-        $folders = $data['folders'] ?? [];
-        $folder = $data['folder'] ?? null;
-        $ancestors = $data['ancestors'] ?? [];
-
-        // 🔧 Perbaikan breadcrumb:
-        // - Hapus root (biasanya email user)
-        // - Hindari duplikasi folder terakhir
-        $breadcrumb = [];
-
-        foreach ($ancestors as $ancestor) {
-            if (!isset($ancestor['name']) || str_contains($ancestor['name'], '@')) {
-                // skip root user (biasanya email)
-                continue;
+            if (!$response->successful()) {
+                abort($response->status(), 'Failed to fetch files');
             }
 
-            $breadcrumb[] = [
-                'id' => $ancestor['id'],
-                'name' => $ancestor['name'],
-            ];
-        }
+            $data = $response->json();
 
-        // Tambahkan folder sekarang hanya jika belum ada di ancestors
-        if (!empty($folder) && (empty($breadcrumb) || end($breadcrumb)['id'] !== $folder['id'])) {
-            $breadcrumb[] = [
-                'id' => $folder['id'],
-                'name' => $folder['name'],
-            ];
-        }
+            $files = $data['files'] ?? [];
+            $folders = $data['folders'] ?? [];
+            $folder = $data['folder'] ?? null;
+            $ancestors = $data['ancestors'] ?? [];
 
-        return view('myspace', [
-            'currentPath' => $currentPath,
-            'token' => $token,
-            'files' => $files,
-            'folders' => $folders,
-            'breadcrumb' => $breadcrumb,
-        ]);
-    } catch (\Exception $e) {
-        abort(500, 'API request failed: ' . $e->getMessage());
+            // Breadcrumb logic
+            $breadcrumb = [];
+
+            foreach ($ancestors as $ancestor) {
+                if (!isset($ancestor['name']) || str_contains($ancestor['name'], '@')) {
+                    continue;
+                }
+
+                $breadcrumb[] = [
+                    'id' => $ancestor['id'],
+                    'name' => $ancestor['name'],
+                ];
+            }
+
+            // Tambahkan folder sekarang hanya jika belum ada di ancestors
+            if (!empty($folder) && (empty($breadcrumb) || end($breadcrumb)['id'] !== $folder['id'])) {
+                $breadcrumb[] = [
+                    'id' => $folder['id'],
+                    'name' => $folder['name'],
+                ];
+            }
+
+            return view('myspace', [
+                'currentPath' => $currentPath,
+                'token' => $token,
+                'files' => $files,
+                'folders' => $folders,
+                'breadcrumb' => $breadcrumb,
+            ]);
+        } catch (\Exception $e) {
+            abort(500, 'API request failed: ' . $e->getMessage());
+        }
     }
-}
 
 
 
-
-    public function getFiles(Request $request)
+   public function getFiles(Request $request)
     {
         $token = $request->bearerToken();
 
@@ -88,7 +85,7 @@ public function index($path = null)
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/json',
-            ])->timeout(30)->get('http://pdu-dms.my.id/api/my-files/');
+            ])->timeout(30)->get('https://pdu-dms.my.id/api/my-files/');
 
             if ($response->successful()) {
                 return response()->json($response->json());
@@ -108,24 +105,20 @@ public function index($path = null)
     }
 
 
-    public function proxyPdf(Request $request, $fileId)
+     public function proxyPdf(Request $request, $fileId)
     {
         $token = session('token') ?? $request->bearerToken();
 
         if (!$token) {
-            dd(session('token'));
-
             return response()->json(['error' => 'Unauthorized: No token found'], 401);
-
         }
-
 
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
             ])
             ->timeout(30)
-            ->get("http://pdu-dms.my.id/api/view-file/{$fileId}");
+            ->get("https://pdu-dms.my.id/api/view-file/{$fileId}");
 
             if ($response->successful()) {
                 return response($response->body(), 200)
@@ -149,46 +142,41 @@ public function index($path = null)
     }
 
 public function viewFile($fileId)
-{
-    $token = session('token') ?? request()->bearerToken();
+    {
+        $token = session('token') ?? request()->bearerToken();
 
-    if (!$token) {
-        abort(401, 'Unauthorized');
-    }
-
-    try {
-        $listResponse = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->timeout(30)->get("http://pdu-dms.my.id/api/my-files");
-
-        if (!$listResponse->successful()) {
-            abort(404, 'Cannot fetch files list');
+        if (!$token) {
+            abort(401, 'Unauthorized');
         }
 
-        $json = $listResponse->json();
+        try {
+            $listResponse = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $token,
+            ])->timeout(30)->get("https://pdu-dms.my.id/api/my-files");
 
-        // ✅ Ambil hanya bagian 'files' (isi daftar file sebenarnya)
-        $files = $json['files'] ?? [];
+            if (!$listResponse->successful()) {
+                abort(404, 'Cannot fetch files list');
+            }
 
-        // 🔍 Cari file berdasarkan ID
-        $fileData = collect($files)->firstWhere('id', (int) $fileId);
+            $json = $listResponse->json();
+            $files = $json['files'] ?? [];
 
-        if (!$fileData) {
-            abort(404, 'File not found');
+            $fileData = collect($files)->firstWhere('id', (int) $fileId);
+
+            if (!$fileData) {
+                abort(404, 'File not found');
+            }
+
+            return view('file-view', [
+                'fileId' => $fileId,
+                'file' => $fileData,
+                'token' => $token,
+            ]);
+
+        } catch (\Exception $e) {
+            abort(500, 'Failed to load file: ' . $e->getMessage());
         }
-
-        // ✅ Kirim ke view
-        return view('file-view', [
-            'fileId' => $fileId,
-            'file' => $fileData, // ubah ke 'file' biar sama dengan Blade kamu
-            'token' => $token,
-        ]);
-
-    } catch (\Exception $e) {
-        abort(500, 'Failed to load file: ' . $e->getMessage());
     }
-}
-
 
 
 
