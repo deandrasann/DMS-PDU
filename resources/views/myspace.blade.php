@@ -70,7 +70,7 @@
 
             try {
 
-                const baseUrl = "http://pdu-dms.my.id/api/my-files";
+                const baseUrl = "https://pdu-dms.my.id/api/my-files";
                 const url = currentPath ? `${baseUrl}/${currentPath}` : baseUrl;
 
                 const response = await fetch(url, {
@@ -328,7 +328,7 @@ if (folders.length === 0) {
             if (!confirm("Yakin mau hapus file ini?")) return;
 
             try {
-                const response = await fetch("http://pdu-dms.my.id/api/delete-file", {
+                const response = await fetch("https://pdu-dms.my.id/api/delete-file", {
                     method: "DELETE",
                     headers: {
                         "Accept": "application/json",
@@ -370,7 +370,7 @@ if (folders.length === 0) {
             }
 
             try {
-                const response = await fetch(`http://pdu-dms.my.id/api/view-file/${fileId}`, {
+                const response = await fetch(`https://pdu-dms.my.id/api/view-file/${fileId}`, {
                     method: "GET",
                     headers: {
                         "Authorization": "Bearer " + token,
@@ -452,7 +452,7 @@ document.addEventListener("click", async function(e) {
     if (!confirm(`Yakin mau menghapus folder "${folderName}"?`)) return;
 
     try {
-        const response = await fetch("http://pdu-dms.my.id/api/delete-folder", {
+        const response = await fetch("https://pdu-dms.my.id/api/delete-folder", {
             method: "DELETE",
             headers: {
                 "Accept": "application/json",
@@ -512,7 +512,7 @@ document.addEventListener("click", async function (e) {
         btn.disabled = true;
 
         // === STEP 1: Panggil endpoint /api/download untuk dapatkan URL zip ===
-        const response1 = await fetch("http://pdu-dms.my.id/api/download", {
+        const response1 = await fetch("https://pdu-dms.my.id/api/download", {
             method: "POST",
             headers: {
                 "Authorization": "Bearer " + token,

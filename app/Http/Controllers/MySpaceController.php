@@ -209,7 +209,7 @@ public function viewFile($fileId)
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/json',
-            ])->timeout(30)->get("http://pdu-dms.my.id/api/files/{$fileId}");
+            ])->timeout(30)->get("https://pdu-dms.my.id/api/files/{$fileId}");
 
             if ($response->successful()) {
                 $fileData = $response->json();
