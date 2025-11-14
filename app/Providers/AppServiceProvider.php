@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (config('app.env') === 'production') {
+        URL::forceScheme('https');
+    }
         View::composer('*', function ($view) {
             $token = Session::get('token');
             $user = null;
@@ -77,7 +81,7 @@ class AppServiceProvider extends ServiceProvider
                     }
                 }
             }
-            
+
             $defaultPhoto = asset('storage/images/profile-pict.jpg') . '?v=' . time();
 
             if (empty($data['photo_profile_path'])) {
