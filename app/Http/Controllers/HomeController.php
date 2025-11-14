@@ -42,7 +42,7 @@ class HomeController extends Controller
             $http = $http->attach('_method', 'PATCH');
 
             // POST tanpa payload kedua
-            $response = $http->post('http://pdu-dms.my.id/api/update-profile');
+            $response = $http->post('https://pdu-dms.my.id/api/update-profile');
 
             Log::info('Profile Update API', [
                 'status' => $response->status(),
@@ -55,7 +55,7 @@ class HomeController extends Controller
                 $newPath = $json['data']['photo_profile_path'] ?? null;
 
                 $newPhotoUrl = $newPath
-                    ? 'http://pdu-dms.my.id/storage/profile_photos/' . $newPath . '?v=' . time()
+                    ? 'https://pdu-dms.my.id/storage/profile_photos/' . $newPath . '?v=' . time()
                     : asset('storage/images/profile-pict.jpg') . '?v=' . time();
 
                 $fullname = $request->fullname;
@@ -94,7 +94,7 @@ class HomeController extends Controller
         try {
             // Request ke API backend
             $response = Http::withToken($token)->post(
-                'http://pdu-dms.my.id/api/delete-photo-profile'
+                'https://pdu-dms.my.id/api/delete-photo-profile'
             );
 
             if ($response->successful()) {
@@ -136,7 +136,7 @@ class HomeController extends Controller
         }
 
         try {
-            $response = Http::withToken($token)->post('http://pdu-dms.my.id/api/change-password', [
+            $response = Http::withToken($token)->post('https://pdu-dms.my.id/api/change-password', [
                 'current_password' => $request->current_password,
                 'new_password' => $request->new_password,
                 'new_password_confirmation' => $request->new_password_confirmation,
