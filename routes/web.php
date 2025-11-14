@@ -19,7 +19,7 @@ Route::get('/file-view/{fileId}', [MySpaceController::class, 'viewFile'])->name(
 Route::post('/myspace/upload', [MySpaceController::class, 'upload'])->name('myspace.upload');
 Route::get('/myspace/{path?}', [MySpaceController::class, 'index'])
     ->where('path', '.*')
-    ->name('myspace');
+    ->name('myspace-subfolder');
 
 
 
