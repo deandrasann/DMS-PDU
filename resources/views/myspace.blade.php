@@ -3,44 +3,40 @@
 @section('title', 'My Space')
 
 @section('content')
-@php
-    $segments = array_filter(explode('/', $currentPath));
-    $accum = '';
-@endphp
-@if (!empty($breadcrumb) && request()->path() !== 'myspace')
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            @foreach ($breadcrumb as $crumb)
-                @if ($loop->last)
-                    <li class="breadcrumb-item active text-dark">
-                        {{ $crumb['name'] }}
-                    </li>
-                @else
-                    <li class="breadcrumb-item">
-                        <a href="{{ url('myspace/' . $crumb['id']) }}" class="text-dark text-decoration-none">
+    @php
+        $segments = array_filter(explode('/', $currentPath));
+        $accum = '';
+    @endphp
+    @if (!empty($breadcrumb) && request()->path() !== 'myspace')
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                @foreach ($breadcrumb as $crumb)
+                    @if ($loop->last)
+                        <li class="breadcrumb-item active text-dark">
                             {{ $crumb['name'] }}
-                        </a>
-                    </li>
-                @endif
-            @endforeach
-        </ol>
-    </nav>
-@endif
-
-
-
-
+                        </li>
+                    @else
+                        <li class="breadcrumb-item">
+                            <a href="{{ url('myspace/' . $crumb['id']) }}" class="text-dark text-decoration-none">
+                                {{ $crumb['name'] }}
+                            </a>
+                        </li>
+                    @endif
+                @endforeach
+            </ol>
+        </nav>
+    @endif
 
     <div class="container py-4">
 
         {{-- ========== SECTION: MY FOLDERS ========== --}}
-        <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4 z-3" style="z-index: 9999 !important;">
+        <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4">
             <h4 class="fw-semibold mb-4">My Folders</h4>
             <div id="folderContainer" class="row g-3"></div>
         </div>
 
         {{-- ========== SECTION: MY FILES ========== --}}
-        <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4 z-n1">
+        <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4">
             <h4 class="fw-semibold mb-4">My Files</h4>
             <div id="fileContainer" class="row g-3 ms-1 me-2"></div>
         </div>
@@ -60,6 +56,7 @@
 
     <script>
         // Set PDF.js worker path
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
         document.addEventListener("DOMContentLoaded", async () => {
             const folderContainer = document.getElementById("folderContainer");
@@ -69,7 +66,6 @@
             const emptyTemplate = document.getElementById("empty-template").content.cloneNode(true);
 
             try {
-
                 const baseUrl = "http://pdu-dms.my.id/api/my-files";
                 const url = currentPath ? `${baseUrl}/${currentPath}` : baseUrl;
 
@@ -79,7 +75,6 @@
                     }
                 });
 
-
                 if (!response.ok) throw new Error("Gagal memuat data");
                 const data = await response.json();
 
@@ -87,63 +82,76 @@
                 const files = data.files.filter(f => !f.is_folder);
 
                 // ===== Render Folders =====
-                // ===== Render Folders =====
-if (folders.length === 0) {
-    const empty = emptyTemplate.cloneNode(true);
-    empty.querySelector("i").className = "ph ph-folder-open";
-    empty.querySelector("p").textContent = "Create a folder to get organized";
-    folderContainer.appendChild(empty);
-} else {
-    folders.forEach(folder => {
-        const col = document.createElement("div");
-        col.className = "col-6 col-sm-4 col-md-3 col-lg-2 folder-item";
-        col.innerHTML = `
-            <div class="position-relative">
-                <div class="folder-card" style="cursor: pointer;">
-                    <img src="{{ asset('storage/images/folder.svg') }}" alt="Folder" class="img-fluid w-100 h-100 object-fit-contain" style="min-height: 100px; min-width:120px">
-                    <div class="position-absolute top-0 start-0 p-2 p-sm-3 w-100 h-100 d-flex flex-column justify-content-between">
-                        <div>
-                            <p class="fw-normal mt-2 mb-0 text-truncate" title="${folder.name}">${folder.name}</p>
-                            <small class="fw-light">${folder.size}</small>
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button class="btn btn-link ms-auto text-dark p-0 folder-dropdown-btn"
-                                    data-folder-id="${folder.id}"
-                                    data-folder-name="${folder.name}">
-                                <i class="ph ph-dots-three-vertical fs-5 text-muted"></i>
-                            </button>
-                            <ul class="dropdown-menu folder-dropdown-menu" style="z-index:9999 !important">
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center gap-2 folder-open-btn"
-                                       href="/myspace/${folder.id}">
-                                        <i class="ph ph-arrow-up-right fs-5"></i> Open
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center gap-2 folder-download-btn"
-                                       href="#"
-                                       data-id="${folder.id}"
-                                       data-name="${folder.name}">
-                                        <i class="ph ph-download fs-5"></i> Download
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item text-danger d-flex align-items-center gap-2 folder-delete-btn"
-                                       href="#"
-                                       data-id="${folder.id}"
-                                       data-name="${folder.name}">
-                                        <i class="ph ph-trash fs-5"></i> Delete
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
+                if (folders.length === 0) {
+                    const empty = emptyTemplate.cloneNode(true);
+                    empty.querySelector("i").className = "ph ph-folder-open";
+                    empty.querySelector("p").textContent = "Create a folder to get organized";
+                    folderContainer.appendChild(empty);
+                } else {
+                    // GANTI DENGAN YANG INI - PAKAI BOOTSTRAP
+                    folders.forEach(folder => {
+                        const col = document.createElement("div");
+                        col.className = "col-6 col-sm-4 col-md-3 col-lg-2 folder-item";
+                        col.innerHTML = `
+           <div class="position-relative">
+        <div class="folder-card" style="cursor: pointer;">
+            <img src="{{ asset('storage/images/folder.svg') }}" alt="Folder" class="img-fluid w-100 h-100 object-fit-contain" style="min-height: 100px; min-width:120px">
+            <div class="position-absolute top-0 start-0 p-2 p-sm-3 w-100 h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <p class="fw-normal mt-2 mb-0 text-truncate" title="${folder.name}">${folder.name}</p>
+                    <small class="fw-light">${folder.size}</small>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <div class="dropdown folder-dropdown">
+                        <button class="btn btn-link ms-auto text-dark p-0"
+                                data-bs-toggle="dropdown"
+                                data-bs-display="static"
+                                onclick="event.stopPropagation()">
+                            <i class="ph ph-dots-three-vertical fs-6 text-muted"></i>
+                        </button>
+                        <ul class="dropdown-menu shadow rounded-3 border-0 p-2">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2"
+                                   href="/myspace/${folder.id}">
+                                    <i class="ph ph-arrow-up-right fs-5"></i> Open
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2 folder-download-btn"
+                                   href="#"
+                                   data-id="${folder.id}"
+                                   data-name="${folder.name}">
+                                    <i class="ph ph-download fs-5"></i> Download
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-danger d-flex align-items-center gap-2 folder-delete-btn"
+                                   href="#"
+                                   data-id="${folder.id}"
+                                   data-name="${folder.name}">
+                                    <i class="ph ph-trash fs-5"></i> Delete
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
-        `;
-        folderContainer.appendChild(col);
-    });
-}
+        </div>
+    </div>
+`;
+                        folderContainer.appendChild(col);
+                        setTimeout(() => {
+    const dropdown = col.querySelector('.folder-dropdown');
+    const dropdownMenu = col.querySelector('.folder-dropdown .dropdown-menu');
+
+    if (dropdown) dropdown.style.zIndex = '10050';
+    if (dropdownMenu) {
+        dropdownMenu.style.zIndex = '10051';
+        dropdownMenu.style.minWidth = '160px';
+    }
+}, 0);
+                    });
+                }
 
                 // ===== Render Files =====
                 if (files.length === 0) {
@@ -152,16 +160,16 @@ if (folders.length === 0) {
                     empty.querySelector("p").textContent = "Upload your first file to begin";
                     fileContainer.appendChild(empty);
                 } else {
-                    // Render semua file terlebih dahulu
                     files.forEach(file => {
                         const card = document.createElement("div");
+                        const locationPath = generateLocationPath();
+                        const uploadDate = formatUploadDate(file.created_at);
                         card.className = "card rounded-4 border-dark-subtle border-1 me-3 file-card";
                         card.style.width = "180px";
                         card.style.height = "220px";
                         card.style.backgroundColor = "#F2F2F0";
-                        card.style.cursor = "pointer"; // Tambahkan cursor pointer
+                        card.style.cursor = "pointer";
 
-                        // Tentukan ikon berdasarkan tipe file
                         let fileIcon = "ph-file";
                         let fileType = "File";
 
@@ -182,18 +190,17 @@ if (folders.length === 0) {
                             }
                         }
 
-                        // Tentukan URL untuk membuka file
                         const openUrl = file.mime && file.mime.includes('pdf') ?
                             `/files/${file.id}` :
                             `/file-view/${file.id}`;
 
                         card.innerHTML = `
-                    <div class="mt-3 mx-2 preview-container" style="height: 120px;">
-                        <div id="preview-${file.id}" class="d-flex justify-content-center align-items-center h-100 w-100">
-                            <i class="ph ${fileIcon} fs-1 text-muted"></i>
-                        </div>
+                <div class="mt-3 mx-2 preview-container" style="height: 120px;">
+                    <div id="preview-${file.id}" class="d-flex justify-content-center align-items-center h-100 w-100">
+                        <i class="ph ${fileIcon} fs-1 text-muted"></i>
                     </div>
-                   <div class="card-body p-2">
+                </div>
+               <div class="card-body p-2">
     <div class="d-flex align-items-center mb-1">
         <i class="ph ${fileIcon} me-2 text-dark"></i>
         <span class="fw-semibold text-truncate small" title="${file.name}">${file.name}</span>
@@ -204,10 +211,11 @@ if (folders.length === 0) {
         <div class="dropdown z-3">
             <button class="btn btn-link ms-auto text-dark p-0 z-3"
                     data-bs-toggle="dropdown"
-                    data-bs-display="static">
+                    data-bs-display="static"
+                    onclick="event.stopPropagation()">
                 <i class="ph ph-dots-three-vertical fs-6 text-muted z-3"></i>
             </button>
-            <ul class="dropdown-menu shadow rounded-3 border-0 p-2 z-3">
+            <ul class="dropdown-menu shadow rounded-3 border-0 p-2 z-3" style="min-width: 200px;">
                 <li>
                     <a class="dropdown-item d-flex align-items-center gap-2"
                        href="${openUrl}"
@@ -223,6 +231,54 @@ if (folders.length === 0) {
                     <i class="ph ph-download fs-5"></i> Download
                     </a>
                 </li>
+                <li class="dropdown-submenu position-relative">
+                    <a class="dropdown-item d-flex align-items-center gap-2 info-btn"
+                       href="#"
+                       data-file-id="${file.id}">
+                        <i class="ph ph-info fs-5"></i> Info
+                    </a>
+                    <div class="file-info-panel" style="display: none; position: absolute; left: 100%; top: 0; width: 320px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #e9ecef;">
+                        <div class="p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="fw-semibold mb-0">File Informations</h6>
+                                <button type="button" class="btn-close close-info-panel" style="font-size: 0.7rem;"></button>
+                            </div>
+
+                            <div class="file-details">
+                                <div class="detail-item mb-2">
+                                    <label class="text-muted small fw-semibold mb-1">Title</label>
+                                    <p class="mb-0 fw-medium text-truncate">${file.name}</p>
+                                </div>
+
+
+                                        <div class="detail-item mb-2">
+                                            <label class="text-muted small fw-semibold mb-1">Type</label>
+                                            <p class="mb-0 fw-medium">${fileType}</p>
+                                        </div>
+
+
+                                        <div class="detail-item mb-2">
+                                            <label class="text-muted small fw-semibold mb-1">Size</label>
+                                            <p class="mb-0 fw-medium">${file.size}</p>
+                                        </div>
+
+
+
+                                <div class="detail-item mb-2">
+                                    <label class="text-muted small fw-semibold mb-1">Location</label>
+                                    <p class="mb-0 fw-medium upload-date">${uploadDate}</p>
+                                </div>
+
+                                <div class="detail-item mb-2">
+                                    <label class="text-muted small fw-semibold mb-1">Upload Date</label>
+                                    <p class="mb-0 fw-medium location-path">${locationPath}</p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li><hr class="dropdown-divider"></li>
                 <li>
                     <a href="#"
                     class="dropdown-item text-danger d-flex align-items-center gap-2 delete-btn"
@@ -236,11 +292,13 @@ if (folders.length === 0) {
 </div>
                 `;
 
-                        // Tambahkan event listener untuk klik card
                         card.addEventListener('click', (e) => {
-                            // Cegah event bubbling jika yang diklik adalah dropdown
-                            if (e.target.closest('.dropdown') || e.target.closest(
-                                    '.dropdown-menu')) {
+                            if (e.target.closest('.dropdown') ||
+                                e.target.closest('.dropdown-menu') ||
+                                e.target.closest('.delete-btn') ||
+                                e.target.closest('.download-btn') ||
+                                e.target.closest('.info-btn') ||
+                                e.target.closest('.file-info-panel')) {
                                 return;
                             }
                             window.open(openUrl, '_blank');
@@ -248,7 +306,6 @@ if (folders.length === 0) {
 
                         fileContainer.appendChild(card);
 
-                        // Jika file PDF, render preview-nya
                         if (file.mime && file.mime.includes("pdf") && file.url) {
                             renderPDFPreview(file.url, `preview-${file.id}`, token);
                         }
@@ -267,10 +324,8 @@ if (folders.length === 0) {
             const container = document.getElementById(containerId);
 
             try {
-                // Tambahkan loading indicator
                 container.innerHTML = '<div class="spinner-border spinner-border-sm text-primary" role="status"></div>';
 
-                // Load PDF dengan headers authorization
                 const loadingTask = pdfjsLib.getDocument({
                     url: pdfUrl,
                     httpHeaders: {
@@ -279,17 +334,12 @@ if (folders.length === 0) {
                 });
 
                 const pdf = await loadingTask.promise;
-
-                // Get first page
                 const page = await pdf.getPage(1);
-
-                // Set scale untuk thumbnail
-                const scale = 0.3; // Scale lebih kecil untuk thumbnail
+                const scale = 0.3;
                 const viewport = page.getViewport({
                     scale
                 });
 
-                // Create canvas
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
                 canvas.width = viewport.width;
@@ -299,7 +349,6 @@ if (folders.length === 0) {
                 canvas.style.borderRadius = '4px';
                 canvas.style.padding = '16px 0';
 
-                // Render PDF page to canvas
                 const renderContext = {
                     canvasContext: context,
                     viewport: viewport
@@ -307,27 +356,98 @@ if (folders.length === 0) {
 
                 await page.render(renderContext).promise;
 
-                // Clear container dan tambahkan canvas
                 container.innerHTML = '';
                 container.appendChild(canvas);
 
             } catch (error) {
                 console.error('Error rendering PDF preview:', error);
-                // Jika gagal, tetap tampilkan ikon PDF
                 container.innerHTML = '<i class="ph ph-file-pdf fs-1 text-muted"></i>';
             }
         }
+
+        // ========== EVENT LISTENERS ==========
+
+        // Event listener untuk info button
+        document.addEventListener("click", function(e) {
+            const infoBtn = e.target.closest(".info-btn");
+            if (infoBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Sembunyikan semua info panel lainnya
+                document.querySelectorAll('.file-info-panel').forEach(panel => {
+                    panel.style.display = 'none';
+                });
+
+                // Tampilkan info panel yang diklik
+                const infoPanel = infoBtn.closest('.dropdown-submenu').querySelector('.file-info-panel');
+                infoPanel.style.display = 'block';
+
+                // Adjust position jika perlu
+                const rect = infoPanel.getBoundingClientRect();
+                if (rect.right > window.innerWidth) {
+                    infoPanel.style.left = 'auto';
+                    infoPanel.style.right = '100%';
+                }
+            }
+        });
+
+        // Event listener untuk close info panel
+        document.addEventListener("click", function(e) {
+            const closeBtn = e.target.closest(".close-info-panel");
+            if (closeBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const infoPanel = closeBtn.closest('.file-info-panel');
+                infoPanel.style.display = 'none';
+            }
+        });
+
+        // Sembunyikan info panel ketika klik di luar
+        document.addEventListener("click", function(e) {
+            if (!e.target.closest('.dropdown-submenu') && !e.target.closest('.file-info-panel')) {
+                document.querySelectorAll('.file-info-panel').forEach(panel => {
+                    panel.style.display = 'none';
+                });
+            }
+        });
+
+
+
+        // EVENT LISTENER UNTUK BUKA FOLDER - YANG INI JUGA BENER
+        document.addEventListener("click", function(e) {
+            const folderCard = e.target.closest('.folder-card');
+            if (folderCard && !e.target.closest('.folder-dropdown-btn')) {
+                const folderItem = folderCard.closest('.folder-item');
+                const openBtn = folderItem.querySelector('.folder-open-btn');
+                if (openBtn) {
+                    window.location.href = openBtn.getAttribute('href');
+                }
+            }
+        });
+
+
+        // Event listener untuk delete folder
         document.addEventListener("click", async function(e) {
-            const btn = e.target.closest(".delete-btn");
+            const btn = e.target.closest(".folder-delete-btn");
             if (!btn) return;
 
             e.preventDefault();
-            const fileId = btn.getAttribute("data-id");
+            e.stopPropagation();
+
+            const folderId = btn.getAttribute("data-id");
+            const folderName = btn.getAttribute("data-name");
             const token = localStorage.getItem("token");
 
-            if (!confirm("Yakin mau hapus file ini?")) return;
+            if (!confirm(`Yakin mau menghapus folder "${folderName}"?`)) return;
 
             try {
+                const payload = {
+                    ids: [parseInt(folderId)],
+                    parent_id: "",
+                    all: ""
+                };
+
                 const response = await fetch("http://pdu-dms.my.id/api/delete-file", {
                     method: "DELETE",
                     headers: {
@@ -335,30 +455,100 @@ if (folders.length === 0) {
                         "Authorization": "Bearer " + token,
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({
-                        all: "",
-                        ids: [parseInt(fileId)]
-                    })
+                    body: JSON.stringify(payload)
                 });
 
                 const result = await response.json();
 
                 if (response.ok) {
-                    btn.closest(".file-card").remove(); // hapus dari tampilan
+                    btn.closest(".folder-item").remove();
+
+                    const folderContainer = document.getElementById("folderContainer");
+                    const remainingFolders = folderContainer.querySelectorAll('.folder-item');
+                    if (remainingFolders.length === 0) {
+                        const emptyTemplate = document.getElementById("empty-template").content.cloneNode(true);
+                        emptyTemplate.querySelector("i").className = "ph ph-folder-open";
+                        emptyTemplate.querySelector("p").textContent = "Create a folder to get organized";
+                        folderContainer.appendChild(emptyTemplate);
+                    }
+
+                    alert("Folder berhasil dihapus");
                 } else {
-                    alert("Gagal menghapus: " + (result.message || "Unknown error"));
+                    alert("Gagal menghapus folder: " + (result.message || "Unknown error"));
                 }
 
             } catch (err) {
                 console.error(err);
+                alert("Gagal menghapus folder");
             }
         });
 
+        // Event listener untuk delete file
+        document.addEventListener("click", async function(e) {
+            const btn = e.target.closest(".delete-btn");
+            if (!btn) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const fileId = btn.getAttribute("data-id");
+            const token = localStorage.getItem("token");
+
+            if (!confirm("Yakin mau menghapus file ini?")) return;
+
+            try {
+                const payload = {
+                    ids: [parseInt(fileId)],
+                    parent_id: "",
+                    all: ""
+                };
+
+                const response = await fetch("http://pdu-dms.my.id/api/delete-file", {
+                    method: "DELETE",
+                    headers: {
+                        "Accept": "application/json",
+                        "Authorization": "Bearer " + token,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    const fileCard = btn.closest(".file-card");
+                    if (fileCard) {
+                        fileCard.remove();
+                    }
+
+                    const fileContainer = document.getElementById("fileContainer");
+                    const remainingFiles = fileContainer.querySelectorAll('.file-card');
+                    if (remainingFiles.length === 0) {
+                        fileContainer.innerHTML = '';
+                        const emptyTemplate = document.getElementById("empty-template").content.cloneNode(true);
+                        emptyTemplate.querySelector("i").className = "ph ph-file";
+                        emptyTemplate.querySelector("p").textContent = "Upload your first file to begin";
+                        fileContainer.appendChild(emptyTemplate);
+                    }
+
+                    alert("File berhasil dihapus");
+                } else {
+                    alert("Gagal menghapus file: " + (result.message || "Unknown error"));
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert("Gagal menghapus file");
+            }
+        });
+
+        // Event listener untuk download file
         document.addEventListener("click", async function(e) {
             const btn = e.target.closest(".download-btn");
             if (!btn) return;
 
             e.preventDefault();
+            e.stopPropagation();
 
             const fileId = btn.getAttribute("data-id");
             const fileName = btn.getAttribute("data-name");
@@ -382,18 +572,15 @@ if (folders.length === 0) {
                     throw new Error("Gagal mengunduh file. Status: " + response.status);
                 }
 
-                // Konversi ke blob untuk bisa diunduh
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
 
-                // Buat link download sementara
                 const a = document.createElement("a");
                 a.href = url;
                 a.download = fileName || "downloaded_file";
                 document.body.appendChild(a);
                 a.click();
 
-                // Bersihkan URL sementara
                 a.remove();
                 window.URL.revokeObjectURL(url);
 
@@ -404,170 +591,101 @@ if (folders.length === 0) {
                 alert("Gagal mengunduh file: " + error.message);
             }
         });
-        // Event listener untuk dropdown folder
-document.addEventListener("click", function(e) {
-    const btn = e.target.closest(".folder-dropdown-btn");
-    if (btn) {
-        e.preventDefault();
-        e.stopPropagation();
 
-        // Sembunyikan semua dropdown lainnya
-        document.querySelectorAll('.folder-dropdown-menu').forEach(menu => {
-            menu.classList.remove('show');
-        });
+        // Event listener untuk download folder
+        document.addEventListener("click", async function(e) {
+            const btn = e.target.closest(".folder-download-btn");
+            if (!btn) return;
 
-        // Tampilkan dropdown yang diklik
-        const dropdown = btn.nextElementSibling;
-        dropdown.classList.add('show');
-    } else {
-        // Sembunyikan semua dropdown ketika klik di luar
-        document.querySelectorAll('.folder-dropdown-menu').forEach(menu => {
-            menu.classList.remove('show');
-        });
-    }
-});
+            e.preventDefault();
+            e.stopPropagation();
 
-// Event listener untuk klik folder card (open folder)
-document.addEventListener("click", function(e) {
-    const folderCard = e.target.closest('.folder-card');
-    if (folderCard && !e.target.closest('.folder-dropdown-btn')) {
-        const folderItem = folderCard.closest('.folder-item');
-        const openBtn = folderItem.querySelector('.folder-open-btn');
-        if (openBtn) {
-            window.location.href = openBtn.getAttribute('href');
-        }
-    }
-});
+            const folderId = btn.getAttribute("data-id");
+            const folderName = btn.getAttribute("data-name");
+            const token = localStorage.getItem("token");
 
-// Event listener untuk delete folder
-document.addEventListener("click", async function(e) {
-    const btn = e.target.closest(".folder-delete-btn");
-    if (!btn) return;
-
-    e.preventDefault();
-    const folderId = btn.getAttribute("data-id");
-    const folderName = btn.getAttribute("data-name");
-    const token = localStorage.getItem("token");
-
-    if (!confirm(`Yakin mau menghapus folder "${folderName}"?`)) return;
-
-    try {
-        const response = await fetch("http://pdu-dms.my.id/api/delete-folder", {
-            method: "DELETE",
-            headers: {
-                "Accept": "application/json",
-                "Authorization": "Bearer " + token,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                ids: [parseInt(folderId)]
-            })
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            // Hapus folder dari tampilan
-            btn.closest(".folder-item").remove();
-
-            // Jika tidak ada folder lagi, tampilkan empty state
-            const folderContainer = document.getElementById("folderContainer");
-            const remainingFolders = folderContainer.querySelectorAll('.folder-item');
-            if (remainingFolders.length === 0) {
-                const empty = emptyTemplate.cloneNode(true);
-                empty.querySelector("i").className = "ph ph-folder-open";
-                empty.querySelector("p").textContent = "Create a folder to get organized";
-                folderContainer.appendChild(empty);
+            if (!token) {
+                alert("Token tidak ditemukan. Silakan login ulang.");
+                return;
             }
-        } else {
-            alert("Gagal menghapus folder: " + (result.message || "Unknown error"));
-        }
 
-    } catch (err) {
-        console.error(err);
-        alert("Gagal menghapus folder");
-    }
-});
+            try {
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="ph ph-spinner ph-spin fs-5"></i> Downloading...';
+                btn.disabled = true;
 
-// Event listener untuk download folder
-document.addEventListener("click", async function (e) {
-    const btn = e.target.closest(".folder-download-btn");
-    if (!btn) return;
+                const response1 = await fetch("http://pdu-dms.my.id/api/download", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + token,
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        ids: [parseInt(folderId)],
+                    })
+                });
 
-    e.preventDefault();
+                const data = await response1.json();
+                if (!response1.ok) throw new Error(data.message || "Gagal mendapatkan URL download.");
+                if (!data.url) throw new Error("Response tidak mengandung URL download.");
 
-    const folderId = btn.getAttribute("data-id");
-    const folderName = btn.getAttribute("data-name");
-    const token = localStorage.getItem("token");
+                const fileUrl = data.url;
+                const filename = data.filename || folderName + ".zip";
 
-    if (!token) {
-        alert("Token tidak ditemukan. Silakan login ulang.");
-        return;
-    }
+                const response2 = await fetch(fileUrl, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    }
+                });
 
-    try {
-        // Tampilkan indikator loading
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="ph ph-spinner ph-spin fs-5"></i> Downloading...';
-        btn.disabled = true;
+                if (!response2.ok) throw new Error("Gagal mengunduh file ZIP.");
 
-        // === STEP 1: Panggil endpoint /api/download untuk dapatkan URL zip ===
-        const response1 = await fetch("http://pdu-dms.my.id/api/download", {
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer " + token,
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                ids: [parseInt(folderId)],
+                const blob = await response2.blob();
+                const url = window.URL.createObjectURL(blob);
 
-            })
-        });
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
 
-        const data = await response1.json();
-        if (!response1.ok) throw new Error(data.message || "Gagal mendapatkan URL download.");
-        if (!data.url) throw new Error("Response tidak mengandung URL download.");
+                a.remove();
+                window.URL.revokeObjectURL(url);
 
-        const fileUrl = data.url;
-        const filename = data.filename || folderName + ".zip";
+                console.log("Folder berhasil diunduh:", filename);
 
-        // === STEP 2: Download file aktual dari URL ===
-        const response2 = await fetch(fileUrl, {
-            method: "GET",
-            headers: {
-                "Authorization": "Bearer " + token
+            } catch (error) {
+                console.error(error);
+                alert("Gagal mengunduh folder: " + error.message);
+            } finally {
+                btn.innerHTML = '<i class="ph ph-download fs-5"></i> Download';
+                btn.disabled = false;
             }
         });
 
-        if (!response2.ok) throw new Error("Gagal mengunduh file ZIP.");
+        //INFO LOKASI
+        // Fungsi untuk generate location path dari breadcrumb
+        function generateLocationPath() {
+            const breadcrumbItems = document.querySelectorAll('.breadcrumb-item:not(.active)');
+            const pathParts = ['MySpace'];
 
-        const blob = await response2.blob();
-        const url = window.URL.createObjectURL(blob);
+            breadcrumbItems.forEach(item => {
+                const name = item.textContent.trim();
+                if (name) {
+                    pathParts.push(name);
+                }
+            });
 
-        // Buat link download sementara
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
+            return pathParts.join(' / ');
+        }
 
-        a.remove();
-        window.URL.revokeObjectURL(url);
-
-        console.log("Folder berhasil diunduh:", filename);
-
-    } catch (error) {
-        console.error(error);
-        alert("Gagal mengunduh folder: " + error.message);
-    } finally {
-        btn.innerHTML = '<i class="ph ph-download fs-5"></i> Download';
-        btn.disabled = false;
-    }
-});
-
-
+        // Fungsi untuk format upload date (versi simple)
+        function formatUploadDate(createdAt) {
+            if (!createdAt) return 'Unknown date';
+            return createdAt; // Langsung return value dari API
+        }
     </script>
 
 @endsection
-

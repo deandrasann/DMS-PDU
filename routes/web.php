@@ -45,6 +45,7 @@ Route::get('/resend-code', [AuthController::class, 'resendCode'])->name('resend.
 Route::get('/new-password', [AuthController::class, 'showNewPassword'])->name('new.password');
 Route::post('/new-password', [AuthController::class, 'setNewPassword'])->name('set.new.password');
 
+
 Route::patch('/profile/update', [HomeController::class, 'update'])->name('profile.update');
 Route::post('/profile/delete-photo', [HomeController::class, 'deletePhoto'])->name('profile.delete.photo');
 Route::post('/change-password', [HomeController::class, 'updatePassword'])
