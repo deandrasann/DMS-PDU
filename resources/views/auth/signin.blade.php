@@ -6,7 +6,7 @@
             <div class="text-center mb-2 px-4">
                 <!-- Logo Dummy -->
                 <div class="mb-3">
-                    <img src="storage/images/logo v1.png" alt="Logo" class="img-fluid" style="max-width: 80px">
+                    <img src="img/logo v1.png" alt="Logo" class="img-fluid" style="max-width: 80px">
                 </div>
                 <h4 class="welcome-text py-3">Welcome Back!</h4>
                 <p class="desc-text">
