@@ -100,7 +100,7 @@ if (folders.length === 0) {
         col.innerHTML = `
             <div class="position-relative">
                 <div class="folder-card" style="cursor: pointer;">
-                    <img src="{{ asset('storage/images/folder.svg') }}" alt="Folder" class="img-fluid w-100 h-100 object-fit-contain" style="min-height: 100px; min-width:120px">
+                    <img src="{{ asset('img/folder.svg') }}" alt="Folder" class="img-fluid w-100 h-100 object-fit-contain" style="min-height: 100px; min-width:120px">
                     <div class="position-absolute top-0 start-0 p-2 p-sm-3 w-100 h-100 d-flex flex-column justify-content-between">
                         <div>
                             <p class="fw-normal mt-2 mb-0 text-truncate" title="${folder.name}">${folder.name}</p>

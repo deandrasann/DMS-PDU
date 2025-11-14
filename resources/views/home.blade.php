@@ -167,7 +167,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="position-relative d-flex justify-center">
-                        <img src="{{ asset('storage/images/folder.svg') }}" alt="Folder"
+                        <img src="{{ asset('img/folder.svg') }}" alt="Folder"
                             class="img-fluid w-25 h-25 object-fit-contain" style="min-height: 100px; min-width:120px">
                         <!-- Overlay isi folder -->
                         <div
