@@ -25,7 +25,7 @@ class AuthController extends Controller
 
         try {
             // Kirim data ke API eksternal
-            $response = Http::post('http://pdu-dms.my.id/api/register-user', [
+            $response = Http::post('https://pdu-dms.my.id/api/register-user', [
                 'fullname' => $request->fullname,
                 'email' => $request->email,
                 'password' => $request->password,
@@ -46,7 +46,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
 {
-    $response = Http::post('http://pdu-dms.my.id/api/login-user', [
+    $response = Http::post('https://pdu-dms.my.id/api/login-user', [
         'email' => $request->email,
         'password' => $request->password,
     ]);
@@ -88,7 +88,7 @@ class AuthController extends Controller
 
         try {
             // Kirim request ke API eksternal
-            $response = Http::post('http://pdu-dms.my.id/api/forgot-password', [
+            $response = Http::post('https://pdu-dms.my.id/api/forgot-password', [
                 'email' => $request->email,
             ]);
 
@@ -118,7 +118,7 @@ class AuthController extends Controller
         }
 
         // Kirim ulang kode ke API eksternal
-        $response = Http::post('http://pdu-dms.my.id/api/forgot-password', [
+        $response = Http::post('https://pdu-dms.my.id/api/forgot-password', [
             'email' => $email,
         ]);
 
@@ -141,7 +141,7 @@ class AuthController extends Controller
         }
 
         try {
-            $response = Http::post('http://pdu-dms.my.id/api/verify-token', [
+            $response = Http::post('https://pdu-dms.my.id/api/verify-token', [
                 'email' => $email,
                 'token' => $request->token,
             ]);
@@ -178,7 +178,7 @@ class AuthController extends Controller
         }
 
         try {
-            $response = Http::post('http://pdu-dms.my.id/api/reset-password', [
+            $response = Http::post('https://pdu-dms.my.id/api/reset-password', [
                 'email' => $email,
                 'token' => $token,
                 'password' => $request->password,
@@ -207,7 +207,7 @@ class AuthController extends Controller
             }
 
             // Kirim request ke API eksternal
-            $response = Http::withToken($token)->post('http://pdu-dms.my.id/api/logout-user');
+            $response = Http::withToken($token)->post('https://pdu-dms.my.id/api/logout-user');
 
             // Hapus token dari session
             session()->forget('token');
