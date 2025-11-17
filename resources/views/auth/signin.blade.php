@@ -64,49 +64,49 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-    const api = axios.create({
-        baseURL: 'http://https://pdu-dm.my.id/api',
-        withCredentials: true  // WAJIB untuk Sanctum Cookie
-    });
+            const api = axios.create({
+                baseURL: 'https://pdu-dm.my.id/api',
+                withCredentials: true // WAJIB untuk Sanctum Cookie
+            });
 
-    const form = document.getElementById('loginForm');
-    const submitBtn = document.getElementById('submitBtn');
+            const form = document.getElementById('loginForm');
+            const submitBtn = document.getElementById('submitBtn');
 
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
 
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = `
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
             <span class="spinner-border spinner-border-sm me-2"></span>
             Signing In...
         `;
 
-        const email = document.querySelector('input[name="email"]').value;
-        const password = document.querySelector('input[name="password"]').value;
+                const email = document.querySelector('input[name="email"]').value;
+                const password = document.querySelector('input[name="password"]').value;
 
-        try {
-            // 1. Ambil CSRF cookie dari Sanctum
-            await api.get('/csrf-cookie');
+                try {
+                    // 1. Ambil CSRF cookie dari Sanctum
+                    await api.get('/csrf-cookie');
 
-            // 2. Kirim login
-            await api.post('/login-user', {
-                email: email,
-                password: password
+                    // 2. Kirim login
+                    await api.post('/login-user', {
+                        email: email,
+                        password: password
+                    });
+
+                    // 3. Redirect ke dashboard / home
+                    window.location.href = "/myspace";
+
+                } catch (error) {
+                    alert("Login gagal. Pastikan email/password benar.");
+
+                    console.error(error);
+
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = "Sign In";
+                }
             });
-
-            // 3. Redirect ke dashboard / home
-            window.location.href = "/myspace";
-
-        } catch (error) {
-            alert("Login gagal. Pastikan email/password benar.");
-
-            console.error(error);
-
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = "Sign In";
-        }
-    });
-});
+        });
     </script>
 @endpush
