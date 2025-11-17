@@ -7,14 +7,15 @@ use Illuminate\Support\Facades\Http;
 
 class MySpaceController extends Controller
 {
-    public function index($path = null)
+ public function index($path = '')
     {
-        $currentPath = $path ?? '';
+        $currentPath = $path;
         $token = session('token');
 
+        // PERBAIKAN: Gunakan HTTPS dan handle path dengan benar
         $url = $currentPath
-            ? "http://pdu-dms.my.id/api/my-files/{$currentPath}"
-            : "http://pdu-dms.my.id/api/my-files";
+            ? "https://pdu-dms.my.id/api/my-files/{$currentPath}"
+            : "https://pdu-dms.my.id/api/my-files";
 
         try {
             $response = Http::withHeaders([
@@ -33,14 +34,11 @@ class MySpaceController extends Controller
             $folder = $data['folder'] ?? null;
             $ancestors = $data['ancestors'] ?? [];
 
-            // 🔧 Perbaikan breadcrumb:
-            // - Hapus root (biasanya email user)
-            // - Hindari duplikasi folder terakhir
+            // Breadcrumb logic
             $breadcrumb = [];
 
             foreach ($ancestors as $ancestor) {
                 if (!isset($ancestor['name']) || str_contains($ancestor['name'], '@')) {
-                    // skip root user (biasanya email)
                     continue;
                 }
 
@@ -70,7 +68,9 @@ class MySpaceController extends Controller
         }
     }
 
-    public function getFiles(Request $request)
+
+
+   public function getFiles(Request $request)
     {
         $token = $request->bearerToken();
 
@@ -85,7 +85,7 @@ class MySpaceController extends Controller
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/json',
-            ])->timeout(30)->get('http://pdu-dms.my.id/api/my-files/');
+            ])->timeout(30)->get('https://pdu-dms.my.id/api/my-files/');
 
             if ($response->successful()) {
                 return response()->json($response->json());
@@ -104,7 +104,7 @@ class MySpaceController extends Controller
         }
     }
 
-    public function proxyPdf(Request $request, $fileId)
+     public function proxyPdf(Request $request, $fileId)
     {
         $token = session('token') ?? $request->bearerToken();
 
@@ -117,7 +117,7 @@ class MySpaceController extends Controller
                 'Authorization' => 'Bearer ' . $token,
             ])
             ->timeout(30)
-            ->get("http://pdu-dms.my.id/api/view-file/{$fileId}");
+            ->get("https://pdu-dms.my.id/api/view-file/{$fileId}");
 
             if ($response->successful()) {
                 return response($response->body(), 200)
@@ -140,7 +140,7 @@ class MySpaceController extends Controller
         }
     }
 
-    public function viewFile($fileId)
+public function viewFile($fileId)
     {
         $token = session('token') ?? request()->bearerToken();
 
@@ -151,28 +151,24 @@ class MySpaceController extends Controller
         try {
             $listResponse = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->timeout(30)->get("http://pdu-dms.my.id/api/my-files");
+            ])->timeout(30)->get("https://pdu-dms.my.id/api/my-files");
 
             if (!$listResponse->successful()) {
                 abort(404, 'Cannot fetch files list');
             }
 
             $json = $listResponse->json();
-
-            // ✅ Ambil hanya bagian 'files' (isi daftar file sebenarnya)
             $files = $json['files'] ?? [];
 
-            // 🔍 Cari file berdasarkan ID
             $fileData = collect($files)->firstWhere('id', (int) $fileId);
 
             if (!$fileData) {
                 abort(404, 'File not found');
             }
 
-            // ✅ Kirim ke view
             return view('file-view', [
                 'fileId' => $fileId,
-                'file' => $fileData, // ubah ke 'file' biar sama dengan Blade kamu
+                'file' => $fileData,
                 'token' => $token,
             ]);
 
@@ -180,6 +176,9 @@ class MySpaceController extends Controller
             abort(500, 'Failed to load file: ' . $e->getMessage());
         }
     }
+
+
+
 
     // Method untuk membaca file PDF
     public function readFile(Request $request, $fileId)
@@ -197,7 +196,7 @@ class MySpaceController extends Controller
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/json',
-            ])->timeout(30)->get("http://pdu-dms.my.id/api/files/{$fileId}");
+            ])->timeout(30)->get("https://pdu-dms.my.id/api/files/{$fileId}");
 
             if ($response->successful()) {
                 $fileData = $response->json();
@@ -296,5 +295,5 @@ class MySpaceController extends Controller
         }
     }
 
-    
+
 }

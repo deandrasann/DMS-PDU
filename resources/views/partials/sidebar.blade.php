@@ -3,11 +3,11 @@
     style="width: 280px; transition: width 0.3s;">
     <div class="d-flex align-items-center justify-content-between mb-3 position-relative">
         <div class="d-flex align-items-center">
-            <img src="{{ asset('storage/images/logo v1.png') }}" class="d-flex align-items-center ms-2 p-1"
+            <img src="{{ asset('img/logo v1.png') }}" class="d-flex align-items-center ms-2 p-1"
                 alt="Logo Kecil" id="sidebarLogoSmall" style="width:36px;">
 
             <!-- Logo besar (muncul saat expanded) -->
-            <img src="{{ asset('storage/images/logo v2.png') }}" alt="Logo Besar" id="sidebarLogoBig"
+            <img src="{{ asset('img/logo v2.png') }}" alt="Logo Besar" id="sidebarLogoBig"
                 style="width:120px;">
         </div>
         <!-- Tombol toggle -->
@@ -51,13 +51,13 @@
                 <span class="sidebar-text">Last Opened</span>
             </a>
         </li>
-        <li class="nav-item w-100">
-            <a href="{{ route('myspace') }}"
-                class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('myspace') ? 'active' : '' }}">
-                <i class="ph ph-folder-user me-2 fs-5"></i>
-                <span class="sidebar-text">My Space</span>
-            </a>
-        </li>
+<li class="nav-item w-100">
+    <a href="{{ route('myspace') }}"
+        class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('myspace') || request()->routeIs('myspace.subfolder') ? 'active' : '' }}">
+        <i class="ph ph-folder-user me-2 fs-5"></i>
+        <span class="sidebar-text">My Space</span>
+    </a>
+</li>
         <li class="nav-item w-100">
             <hr>
         </li>
@@ -198,7 +198,7 @@
             <!-- Body -->
             <div class="modal-body">
                 <div class="mb-3 text-center">
-                    <img src="{{ asset('storage/images/folder.svg') }}" alt="Folder Icon" style="width: 80px;">
+                    <img src="{{ asset('img/folder.svg') }}" alt="Folder Icon" style="width: 80px;">
                 </div>
 
                 <!-- Form untuk membuat folder -->

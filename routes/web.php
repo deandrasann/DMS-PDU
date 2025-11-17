@@ -9,26 +9,28 @@ use App\Http\Controllers\DashboardController;
 Route::get('/', function () {
     return redirect()->route('signin');
 });
+
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/last-opened', [DashboardController::class, 'lastOpen'])->name('last');
 
+// Route utama myspace
 Route::get('/myspace', [MySpaceController::class, 'index'])->name('myspace');
+
+// API routes
 Route::get('/my-files', [MySpaceController::class, 'getFiles'])->name('my-files');
 Route::get('/files/{fileId}', [MySpaceController::class, 'proxyPdf'])->name('pdf.view');
 Route::get('/file-view/{fileId}', [MySpaceController::class, 'viewFile'])->name('file.view');
 Route::post('/myspace/upload', [MySpaceController::class, 'upload'])->name('myspace.upload');
+
+// Route untuk subfolder - GUNAKAN NAMA BERBEDA
 Route::get('/myspace/{path?}', [MySpaceController::class, 'index'])
     ->where('path', '.*')
-    ->name('myspace');
-
-
-
-
+    ->name('myspace.subfolder'); // ← PERUBAHAN DI SINI
 
 Route::get('/shared-with-me', [DashboardController::class, 'sharedWithMe'])->name('shared');
 Route::get('/upload', [DashboardController::class, 'uploadFile'])->name('upload');
 
-
+// Auth routes
 Route::get('/signin', fn() => view('auth.signin'))->name('signin');
 Route::post('/signin', [AuthController::class, 'login'])->name('signin.process');
 
@@ -48,5 +50,4 @@ Route::post('/new-password', [AuthController::class, 'setNewPassword'])->name('s
 
 Route::patch('/profile/update', [HomeController::class, 'update'])->name('profile.update');
 Route::post('/profile/delete-photo', [HomeController::class, 'deletePhoto'])->name('profile.delete.photo');
-Route::post('/change-password', [HomeController::class, 'updatePassword'])
-    ->name('password.update');
+Route::post('/change-password', [HomeController::class, 'updatePassword'])->name('password.update');

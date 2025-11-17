@@ -13,7 +13,8 @@
         rel="stylesheet">
     <link rel="icon" href="{{ asset('favicon.png') }}" type="image/x-icon">
     {{-- <link href="{{ asset('style.css') }}" rel="stylesheet"> --}}
-    <link href="{{ asset('css/auth.css') }}" rel="stylesheet">
+    {{-- <link href="{{ asset('css/auth.css') }}" rel="stylesheet"> --}}
+        <link rel="stylesheet" href="/css/auth.css">
 </head>
 
 <body>

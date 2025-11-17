@@ -108,7 +108,7 @@
                     formData.append("parent_id", parentId);
 
                     try {
-                        const response = await axios.post("http://pdu-dms.my.id/api/upload-files", formData, {
+                        const response = await axios.post("https://pdu-dms.my.id/api/upload-files", formData, {
                             headers: {
                                 "Content-Type": "multipart/form-data"
                             },

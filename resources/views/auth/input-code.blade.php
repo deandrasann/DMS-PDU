@@ -11,7 +11,7 @@
                     <div class="alert alert-danger text-center">{{ session('error') }}</div>
                 @endif
 
-                <img src="storage/images/logo v1.png" alt="Logo" class="img-fluid mb-2" style="max-width: 80px">
+                <img src="img/logo v1.png" alt="Logo" class="img-fluid mb-2" style="max-width: 80px">
                 <h4 class="welcome-text py-3">Input The Code</h4>
                 <p class="desc-text">
                     We've sent a 4-digit confirmation code to your email address.

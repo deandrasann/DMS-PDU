@@ -39,7 +39,7 @@
     <button type="button" class="border-0 bg-white me-4 mt-2" data-bs-dismiss="offcanvas" aria-label="Close">
         <i class="ph ph-x"></i>
     </button>
-    <img src="{{ asset('storage/images/logo v2.png') }}"
+    <img src="{{ asset('img/logo v2.png') }}"
     alt="Logo Besar"
     id="sidebarLogoBig"
     style="width:120px;">
