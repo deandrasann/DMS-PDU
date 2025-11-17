@@ -15,7 +15,7 @@
             </div>
 
             <!-- Form Login -->
-            <form method="POST" class="px-4" action="{{ route('signin.process') }}" id="loginForm">
+            <form method="POST" class="px-4" id="loginForm">
                 @csrf
                 <div class="mb-3">
                     <div class="input-group">
@@ -63,41 +63,50 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('loginForm');
-            const submitBtn = document.getElementById('submitBtn');
 
-            if (form && submitBtn) {
-                form.addEventListener('submit', function(e) {
-                    // Cegah submit ganda
-                    if (submitBtn.disabled) return;
+    const api = axios.create({
+        baseURL: 'http://https://pdu-dm.my.id/api',
+        withCredentials: true  // WAJIB untuk Sanctum Cookie
+    });
 
-                    // Ganti teks + tambah spinner kecil
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = `
-                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Signing In...
-                `;
+    const form = document.getElementById('loginForm');
+    const submitBtn = document.getElementById('submitBtn');
 
-                    // Opsional: tambah kelas biar tombol tetap rapi
-                    submitBtn.classList.add('disabled');
-                });
-            }
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
 
-            // Toggle password (tetap ada)
-            const toggleBtn = document.getElementById('togglePassword');
-            if (toggleBtn) {
-                toggleBtn.addEventListener('click', function() {
-                    const passwordInput = document.getElementById('password');
-                    const icon = this.querySelector('i');
-                    if (passwordInput.type === 'password') {
-                        passwordInput.type = 'text';
-                        icon.classList.replace('ph-eye', 'ph-eye-slash');
-                    } else {
-                        passwordInput.type = 'password';
-                        icon.classList.replace('ph-eye-slash', 'ph-eye');
-                    }
-                });
-            }
-        });
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Signing In...
+        `;
+
+        const email = document.querySelector('input[name="email"]').value;
+        const password = document.querySelector('input[name="password"]').value;
+
+        try {
+            // 1. Ambil CSRF cookie dari Sanctum
+            await api.get('/csrf-cookie');
+
+            // 2. Kirim login
+            await api.post('/login-user', {
+                email: email,
+                password: password
+            });
+
+            // 3. Redirect ke dashboard / home
+            window.location.href = "/myspace";
+
+        } catch (error) {
+            alert("Login gagal. Pastikan email/password benar.");
+
+            console.error(error);
+
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = "Sign In";
+        }
+    });
+});
     </script>
 @endpush

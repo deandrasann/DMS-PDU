@@ -3,33 +3,35 @@
 @section('title', 'My Space')
 
 @section('content')
-@php
-    $segments = array_filter(explode('/', $currentPath));
-    $accum = '';
-@endphp
-@if (!empty($breadcrumb) && $currentPath !== '')
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            @foreach ($breadcrumb as $crumb)
-                @if ($loop->last)
-                    <li class="breadcrumb-item active text-dark">
-                        {{ $crumb['name'] }}
-                    </li>
-                @else
-                    <li class="breadcrumb-item">
-                        <a href="{{ route('myspace.subfolder', ['path' => $crumb['id']]) }}" class="text-dark text-decoration-none">
+    @php
+        $segments = array_filter(explode('/', $currentPath));
+        $accum = '';
+    @endphp
+    @if (!empty($breadcrumb) && $currentPath !== '')
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                @foreach ($breadcrumb as $crumb)
+                    @if ($loop->last)
+                        <li class="breadcrumb-item active text-dark">
                             {{ $crumb['name'] }}
-                        </a>
-                    </li>
-                @endif
-            @endforeach
-        </ol>
-    </nav>
-@endif
+                        </li>
+                    @else
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('myspace.subfolder', ['path' => $crumb['id']]) }}"
+                                class="text-dark text-decoration-none">
+                                {{ $crumb['name'] }}
+                            </a>
+                        </li>
+                    @endif
+                @endforeach
+            </ol>
+        </nav>
+    @endif
 
     <div class="container py-4">
         {{-- ========== SECTION: MY FOLDERS ========== --}}
-        <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4 z-3" style="z-index: 9999 !important;">
+        <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4 z-3"
+            style="z-index: 9999 !important;">
             <h4 class="fw-semibold mb-4">My Folders</h4>
             <div id="folderContainer" class="row g-3"></div>
         </div>
@@ -112,6 +114,21 @@
                                                         <i class="ph ph-arrow-up-right fs-5"></i> Open
                                                     </a>
                                                 </li>
+                                                <li class="dropdown-submenu position-relative">
+                                                    <a class="dropdown-item d-flex align-items-center gap-2 dropdown-toggle" href="#">
+                                                        <i class="ph ph-share-network fs-5"></i> Share
+                                                    </a>
+                                                    <ul class="dropdown-menu shadow border-0 p-2">
+                                                        <li><a class="dropdown-item d-flex align-items-center gap-2" href="#"><i
+                                                                    class="ph ph-link fs-5"></i>Copy Link</a></li>
+                                                        <li>
+                                                            <a class="dropdown-item d-flex align-items-center gap-2" href="#"
+                                                                data-bs-toggle="modal" data-bs-target="#advancedShareModal">
+                                                                <i class="ph ph-share-network fs-5"></i> Advanced Share
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </li>
                                                 <li>
                                                     <a class="dropdown-item d-flex align-items-center gap-2 folder-download-btn"
                                                        href="#"
@@ -163,7 +180,8 @@
                             } else if (file.mime.includes("docs") || file.mime.includes("document")) {
                                 fileIcon = "ph-file-doc";
                                 fileType = "DOC";
-                            } else if (file.mime.includes("xlsx") || file.mime.includes("spreadsheet")) {
+                            } else if (file.mime.includes("xlsx") || file.mime.includes(
+                                "spreadsheet")) {
                                 fileIcon = "ph-file-xls";
                                 fileType = "XLS";
                             } else if (file.mime.includes("ppt")) {
@@ -226,7 +244,8 @@
                         `;
 
                         card.addEventListener('click', (e) => {
-                            if (e.target.closest('.dropdown') || e.target.closest('.dropdown-menu')) {
+                            if (e.target.closest('.dropdown') || e.target.closest(
+                                    '.dropdown-menu')) {
                                 return;
                             }
                             window.open(openUrl, '_blank');
@@ -264,7 +283,9 @@
                 const pdf = await loadingTask.promise;
                 const page = await pdf.getPage(1);
                 const scale = 0.3;
-                const viewport = page.getViewport({ scale });
+                const viewport = page.getViewport({
+                    scale
+                });
 
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
@@ -458,7 +479,7 @@
         });
 
         // Event listener untuk download folder
-        document.addEventListener("click", async function (e) {
+        document.addEventListener("click", async function(e) {
             const btn = e.target.closest(".folder-download-btn");
             if (!btn) return;
 

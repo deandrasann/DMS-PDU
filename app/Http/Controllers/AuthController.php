@@ -52,22 +52,22 @@ class AuthController extends Controller
     ]);
 
     if ($response->successful()) {
-        $data = $response->json();
+        // $data = $response->json();
 
-        // Ambil token sesuai key yang benar
-        $token = $data['access_token'] ?? null;
+        // // Ambil token sesuai key yang benar
+        // $token = $data['access_token'] ?? null;
 
-        if (!$token) {
-            return back()->withErrors(['login' => 'Token tidak ditemukan dalam respons API.']);
-        }
+        // if (!$token) {
+        //     return back()->withErrors(['login' => 'Token tidak ditemukan dalam respons API.']);
+        // }
 
-        // ✅ Simpan token secara permanen ke session
-        session()->put('token', $token);
+        // // ✅ Simpan token secara permanen ke session
+        // session()->put('token', $token);
 
-        // (Opsional) simpan juga nama user biar mudah diakses di view
-        if (isset($data['user'])) {
-            session()->put('user', $data['user']);
-        }
+        // // (Opsional) simpan juga nama user biar mudah diakses di view
+        // if (isset($data['user'])) {
+        //     session()->put('user', $data['user']);
+        // }
 
         // ✅ Redirect langsung tanpa flash data
         return redirect()->route('dashboard');

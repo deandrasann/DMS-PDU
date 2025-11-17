@@ -246,7 +246,7 @@ public function viewFile($fileId)
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/json',
-            ])->timeout(30)->get("http://pdu-dms.my.id/api/folders/{$folderId}");
+            ])->timeout(30)->get("https://pdu-dms.my.id/api/folders/{$folderId}");
 
             if ($response->successful()) {
                 return response()->json($response->json());
