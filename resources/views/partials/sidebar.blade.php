@@ -54,13 +54,13 @@
                 <span class="sidebar-text">Last Opened</span>
             </a>
         </li>
-        <li class="nav-item w-100">
-            <a href="{{ route('myspace') }}"
-                class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('myspace') ? 'active' : '' }}">
-                <i class="ph ph-folder-user me-2 fs-5"></i>
-                <span class="sidebar-text">My Space</span>
-            </a>
-        </li>
+<li class="nav-item w-100">
+    <a href="{{ route('myspace') }}"
+        class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('myspace') || request()->routeIs('myspace.subfolder') ? 'active' : '' }}">
+        <i class="ph ph-folder-user me-2 fs-5"></i>
+        <span class="sidebar-text">My Space</span>
+    </a>
+</li>
         <li class="nav-item w-100">
             <hr>
         </li>
