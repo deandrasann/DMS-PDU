@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
             $user = null;
 
             if ($token) {
-                $response = Http::withToken($token)->get('http://pdu-dms.my.id/api/user');
+                $response = Http::withToken($token)->get('https://pdu-dms.my.id/api/user');
                 $user = $response->json();
             }
 
@@ -58,12 +58,12 @@ class AppServiceProvider extends ServiceProvider
                     ];
                 } else {
                     try {
-                        $response = Http::withToken($token)->get('http://pdu-dms.my.id/api/user');
+                        $response = Http::withToken($token)->get('https://pdu-dms.my.id/api/user');
                         if ($response->successful()) {
                             $data = $response->json('data') ?? $response->json();
 
                             if (!empty($data['photo_profile_path'])) {
-                                $photoUrl = 'http://pdu-dms.my.id/storage/profile_photos/' . $data['photo_profile_path'];
+                                $photoUrl = 'https://pdu-dms.my.id/storage/profile_photos/' . $data['photo_profile_path'];
                                 $photoUrl .= '?t=' . time(); // cache buster
 
                                 $profile = [
@@ -87,10 +87,11 @@ class AppServiceProvider extends ServiceProvider
             if (empty($data['photo_profile_path'])) {
                 $profile['photo'] = $defaultPhoto;
             } else {
-                $profile['photo'] = 'http://pdu-dms.my.id/storage/profile_photos/' . $data['photo_profile_path'] . '?v=' . time();
+                $profile['photo'] = 'https://pdu-dms.my.id/storage/profile_photos/' . $data['photo_profile_path'] . '?v=' . time();
             }
 
             $view->with('profile', $profile);
         });
     }
 }
+ 
