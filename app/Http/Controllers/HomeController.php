@@ -10,6 +10,20 @@ use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
 {
+    public function dashboard()
+    {
+        $response = Http::withCookies(request()->cookies->all(), config('session.domain'))
+            ->get("https://pdu-dms.my.id/api/user");
+
+        if (!$response->successful()) {
+            return redirect("/signin");
+        }
+
+        return view("dashboard", [
+            "user" => $response->json()["data"]
+        ]);
+    }
+
     /**
      * Update profile (khususnya foto profil)
      */
