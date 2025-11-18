@@ -287,7 +287,9 @@
                 const pdf = await loadingTask.promise;
                 const page = await pdf.getPage(1);
                 const scale = 0.3;
-                const viewport = page.getViewport({ scale });
+                const viewport = page.getViewport({
+                    scale
+                });
 
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
@@ -602,7 +604,7 @@
         });
 
         // Event listener untuk download folder
-        document.addEventListener("click", async function (e) {
+        document.addEventListener("click", async function(e) {
             const btn = e.target.closest(".folder-download-btn");
             if (!btn) return;
 

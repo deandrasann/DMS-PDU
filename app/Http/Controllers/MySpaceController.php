@@ -235,20 +235,69 @@ class MySpaceController extends Controller
         }
 
         try {
-            $http = Http::withToken($token)->asMultipart();
-
-            if ($request->hasFile('files')) {
-                foreach ($request->file('files') as $file) {
-                    $http = $http->attach('files[]', file_get_contents($file->getRealPath()), $file->getClientOriginalName());
-                }
+            // Validasi ada file
+            if (!$request->hasFile('files')) {
+                return response()->json(['error' => 'No files uploaded'], 400);
             }
 
-            $response = $http->post('https://pdu-dms.my.id/api/upload-files', [
-                'parent_id' => $request->input('parent_id'),
-                'relative_paths' => $request->input('relative_paths', [])
-            ]);
+            // Persiapkan multipart data
+            $multipartData = [];
 
-            return response()->json($response->json(), $response->status());
+            // Tambahkan setiap file
+            foreach ($request->file('files') as $file) {
+                $multipartData[] = [
+                    'name' => 'files[]',
+                    'contents' => fopen($file->getRealPath(), 'r'),
+                    'filename' => $file->getClientOriginalName()
+                ];
+            }
+
+            // Kirim ke API
+            $response = Http::withToken($token)
+                ->asMultipart()
+                ->post('https://pdu-dms.my.id/api/upload', $multipartData);
+
+            if ($response->successful()) {
+                return response()->json($response->json());
+            }
+
+            return response()->json([
+                'error' => 'Upload failed',
+                'status' => $response->status()
+            ], $response->status());
+
+        } catch (\Exception $e) {
+            Log::error('Upload Error', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Upload failed'], 500);
+        }
+    }
+
+    // Method untuk membuka folder
+    public function openFolder(Request $request, $folderId)
+    {
+        $token = $request->bearerToken();
+
+        if (!$token) {
+            return response()->json([
+                'error' => 'Unauthenticated',
+                'message' => 'Please login first'
+            ], 401);
+        }
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/json',
+            ])->timeout(30)->get("https://pdu-dms.my.id/api/folders/{$folderId}");
+
+            if ($response->successful()) {
+                return response()->json($response->json());
+            } else {
+                return response()->json([
+                    'error' => 'Failed to fetch folder',
+                    'status' => $response->status()
+                ], $response->status());
+            }
 
         } catch (\Exception $e) {
             Log::error('Upload Error', ['error' => $e->getMessage()]);

@@ -63,41 +63,41 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('loginForm');
-            const submitBtn = document.getElementById('submitBtn');
+        const form = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
 
-            if (form && submitBtn) {
-                form.addEventListener('submit', function(e) {
-                    // Cegah submit ganda
-                    if (submitBtn.disabled) return;
+        if (form && submitBtn) {
+            form.addEventListener('submit', function(e) {
+                // Cegah submit ganda
+                if (submitBtn.disabled) return;
 
-                    // Ganti teks + tambah spinner kecil
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = `
+                // Ganti teks + tambah spinner kecil
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
                     <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                     Signing In...
                 `;
 
-                    // Opsional: tambah kelas biar tombol tetap rapi
-                    submitBtn.classList.add('disabled');
-                });
-            }
+                // Opsional: tambah kelas biar tombol tetap rapi
+                submitBtn.classList.add('disabled');
+            });
+        }
 
-            // Toggle password (tetap ada)
-            const toggleBtn = document.getElementById('togglePassword');
-            if (toggleBtn) {
-                toggleBtn.addEventListener('click', function() {
-                    const passwordInput = document.getElementById('password');
-                    const icon = this.querySelector('i');
-                    if (passwordInput.type === 'password') {
-                        passwordInput.type = 'text';
-                        icon.classList.replace('ph-eye', 'ph-eye-slash');
-                    } else {
-                        passwordInput.type = 'password';
-                        icon.classList.replace('ph-eye-slash', 'ph-eye');
-                    }
-                });
-            }
+        // Toggle password (tetap ada)
+        const toggleBtn = document.getElementById('togglePassword');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+                const passwordInput = document.getElementById('password');
+                const icon = this.querySelector('i');
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.classList.replace('ph-eye', 'ph-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    icon.classList.replace('ph-eye-slash', 'ph-eye');
+                }
+            });
+        }
         });
     </script>
 @endpush
