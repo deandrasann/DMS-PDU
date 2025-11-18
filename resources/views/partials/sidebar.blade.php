@@ -386,7 +386,7 @@
         // 🟢 Ambil semua label dari API
         async function loadLabels() {
             try {
-                const res = await fetch("http://pdu-dms.my.id/api/labels", {
+                const res = await fetch("https://pdu-dms.my.id/api/labels", {
                     headers: {
                         "Authorization": "Bearer " + token
                     }
@@ -503,7 +503,7 @@ saveNewLabelBtn.addEventListener("click", async () => {
     const color = labelColors[Math.floor(Math.random() * labelColors.length)];
 
     try {
-        const res = await fetch("http://pdu-dms.my.id/api/create-label", {
+        const res = await fetch("https://pdu-dms.my.id/api/create-label", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -631,7 +631,7 @@ newLabelInput.addEventListener("keypress", (e) => {
         const token = localStorage.getItem("token");
 
         try {
-            const res = await fetch("http://pdu-dms.my.id/api/upload-files", {
+            const res = await fetch("https://pdu-dms.my.id/api/upload-files", {
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + token
@@ -703,7 +703,7 @@ newLabelInput.addEventListener("keypress", (e) => {
             this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
 
             // Kirim request ke API
-            const res = await fetch("http://pdu-dms.my.id/api/create-folder", {
+            const res = await fetch("https://pdu-dms.my.id/api/create-folder", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
