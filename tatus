@@ -1,0 +1,43 @@
+[33m69b0879[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdea-fe[m[33m, [m[1;31morigin/dea-fe[m[33m)[m fixing slicing
+[33me310b6e[m[33m ([m[1;32mmaster[m[33m)[m fix: endpoint
+[33m8dec909[m fixing deployment
+[33md3272d1[m fixing deploy
+[33m7116d34[m Merge branch 'master' of https://github.com/deandrasann/DMS-PDU
+[33mc9203f3[m fixing deploy
+[33m392a801[m fixing endpoint
+[33md88e2f3[m fixing deploy
+[33m832f9ea[m fixing deployment
+[33m6dade45[m fixing deployment
+[33m13c4afd[m fix deployment
+[33m6da2289[m fix deployment
+[33mbce9c11[m fixing deployment
+[33m71b4a75[m fix : route
+[33m907256c[m feat : info, label management
+[33md13e374[m minor sidebar change
+[33m2995d86[m merge aul dan dea
+[33mf999748[m Merge branch 'origin/aul-fe' of https://github.com/deandrasann/DMS-PDU
+[33me38aece[m  fix : create folder
+[33m22df9b9[m[33m ([m[1;31morigin/origin/aul-fe[m[33m)[m fix: fe account settings
+[33m626d92e[m fe: account settings
+[33mea51711[m  add yaml file
+[33m3f5709f[m  add yaml file
+[33m668a0b6[m nambah docker
+[33mf99a1b6[m Merge branch 'master' of https://github.com/deandrasann/DMS-PDU into aul-fe
+[33mc808750[m Merge branch 'master' of https://github.com/deandrasann/DMS-PDU into aul-fe
+[33m2f72f60[m fix:merge
+[33m6bd7a48[m Merge branch 'dea-fe' of https://github.com/deandrasann/DMS-PDU
+[33m1951d3e[m feat: delete dan download file
+[33ma771436[m Merge pull request #3 from deandrasann/dea-fe
+[33m15e0b44[m Merge pull request #2 from deandrasann/dea-fe
+[33m49df659[m feat read file pdf, xlsx, doc di myspace
+[33m7dbf577[m Merge branch 'origin/aul-fe' of https://github.com/deandrasann/DMS-PDU into dea-fe
+[33m862b7a0[m merge branch dea dan aul
+[33m5d04786[m fix API authentication (set new password)
+[33m5abc703[m fetch API authentication
+[33m9c974d9[m Merge pull request #1 from deandrasann/dea-fe
+[33m3fa9590[m Merge branch 'origin/aul-fe' into dea-fe
+[33m6764c28[m fix sidebar, feat halaman utama
+[33me308374[m fe authentication
+[33m5c82db3[m feat slicing  navbar, sidebar
+[33m0b651c9[m add font
+[33mb61fd7f[m set up projek

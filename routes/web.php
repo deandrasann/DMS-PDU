@@ -10,26 +10,6 @@ Route::get('/', function () {
     return redirect()->route('signin');
 });
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('/last-opened', [DashboardController::class, 'lastOpen'])->name('last');
-
-// Route utama myspace
-Route::get('/myspace', [MySpaceController::class, 'index'])->name('myspace');
-
-// API routes
-Route::get('/my-files', [MySpaceController::class, 'getFiles'])->name('my-files');
-Route::get('/files/{fileId}', [MySpaceController::class, 'proxyPdf'])->name('pdf.view');
-Route::get('/file-view/{fileId}', [MySpaceController::class, 'viewFile'])->name('file.view');
-Route::post('/myspace/upload', [MySpaceController::class, 'upload'])->name('myspace.upload');
-
-// Route untuk subfolder - GUNAKAN NAMA BERBEDA
-Route::get('/myspace/{path?}', [MySpaceController::class, 'index'])
-    ->where('path', '.*')
-    ->name('myspace.subfolder'); // ← PERUBAHAN DI SINI
-
-Route::get('/shared-with-me', [DashboardController::class, 'sharedWithMe'])->name('shared');
-Route::get('/upload', [DashboardController::class, 'uploadFile'])->name('upload');
-
 // Auth routes
 Route::get('/signin', fn() => view('auth.signin'))->name('signin');
 Route::post('/signin', [AuthController::class, 'login'])->name('signin.process');
@@ -47,6 +27,38 @@ Route::get('/resend-code', [AuthController::class, 'resendCode'])->name('resend.
 Route::get('/new-password', [AuthController::class, 'showNewPassword'])->name('new.password');
 Route::post('/new-password', [AuthController::class, 'setNewPassword'])->name('set.new.password');
 
+// Dashboard routes
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/last-opened', [DashboardController::class, 'lastOpen'])->name('last');
+Route::get('/shared-with-me', [DashboardController::class, 'sharedWithMe'])->name('shared');
+Route::get('/upload', [DashboardController::class, 'uploadFile'])->name('upload');
+
+// Profile routes
 Route::patch('/profile/update', [HomeController::class, 'update'])->name('profile.update');
 Route::post('/profile/delete-photo', [HomeController::class, 'deletePhoto'])->name('profile.delete.photo');
 Route::post('/change-password', [HomeController::class, 'updatePassword'])->name('password.update');
+
+// MySpace routes - HARUS URUT YANG SPESIFIK DULU
+Route::prefix('myspace')->group(function () {
+    // Route spesifik dulu
+    Route::post('/upload', [MySpaceController::class, 'upload'])->name('myspace.upload');
+
+    // Route utama
+    Route::get('/', [MySpaceController::class, 'index'])->name('myspace');
+
+    // Dynamic path TERAKHIR
+    Route::get('/{path}', [MySpaceController::class, 'index'])
+        ->where('path', '.*')
+        ->name('myspace.subfolder');
+});
+
+// API routes - di luar group myspace
+Route::get('/my-files', [MySpaceController::class, 'getFiles'])->name('my-files');
+Route::get('/files/{fileId}', [MySpaceController::class, 'proxyPdf'])->name('pdf.view');
+Route::get('/file-view/{fileId}', [MySpaceController::class, 'viewFile'])->name('file.view');
+
+// Di routes/web.php
+Route::middleware(['web'])->group(function () {
+    Route::get('/file/{fileId}/edit', [MySpaceController::class, 'editFile'])->name('file.edit');
+    Route::put('/file/{fileId}/update', [MySpaceController::class, 'updateFile'])->name('file.update');
+});

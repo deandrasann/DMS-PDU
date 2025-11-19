@@ -3,12 +3,11 @@
     style="width: 280px; transition: width 0.3s;">
     <div class="d-flex align-items-center justify-content-between mb-3 position-relative">
         <div class="d-flex align-items-center">
-            <img src="{{ asset('img/logo v1.png') }}" class="d-flex align-items-center ms-2 p-1"
-                alt="Logo Kecil" id="sidebarLogoSmall" style="width:36px;">
+            <img src="{{ asset('img/logo v1.png') }}" class="d-flex align-items-center ms-2 p-1" alt="Logo Kecil"
+                id="sidebarLogoSmall" style="width:36px;">
 
             <!-- Logo besar (muncul saat expanded) -->
-            <img src="{{ asset('img/logo v2.png') }}" alt="Logo Besar" id="sidebarLogoBig"
-                style="width:120px;">
+            <img src="{{ asset('img/logo v2.png') }}" alt="Logo Besar" id="sidebarLogoBig" style="width:120px;">
         </div>
         <!-- Tombol toggle -->
         <button id="toggleBtn" class="btn btn-light bg-white ms-2">
@@ -32,11 +31,8 @@
                 <a class="dropdown-item d-flex align-items-center rounded-3" href="#" id="openUploadFolderModal">
                     <i class="ph ph-folder-simple-plus me-2"></i> Upload Folder
                 </a>
-
             </li>
         </ul>
-
-
     </div>
     <!-- Menu -->
     <ul class="nav nav-pills mt-2">
@@ -54,13 +50,13 @@
                 <span class="sidebar-text">Last Opened</span>
             </a>
         </li>
-<li class="nav-item w-100">
-    <a href="{{ route('myspace') }}"
-        class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('myspace') || request()->routeIs('myspace.subfolder') ? 'active' : '' }}">
-        <i class="ph ph-folder-user me-2 fs-5"></i>
-        <span class="sidebar-text">My Space</span>
-    </a>
-</li>
+        <li class="nav-item w-100">
+            <a href="{{ route('myspace') }}"
+                class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('myspace') || request()->routeIs('myspace.subfolder') ? 'active' : '' }}">
+                <i class="ph ph-folder-user me-2 fs-5"></i>
+                <span class="sidebar-text">My Space</span>
+            </a>
+        </li>
         <li class="nav-item w-100">
             <hr>
         </li>
@@ -76,14 +72,14 @@
     <!-- Footer -->
     <div class="mt-auto">
         <a href="#" class="d-flex align-items-center link-dark text-decoration-none" id="logoutLink">
-    <i class="ph ph-sign-out me-2 fs-5"></i>
-    <span class="sidebar-text">Log Out</span>
-</a>
+            <i class="ph ph-sign-out me-2 fs-5"></i>
+            <span class="sidebar-text">Log Out</span>
+        </a>
 
-<!-- Hidden Logout Form -->
-<form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-    @csrf
-</form>
+        <!-- Hidden Logout Form -->
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+            @csrf
+        </form>
     </div>
 </div>
 
@@ -132,33 +128,48 @@
                     </div>
 
                     <!-- Label Input -->
+                    <!-- Label Input -->
                     <div class="mb-4">
-                        <label for="label" class="form-label fw-semibold">Label</label>
-                        <div class="d-flex align-items-center gap-2">
-                            <!-- Dropdown Label -->
-                            <select class="form-select rounded-3" id="labelSelect" name="label" style="flex:1;">
-                                <option value="">Select Label</option>
-                            </select>
-                            <!-- Tombol Add -->
-                            <button type="button" class="btn btn-outline-primary rounded-3" id="addLabelBtn">
-                                + Add
-                            </button>
-                        </div>
+                        <label class="form-label fw-semibold">Label</label>
 
-                        <!-- Input Label Baru (hidden default) -->
-                        <div id="newLabelContainer" class="mt-2 d-none">
-                            <div class="input-group">
-                                <input type="text" id="newLabelInput" class="form-control"
-                                    placeholder="Enter new label name">
-                                <button type="button" class="btn btn-success" id="saveNewLabelBtn">Save</button>
+                        <!-- Container untuk existing labels dan tombol/input -->
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            <!-- Daftar label yang tersedia -->
+                            <div id="existingLabels" class="d-flex flex-wrap gap-2">
+                                <!-- Label akan diisi via JavaScript -->
+                            </div>
+
+                            <!-- Tombol Add Label (akan berubah jadi input) -->
+                            <div id="addLabelContainer">
+                                <button type="button"
+                                    class="btn btn-outline-primary rounded-3 d-flex align-items-center"
+                                    id="addLabelBtn">
+                                    <i class="ph ph-plus me-2"></i> Add Label
+                                </button>
+
+                                <!-- Input Label Baru (hidden default) -->
+                                <div id="newLabelContainer" class="d-none">
+                                    <div class="input-group">
+                                        <input type="text" id="newLabelInput" class="form-control rounded-3 mx-2"
+                                            placeholder="Enter new label name" style="width: 150px;">
+                                        <button type="button" class="btn btn-blue rounded-3 me-2 small"
+                                            style="size: 12px" id="saveNewLabelBtn">
+                                            Save
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary rounded-3 me-2 small"
+                                            style="size: 12px" id="cancelNewLabelBtn">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Daftar label preview -->
-                        <div id="labelPreview" class="d-flex flex-wrap gap-2 mt-2"></div>
+                        <!-- Label yang dipilih (akan ditampilkan setelah dipilih) -->
+                        <div id="selectedLabels" class="d-flex flex-wrap gap-2 mt-3">
+                            <!-- Label yang dipilih akan muncul di sini -->
+                        </div>
                     </div>
-
-
                     <!-- Buttons -->
                     <div class="d-flex justify-content-end gap-2">
                         <button type="button" class="btn btn-outline-secondary rounded-3  px-4"
@@ -196,7 +207,7 @@
                     <div class="mb-3">
                         <label for="folderName" class="form-label fw-semibold">Folder Name</label>
                         <input type="text" class="form-control rounded-3" id="folderName" name="name"
-                               placeholder="Enter folder name" required>
+                            placeholder="Enter folder name" required>
                     </div>
 
                     <!-- Feedback Message -->
@@ -206,22 +217,23 @@
 
             <!-- Footer -->
             <div class="modal-footer border-0">
-                <button type="button" class="btn btn-light border rounded-3 px-4" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary rounded-3 px-4 fw-semibold" id="createFolderBtn">Create Folder</button>
+                <button type="button" class="btn btn-outline-secondary border rounded-3 px-4"
+                    data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-blue rounded-3 px-4 fw-semibold" id="createFolderBtn">Create
+                    Folder</button>
             </div>
         </div>
     </div>
 </div>
+
 <!-- Logout Confirmation Modal -->
 <div class="modal fade" id="logoutConfirmationModal" tabindex="-1" data-bs-backdrop="false" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 rounded-4 shadow-lg" style="background-color: #fff; max-width: 500px;">
 
             <!-- Close Button (Kanan Atas) -->
-            <button type="button"
-                    class="btn-close position-absolute top-0 end-0 mt-3 me-3"
-                    data-bs-dismiss="modal" aria-label="Close"
-                    style="z-index: 10; font-size: 1.1rem; opacity: 0.7;">
+            <button type="button" class="btn-close position-absolute top-0 end-0 mt-3 me-3" data-bs-dismiss="modal"
+                aria-label="Close" style="z-index: 10; font-size: 1.1rem; opacity: 0.7;">
             </button>
 
             <div class="modal-body py-4 px-4">
@@ -230,22 +242,23 @@
                     <h5 class="fw-bold mb-2 text-start" style="font-size: 1.25rem;">
                         Are you sure want to leave?
                     </h5>
-                    <p class="text-muted small mb-4 text-start" style="font-family: Rubik; line-height: 1.5; font-size: 0.875rem;">
+                    <p class="text-muted small mb-4 text-start"
+                        style="font-family: Rubik; line-height: 1.5; font-size: 0.875rem;">
                         You must log in again to access this dashboard.
                     </p>
                 </div>
 
                 <!-- Tombol: Cancel (kiri) + Log out (kanan) -->
-                <div class="d-flex justify-content-between align-items-center" style="padding-left: 1.75rem; padding-right: 1.5rem;">
-                    <button type="button"
-                            class="btn btn-outline-secondary rounded-4 px-4 py-2"
-                            data-bs-dismiss="modal"
-                            style="min-width: 100px; font-size: 14px;border-color: #d1d5db; color: #6b7280;">
+                <div class="d-flex justify-content-between align-items-center"
+                    style="padding-left: 1.75rem; padding-right: 1.5rem;">
+                    <button type="button" class="btn btn-outline-secondary rounded-4 px-4 py-2"
+                        data-bs-dismiss="modal"
+                        style="min-width: 100px; font-size: 14px;border-color: #d1d5db; color: #6b7280;">
                         Cancel
                     </button>
                     <button type="button" id="confirmLogoutBtn"
-                            class="btn btn-danger rounded-4 px-4 py-2 text-white"
-                            style="min-width: 100px; font-size:14px; background-color: #dc3545; border: none;">
+                        class="btn btn-danger rounded-4 px-4 py-2 text-white"
+                        style="min-width: 100px; font-size:14px; background-color: #dc3545; border: none;">
                         Log out
                     </button>
                 </div>
@@ -255,18 +268,11 @@
 </div>
 
 <script>
-    document.getElementById("openUploadFolderModal").addEventListener("click", function(e) {
-        e.preventDefault();
-        const modal = new bootstrap.Modal(document.getElementById("uploadFolderModal"));
-        modal.show();
-    });
+    // ==================== GLOBAL VARIABLES ====================
+    let selectedLabelIds = []; // Global variable untuk menyimpan label yang dipilih
+    let allLabels = [];
 
-    document.getElementById("openUploadModal").addEventListener("click", function(e) {
-        e.preventDefault();
-        const modal = new bootstrap.Modal(document.getElementById("uploadFileModal"));
-        modal.show();
-    });
-
+    // ==================== SIDEBAR TOGGLE FUNCTIONALITY ====================
     document.addEventListener("DOMContentLoaded", () => {
         const sidebar = document.getElementById('sidebar');
         const toggleBtn = document.getElementById('toggleBtn');
@@ -291,27 +297,555 @@
         });
     });
 
-    document.addEventListener("DOMContentLoaded", function () {
-    const logoutLink = document.getElementById('logoutLink');
-    const logoutForm = document.getElementById('logout-form');
-    const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
-
-    // Buka modal saat klik "Log Out"
-    logoutLink.addEventListener('click', function (e) {
+    // ==================== MODAL OPENERS ====================
+    document.getElementById("openUploadFolderModal").addEventListener("click", function(e) {
         e.preventDefault();
-        const modal = new bootstrap.Modal(document.getElementById('logoutConfirmationModal'));
+        const modal = new bootstrap.Modal(document.getElementById("uploadFolderModal"));
+
+        // Reset form
+        document.getElementById("createFolderForm").reset();
+        document.getElementById("folderMessage").classList.add("d-none");
+
         modal.show();
     });
 
-    // Konfirmasi logout → submit form
-    confirmLogoutBtn.addEventListener('click', function () {
-        logoutForm.submit();
+    document.getElementById("openUploadModal").addEventListener("click", function(e) {
+        e.preventDefault();
+        const modal = new bootstrap.Modal(document.getElementById("uploadFileModal"));
+
+        // Reset form dan labels
+        document.getElementById("uploadForm").reset();
+        document.getElementById("fileName").textContent = "";
+
+        // Reset selected labels
+        selectedLabelIds = [];
+        const selectedLabelsContainer = document.getElementById("selectedLabels");
+        if (selectedLabelsContainer) {
+            selectedLabelsContainer.innerHTML = "";
+        }
+
+        modal.show();
     });
-    document.getElementById('logoutConfirmationModal').addEventListener('click', function (e) {
-        if (e.target === this) {
-            bootstrap.Modal.getInstance(this).hide();
+
+    // ==================== LOGOUT FUNCTIONALITY ====================
+    document.addEventListener("DOMContentLoaded", function() {
+        const logoutLink = document.getElementById('logoutLink');
+        const logoutForm = document.getElementById('logout-form');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+
+        // Buka modal saat klik "Log Out"
+        logoutLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            const modal = new bootstrap.Modal(document.getElementById('logoutConfirmationModal'));
+            modal.show();
+        });
+
+        // Konfirmasi logout → submit form
+        confirmLogoutBtn.addEventListener('click', function() {
+            logoutForm.submit();
+        });
+
+        document.getElementById('logoutConfirmationModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                bootstrap.Modal.getInstance(this).hide();
+            }
+        });
+    });
+
+    // ==================== LABEL MANAGEMENT FUNCTIONALITY ====================
+    document.addEventListener("DOMContentLoaded", async () => {
+        // PERBAIKAN: Gunakan token dari session PHP, bukan localStorage
+        const token = "{{ session('token') }}";
+
+        // Jika token tidak ada, redirect ke login
+        if (!token) {
+            console.error('No token available in session');
+            window.location.href = "{{ route('signin') }}";
+            return;
+        }
+
+        const existingLabelsContainer = document.getElementById("existingLabels");
+        const selectedLabelsContainer = document.getElementById("selectedLabels");
+        const addLabelBtn = document.getElementById("addLabelBtn");
+        const newLabelContainer = document.getElementById("newLabelContainer");
+        const newLabelInput = document.getElementById("newLabelInput");
+        const saveNewLabelBtn = document.getElementById("saveNewLabelBtn");
+        const cancelNewLabelBtn = document.getElementById("cancelNewLabelBtn");
+
+        // 🎨 Warna background untuk label
+        const labelColors = [
+            "FDDCD9", "EBE0D9", "FDE9DD", "EFEAFF", "FCF9DE",
+            "E4F3FE", "FCE7ED", "E6E5E3", "EEFEF1", "F0EFED"
+        ];
+
+        // 🎨 Map background → text color
+        const colorMap = {
+            "FDDCD9": "#CB564A",
+            "EBE0D9": "#763E1A",
+            "FDE9DD": "#C2825D",
+            "EFEAFF": "#7762BB",
+            "FCF9DE": "#BDB470",
+            "E4F3FE": "#5F92B6",
+            "FCE7ED": "#CA8499",
+            "E6E5E3": "#989797",
+            "EEFEF1": "#8ABB93",
+            "F0EFED": "#729D9C"
+        };
+
+        // 🟢 Ambil semua label dari API
+        async function loadLabels() {
+            try {
+                const res = await fetch("https://pdu-dms.my.id/api/labels", {
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    }
+                });
+
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        // Token expired, redirect ke login
+                        window.location.href = "{{ route('signin') }}";
+                        return;
+                    }
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const data = await res.json();
+                allLabels = data.data || [];
+
+                renderExistingLabels();
+                renderSelectedLabels();
+            } catch (err) {
+                console.error("Gagal memuat label:", err);
+                alert("Failed to load labels. Please try again.");
+            }
+        }
+
+        // Render daftar label yang tersedia
+        function renderExistingLabels() {
+            existingLabelsContainer.innerHTML = "";
+
+            allLabels.forEach(label => {
+                const bgColor = label.color ? `#${label.color}` : "#E6E5E3";
+                const textColor = colorMap[label.color] || "#333";
+
+                const labelElement = document.createElement("button");
+                labelElement.type = "button";
+                labelElement.classList.add("btn", "rounded-pill", "px-3", "py-2", "small",
+                    "border-0");
+                labelElement.textContent = label.name;
+
+                labelElement.style.backgroundColor = bgColor;
+                labelElement.style.color = textColor;
+                labelElement.style.border = `1px solid ${textColor}22 !important`;
+                labelElement.style.cursor = "pointer";
+                labelElement.style.transition = "all 0.2s ease";
+
+                // Hover effects
+                labelElement.addEventListener("mouseenter", () => {
+                    labelElement.style.opacity = "0.8";
+                    labelElement.style.transform = "scale(1.05)";
+                });
+                labelElement.addEventListener("mouseleave", () => {
+                    labelElement.style.opacity = "1";
+                    labelElement.style.transform = "scale(1)";
+                });
+
+                // Click handler untuk memilih label
+                labelElement.addEventListener("click", () => {
+                    if (!selectedLabelIds.includes(label.id)) {
+                        selectedLabelIds.push(label.id);
+                        renderSelectedLabels();
+                    }
+                });
+
+                existingLabelsContainer.appendChild(labelElement);
+            });
+        }
+
+        // Render label yang sudah dipilih
+        function renderSelectedLabels() {
+            selectedLabelsContainer.innerHTML = "";
+
+            selectedLabelIds.forEach(labelId => {
+                const label = allLabels.find(l => l.id === labelId);
+                if (label) {
+                    const bgColor = label.color ? `#${label.color}` : "#E6E5E3";
+                    const textColor = colorMap[label.color] || "#333";
+
+                    const labelElement = document.createElement("div");
+                    labelElement.classList.add("d-flex", "align-items-center", "gap-2",
+                        "rounded-pill", "px-3", "py-2", "small");
+                    labelElement.style.backgroundColor = bgColor;
+                    labelElement.style.color = textColor;
+                    labelElement.style.border = `1px solid ${textColor}22`;
+
+                    const labelText = document.createElement("span");
+                    labelText.textContent = label.name;
+
+                    const removeBtn = document.createElement("button");
+                    removeBtn.type = "button";
+                    removeBtn.classList.add("btn", "btn-sm", "p-0", "shadow-none");
+                    removeBtn.innerHTML =
+                        '<i class="ph ph-x shadow-none" style="font-size: 12px;"></i>';
+                    removeBtn.style.color = textColor;
+                    removeBtn.style.border = "none";
+                    removeBtn.style.background = "none";
+                    removeBtn.style.cursor = "pointer";
+
+                    removeBtn.addEventListener("click", () => {
+                        selectedLabelIds = selectedLabelIds.filter(id => id !== labelId);
+                        renderSelectedLabels();
+                    });
+
+                    labelElement.appendChild(labelText);
+                    labelElement.appendChild(removeBtn);
+                    selectedLabelsContainer.appendChild(labelElement);
+                }
+            });
+        }
+
+        // 🔘 Klik tombol Add → ganti dengan input
+        addLabelBtn.addEventListener("click", () => {
+            addLabelBtn.classList.add("d-none");
+            newLabelContainer.classList.remove("d-none");
+            newLabelInput.focus();
+        });
+
+        // 💾 Simpan label baru
+        saveNewLabelBtn.addEventListener("click", async () => {
+            const name = newLabelInput.value.trim();
+            if (!name) {
+                alert("Label name cannot be empty");
+                return;
+            }
+
+            const color = labelColors[Math.floor(Math.random() * labelColors.length)];
+
+            try {
+                const res = await fetch("https://pdu-dms.my.id/api/create-label", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + token
+                    },
+                    body: JSON.stringify({
+                        name,
+                        color
+                    })
+                });
+
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        window.location.href = "{{ route('signin') }}";
+                        return;
+                    }
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const result = await res.json();
+
+                if (!res.ok) throw new Error(result.message || "Failed to create label");
+
+                // Refresh labels
+                await loadLabels();
+
+                // Otomatis pilih label yang baru dibuat
+                if (result.data && result.data.id) {
+                    selectedLabelIds.push(result.data.id);
+                    renderSelectedLabels();
+                }
+
+                // Kembalikan ke tombol Add
+                resetAddLabelForm();
+
+            } catch (err) {
+                alert("Failed to create label: " + err.message);
+            }
+        });
+
+        // ❌ Cancel pembuatan label baru
+        cancelNewLabelBtn.addEventListener("click", () => {
+            resetAddLabelForm();
+        });
+
+        // Fungsi untuk reset form add label
+        function resetAddLabelForm() {
+            newLabelInput.value = "";
+            newLabelContainer.classList.add("d-none");
+            addLabelBtn.classList.remove("d-none");
+        }
+
+        // Submit dengan Enter di input label baru
+        newLabelInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                saveNewLabelBtn.click();
+            }
+        });
+
+        // Jalankan load awal
+        loadLabels();
+    });
+
+    // ==================== UPLOAD FILE FUNCTIONALITY ====================
+    const uploadArea = document.getElementById("uploadArea");
+    const fileInput = document.getElementById("fileInput");
+    const fileNameDisplay = document.getElementById("fileName");
+
+    // Klik area upload → buka file picker
+    uploadArea.addEventListener("click", () => fileInput.click());
+
+    // Preview nama file
+    // Preview nama file DAN auto-fill title
+    fileInput.addEventListener("change", () => {
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            fileNameDisplay.textContent = file.name;
+
+            // Auto-fill title dengan nama file tanpa extension
+            const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+            document.getElementById("title").value = fileNameWithoutExt;
+        } else {
+            fileNameDisplay.textContent = "";
+            document.getElementById("title").value = "";
         }
     });
-});
-</script>
 
+    // Efek drag & drop
+    uploadArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = "#0d6efd";
+        uploadArea.style.backgroundColor = "rgba(13, 110, 253, 0.05)";
+    });
+
+    uploadArea.addEventListener("dragleave", () => {
+        uploadArea.style.borderColor = "#dee2e6";
+        uploadArea.style.backgroundColor = "transparent";
+    });
+
+    uploadArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = "#dee2e6";
+        uploadArea.style.backgroundColor = "transparent";
+
+        fileInput.files = e.dataTransfer.files;
+
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            fileNameDisplay.textContent = file.name;
+
+            // Auto-fill title dengan nama file tanpa extension
+            const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+            document.getElementById("title").value = fileNameWithoutExt;
+        }
+    });
+
+    // Submit form upload file
+    // Submit form upload file - DIPERBAIKI (Single file only)
+    document.getElementById("uploadForm").addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        const token = "{{ session('token') }}";
+        if (!token) {
+            alert("Session expired. Please login again.");
+            window.location.href = "{{ route('signin') }}";
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const parentId = getParentIdFromUrl();
+
+        if (!file) {
+            alert("Please select a file to upload");
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            const title = document.getElementById("title").value.trim();
+
+            // Jika title diisi, gunakan sebagai custom filename
+            if (title) {
+                // Tambahkan extension asli file
+                const originalExtension = file.name.split('.').pop();
+                const customFileName = `${title}.${originalExtension}`;
+
+                formData.append("files[]", file, customFileName); // Custom filename
+                formData.append("relative_paths[]", customFileName);
+            } else {
+                // Gunakan nama file asli
+                formData.append("files[]", file);
+                formData.append("relative_paths[]", file.name);
+            }
+
+            if (parentId) formData.append("parent_id", parentId);
+
+            // Tambahkan labels jika ada (multiple labels work)
+            if (selectedLabelIds.length > 0) {
+                selectedLabelIds.forEach(labelId => {
+                    formData.append("labels[]", labelId);
+                });
+            }
+
+            const res = await fetch("https://pdu-dms.my.id/api/upload-files", {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + token
+                },
+                body: formData
+            });
+
+            if (!res.ok) {
+                if (res.status === 401) {
+                    alert("Session expired. Please login again.");
+                    window.location.href = "{{ route('signin') }}";
+                    return;
+                }
+                throw new Error(`HTTP ${res.status}`);
+            }
+
+            const result = await res.json();
+            if (!res.ok) throw new Error(result.message || "Failed to upload file");
+
+            alert("File uploaded successfully!");
+            bootstrap.Modal.getInstance(document.getElementById("uploadFileModal")).hide();
+            location.reload();
+
+        } catch (err) {
+            alert("Failed to upload: " + err.message);
+        }
+    });
+
+    // ==================== CREATE FOLDER FUNCTIONALITY ====================
+
+    // Fungsi untuk mendapatkan parent_id dari URL
+    function getParentIdFromUrl() {
+        const currentUrl = window.location.href;
+        const urlParts = currentUrl.split('/');
+
+        // Cari bagian 'myspace' dalam URL
+        const myspaceIndex = urlParts.indexOf('myspace');
+
+        if (myspaceIndex !== -1 && urlParts.length > myspaceIndex + 1) {
+            const potentialId = urlParts[myspaceIndex + 1];
+
+            // Validasi apakah ini angka (ID folder)
+            if (potentialId && !isNaN(potentialId) && potentialId.trim() !== '') {
+                return parseInt(potentialId);
+            }
+        }
+
+        // Jika tidak ada ID setelah 'myspace', return null (root folder)
+        return null;
+    }
+
+    // Fungsi untuk membuat folder baru
+    document.getElementById("createFolderBtn").addEventListener("click", async function() {
+        // PERBAIKAN: Gunakan token dari session PHP
+        const token = "{{ session('token') }}";
+
+        if (!token) {
+            alert("Session expired. Please login again.");
+            window.location.href = "{{ route('signin') }}";
+            return;
+        }
+
+        const folderName = document.getElementById("folderName").value.trim();
+        const messageDiv = document.getElementById("folderMessage");
+
+        // Validasi input
+        if (!folderName) {
+            showMessage("Please enter a folder name", "danger");
+            return;
+        }
+
+        // Dapatkan parent_id dari URL
+        const parentId = getParentIdFromUrl();
+
+        // Siapkan data untuk API
+        const folderData = {
+            name: folderName
+        };
+
+        // Tambahkan parent_id jika ada
+        if (parentId) {
+            folderData.parent_id = parentId;
+        }
+
+        try {
+            // Tampilkan loading state
+            this.disabled = true;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
+
+            // Kirim request ke API
+            const res = await fetch("https://pdu-dms.my.id/api/create-folder", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify(folderData)
+            });
+
+            if (!res.ok) {
+                if (res.status === 401) {
+                    alert("Session expired. Please login again.");
+                    window.location.href = "{{ route('signin') }}";
+                    return;
+                }
+                throw new Error(`HTTP ${res.status}`);
+            }
+
+            const result = await res.json();
+
+            if (res.ok) {
+                // Success
+                showMessage("Folder created successfully!", "success");
+
+                // Reset form setelah beberapa detik dan tutup modal
+                setTimeout(() => {
+                    document.getElementById("createFolderForm").reset();
+                    bootstrap.Modal.getInstance(document.getElementById("uploadFolderModal"))
+                        .hide();
+
+                    // Refresh halaman untuk menampilkan folder baru
+                    location.reload();
+                }, 1500);
+            } else {
+                // Error dari server
+                throw new Error(result.message || "Failed to create folder");
+            }
+        } catch (err) {
+            console.error("Error creating folder:", err);
+            showMessage("Failed to create folder: " + err.message, "danger");
+        } finally {
+            // Reset button state
+            this.disabled = false;
+            this.innerHTML = "Create Folder";
+        }
+    });
+
+    // Fungsi untuk menampilkan pesan feedback
+    function showMessage(message, type) {
+        const messageDiv = document.getElementById("folderMessage");
+        messageDiv.textContent = message;
+        messageDiv.className = `alert alert-${type} mt-3`;
+        messageDiv.classList.remove("d-none");
+
+        // Auto hide setelah 5 detik untuk pesan success
+        if (type === "success") {
+            setTimeout(() => {
+                messageDiv.classList.add("d-none");
+            }, 5000);
+        }
+    }
+
+    // Submit form dengan tombol Enter
+    document.getElementById("folderName").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            document.getElementById("createFolderBtn").click();
+        }
+    });
+</script>
