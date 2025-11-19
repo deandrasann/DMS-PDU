@@ -10,15 +10,12 @@ class MySpaceController extends Controller
 {
     public function index($path = '')
     {
-        // CEK TOKEN dari header atau query parameter
-        $token = request()->bearerToken();
-        if (!$token) {
-            $token = request()->query('token');
-        }
+        // PERBAIKAN: Ambil token dari session
+        $token = session('token');
 
         // Jika tidak ada token, redirect ke login
         if (!$token) {
-            Log::warning('No token provided, redirecting to login');
+            Log::warning('No token provided in session, redirecting to login');
             return redirect()->route('signin')->with('error', 'Please login first');
         }
 
@@ -97,41 +94,41 @@ class MySpaceController extends Controller
     }
 
     private function buildBreadcrumb($ancestors, $currentFolder, $currentPath)
-    {
-        $breadcrumb = [];
+{
+    $breadcrumb = [];
 
-        // Always start with root
-        $breadcrumb[] = [
-            'id' => '',
-            'name' => 'MySpace',
-            'path' => ''
-        ];
+    // Always start with root
+    $breadcrumb[] = [
+        'id' => '',
+        'path' => '' // Pastikan path kosong untuk root
+    ];
 
-        // Add ancestors
-        foreach ($ancestors as $ancestor) {
-            if (isset($ancestor['id']) && isset($ancestor['name'])) {
-                $breadcrumb[] = [
-                    'id' => $ancestor['id'],
-                    'name' => $ancestor['name'],
-                    'path' => $this->buildPath($breadcrumb, $ancestor['id'])
-                ];
-            }
+    // Add ancestors
+    foreach ($ancestors as $ancestor) {
+        if (isset($ancestor['id']) && isset($ancestor['name'])) {
+            $breadcrumb[] = [
+                'id' => $ancestor['id'],
+                'name' => $ancestor['name'],
+                'path' => $this->buildPath($breadcrumb, $ancestor['id'])
+            ];
         }
-
-        // Add current folder if exists
-        if ($currentFolder && isset($currentFolder['id']) && isset($currentFolder['name'])) {
-            $lastItem = end($breadcrumb);
-            if (!$lastItem || $lastItem['id'] !== $currentFolder['id']) {
-                $breadcrumb[] = [
-                    'id' => $currentFolder['id'],
-                    'name' => $currentFolder['name'],
-                    'path' => $currentPath
-                ];
-            }
-        }
-
-        return $breadcrumb;
     }
+
+    // Add current folder if exists
+    if ($currentFolder && isset($currentFolder['id']) && isset($currentFolder['name'])) {
+        $lastItem = end($breadcrumb);
+        if (!$lastItem || $lastItem['id'] !== $currentFolder['id']) {
+            $breadcrumb[] = [
+                'id' => $currentFolder['id'],
+                'name' => $currentFolder['name'],
+                'path' => $currentPath ?: '' // Pastikan tidak null
+            ];
+        }
+    }
+
+    return $breadcrumb;
+}
+
 
     private function buildPath($breadcrumb, $newId)
     {
@@ -147,8 +144,8 @@ class MySpaceController extends Controller
     // API routes handler
     public function getFiles(Request $request)
     {
-        // Cek token dari request
-        $token = $request->bearerToken();
+        // PERBAIKAN: Ambil token dari session, bukan bearer token
+        $token = session('token');
         if (!$token) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
@@ -170,66 +167,104 @@ class MySpaceController extends Controller
 
     public function proxyPdf($fileId)
     {
-        // Cek token dari request
-        $token = request()->bearerToken();
+        // PERBAIKAN: Ambil token dari session
+        $token = session('token');
+
         if (!$token) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         try {
-            $response = Http::withToken($token)->get("https://pdu-dms.my.id/api/view-file/{$fileId}");
+            $response = Http::withToken($token)
+                ->withOptions([
+                    'verify' => false,
+                ])
+                ->get("https://pdu-dms.my.id/api/view-file/{$fileId}");
 
             if ($response->successful()) {
+                // Return file dengan content type yang sesuai
+                $contentType = $response->header('Content-Type', 'application/octet-stream');
+
                 return response($response->body(), 200)
-                    ->header('Content-Type', 'application/pdf');
+                    ->header('Content-Type', $contentType)
+                    ->header('Access-Control-Allow-Origin', '*');
             }
 
             return response()->json(['error' => 'File not found'], 404);
 
         } catch (\Exception $e) {
-            Log::error('proxyPdf Error', ['error' => $e->getMessage()]);
+            Log::error('Proxy file error', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Service unavailable'], 500);
         }
     }
 
     public function viewFile($fileId)
     {
-        // Cek token dari request
-        $token = request()->bearerToken();
+        // PERBAIKAN: Ambil token dari session
+        $token = session('token');
+
         if (!$token) {
-            return redirect()->route('signin');
+            Log::warning('No token in session for file view', ['file_id' => $fileId]);
+            return redirect()->route('signin')->with('error', 'Please login first');
         }
 
         try {
-            $response = Http::withToken($token)->get('https://pdu-dms.my.id/api/my-files');
+            // Gunakan endpoint yang sama seperti di MySpace
+            $response = Http::withToken($token)
+                ->withOptions([
+                    'verify' => false,
+                    'timeout' => 30,
+                ])
+                ->get('https://pdu-dms.my.id/api/my-files');
 
             if (!$response->successful()) {
+                Log::error('Failed to fetch files for file view', [
+                    'status' => $response->status(),
+                    'file_id' => $fileId
+                ]);
                 abort(404, 'Cannot fetch files');
             }
 
             $data = $response->json();
             $files = $data['files'] ?? [];
+
+            // Cari file berdasarkan ID
             $fileData = collect($files)->firstWhere('id', (int) $fileId);
 
             if (!$fileData) {
+                Log::warning('File not found', ['file_id' => $fileId]);
                 abort(404, 'File not found');
             }
+
+            // PERBAIKAN: Pastikan URL file lengkap
+            if (isset($fileData['url']) && !str_starts_with($fileData['url'], 'http')) {
+                $fileData['url'] = 'https://pdu-dms.my.id' . $fileData['url'];
+            }
+
+            Log::info('File view accessed', [
+                'file_id' => $fileId,
+                'file_name' => $fileData['name'] ?? 'Unknown'
+            ]);
 
             return view('file-view', [
                 'fileId' => $fileId,
                 'file' => $fileData,
-                'token' => $token
+                'token' => $token // Kirim token ke view
             ]);
 
         } catch (\Exception $e) {
+            Log::error('File view error', [
+                'file_id' => $fileId,
+                'error' => $e->getMessage()
+            ]);
             abort(500, 'Failed to load file');
         }
     }
 
     public function upload(Request $request)
     {
-        // Cek token dari request
-        $token = $request->bearerToken();
+        // PERBAIKAN: Ambil token dari session
+        $token = session('token');
         if (!$token) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
@@ -275,7 +310,8 @@ class MySpaceController extends Controller
     // Method untuk membuka folder
     public function openFolder(Request $request, $folderId)
     {
-        $token = $request->bearerToken();
+        // PERBAIKAN: Ambil token dari session
+        $token = session('token');
 
         if (!$token) {
             return response()->json([
@@ -300,8 +336,132 @@ class MySpaceController extends Controller
             }
 
         } catch (\Exception $e) {
-            Log::error('Upload Error', ['error' => $e->getMessage()]);
-            return response()->json(['error' => 'Upload failed'], 500);
+            Log::error('Open Folder Error', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Failed to open folder'], 500);
         }
     }
+
+    // Method untuk proxy API (untuk menghindari CORS)
+    public function proxyApi(Request $request, $endpoint)
+    {
+        // PERBAIKAN: Ambil token dari session
+        $token = session('token');
+
+        if (!$token) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        try {
+            $url = "https://pdu-dms.my.id/api/{$endpoint}";
+
+            // Forward method dan headers
+            $response = Http::withToken($token)
+                ->withHeaders([
+                    'Accept' => 'application/json',
+                ])
+                ->withOptions([
+                    'verify' => false,
+                ])
+                ->send($request->method(), $url, [
+                    'query' => $request->query(),
+                    'json' => $request->json()->all(),
+                ]);
+
+            return response($response->body(), $response->status())
+                ->withHeaders($response->headers());
+
+        } catch (\Exception $e) {
+            Log::error('Proxy API Error', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Service unavailable'], 500);
+        }
+    }
+    // Method untuk menampilkan form edit file
+public function editFile($fileId)
+{
+    $token = session('token');
+
+    if (!$token) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    try {
+        // Get file details
+        $fileResponse = Http::withToken($token)
+            ->withOptions(['verify' => false])
+            ->get("https://pdu-dms.my.id/api/my-files");
+
+        if (!$fileResponse->successful()) {
+            return response()->json(['error' => 'Failed to fetch file'], 500);
+        }
+
+        $data = $fileResponse->json();
+        $files = $data['files'] ?? [];
+        $file = collect($files)->firstWhere('id', (int) $fileId);
+
+        if (!$file) {
+            return response()->json(['error' => 'File not found'], 404);
+        }
+
+        // Get all labels
+        $labelsResponse = Http::withToken($token)
+            ->withOptions(['verify' => false])
+            ->get("https://pdu-dms.my.id/api/labels");
+
+        $labels = $labelsResponse->successful() ? $labelsResponse->json()['data'] ?? [] : [];
+
+        return response()->json([
+            'file' => $file,
+            'labels' => $labels
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('Edit file error:', ['error' => $e->getMessage()]);
+        return response()->json(['error' => 'Service unavailable'], 500);
+    }
+}
+
+// Method untuk update file - DIPERBAIKI untuk FormData
+public function updateFile(Request $request, $fileId)
+{
+    $token = session('token');
+
+    if (!$token) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    try {
+        // Handle labels dari FormData
+        $labels = [];
+        if ($request->has('labels')) {
+            $labels = is_array($request->labels) ? $request->labels : json_decode($request->labels, true) ?? [];
+        }
+
+        $updateData = [
+            'title' => $request->title,
+            'labels' => $labels
+        ];
+
+        Log::info('Updating file:', ['file_id' => $fileId, 'data' => $updateData]);
+
+        $response = Http::withToken($token)
+            ->withOptions(['verify' => false])
+            ->timeout(30)
+            ->put("https://pdu-dms.my.id/api/update-file/{$fileId}", $updateData);
+
+        if ($response->successful()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'File updated successfully'
+            ]);
+        }
+
+        return response()->json([
+            'error' => 'Update failed: ' . ($response->body() ?? 'Unknown error')
+        ], $response->status());
+
+    } catch (\Exception $e) {
+        Log::error('Update file exception:', ['error' => $e->getMessage()]);
+        return response()->json(['error' => 'Service unavailable'], 500);
+    }
+}
 }

@@ -3,12 +3,11 @@
     style="width: 280px; transition: width 0.3s;">
     <div class="d-flex align-items-center justify-content-between mb-3 position-relative">
         <div class="d-flex align-items-center">
-            <img src="{{ asset('img/logo v1.png') }}" class="d-flex align-items-center ms-2 p-1"
-                alt="Logo Kecil" id="sidebarLogoSmall" style="width:36px;">
+            <img src="{{ asset('img/logo v1.png') }}" class="d-flex align-items-center ms-2 p-1" alt="Logo Kecil"
+                id="sidebarLogoSmall" style="width:36px;">
 
             <!-- Logo besar (muncul saat expanded) -->
-            <img src="{{ asset('img/logo v2.png') }}" alt="Logo Besar" id="sidebarLogoBig"
-                style="width:120px;">
+            <img src="{{ asset('img/logo v2.png') }}" alt="Logo Besar" id="sidebarLogoBig" style="width:120px;">
         </div>
         <!-- Tombol toggle -->
         <button id="toggleBtn" class="btn btn-light bg-white ms-2">
@@ -51,13 +50,13 @@
                 <span class="sidebar-text">Last Opened</span>
             </a>
         </li>
-<li class="nav-item w-100">
-    <a href="{{ route('myspace') }}"
-        class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('myspace') || request()->routeIs('myspace.subfolder') ? 'active' : '' }}">
-        <i class="ph ph-folder-user me-2 fs-5"></i>
-        <span class="sidebar-text">My Space</span>
-    </a>
-</li>
+        <li class="nav-item w-100">
+            <a href="{{ route('myspace') }}"
+                class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('myspace') || request()->routeIs('myspace.subfolder') ? 'active' : '' }}">
+                <i class="ph ph-folder-user me-2 fs-5"></i>
+                <span class="sidebar-text">My Space</span>
+            </a>
+        </li>
         <li class="nav-item w-100">
             <hr>
         </li>
@@ -104,7 +103,7 @@
                     <!-- Drop Zone -->
                     <div id="uploadArea" class="upload-box text-center mb-4 border border-2 border-dashed rounded-4 p-4"
                         style="border-color: #dee2e6; cursor: pointer; transition: all 0.2s ease;">
-                        <input type="file" name="file" id="fileInput" class="d-none" multiple
+                        <input type="file" name="file" id="fileInput" class="d-none"
                             accept=".csv,.docx,.pdf,.pptx,.xlsx">
 
                         <div class="d-flex flex-column align-items-center">
@@ -130,46 +129,47 @@
 
                     <!-- Label Input -->
                     <!-- Label Input -->
-                   <!-- Label Input -->
-<div class="mb-4">
-    <label class="form-label fw-semibold">Label</label>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Label</label>
 
-    <!-- Container untuk existing labels dan tombol/input -->
-    <div class="d-flex flex-wrap gap-2 align-items-center">
-        <!-- Daftar label yang tersedia -->
-        <div id="existingLabels" class="d-flex flex-wrap gap-2">
-            <!-- Label akan diisi via JavaScript -->
-        </div>
+                        <!-- Container untuk existing labels dan tombol/input -->
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            <!-- Daftar label yang tersedia -->
+                            <div id="existingLabels" class="d-flex flex-wrap gap-2">
+                                <!-- Label akan diisi via JavaScript -->
+                            </div>
 
-        <!-- Tombol Add Label (akan berubah jadi input) -->
-        <div id="addLabelContainer">
-            <button type="button" class="btn btn-outline-primary rounded-3 d-flex align-items-center"
-                id="addLabelBtn">
-                <i class="ph ph-plus me-2"></i> Add Label
-            </button>
+                            <!-- Tombol Add Label (akan berubah jadi input) -->
+                            <div id="addLabelContainer">
+                                <button type="button"
+                                    class="btn btn-outline-primary rounded-3 d-flex align-items-center"
+                                    id="addLabelBtn">
+                                    <i class="ph ph-plus me-2"></i> Add Label
+                                </button>
 
-            <!-- Input Label Baru (hidden default) -->
-            <div id="newLabelContainer" class="d-none">
-                <div class="input-group">
-                    <input type="text" id="newLabelInput" class="form-control rounded-3 mx-2"
-                        placeholder="Enter new label name" style="width: 150px;">
-                    <button type="button" class="btn btn-blue rounded-3 me-2 small" style="size: 12px" id="saveNewLabelBtn">
-                        Save
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary rounded-3 me-2 small" style="size: 12px"
-                        id="cancelNewLabelBtn">
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+                                <!-- Input Label Baru (hidden default) -->
+                                <div id="newLabelContainer" class="d-none">
+                                    <div class="input-group">
+                                        <input type="text" id="newLabelInput" class="form-control rounded-3 mx-2"
+                                            placeholder="Enter new label name" style="width: 150px;">
+                                        <button type="button" class="btn btn-blue rounded-3 me-2 small"
+                                            style="size: 12px" id="saveNewLabelBtn">
+                                            Save
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary rounded-3 me-2 small"
+                                            style="size: 12px" id="cancelNewLabelBtn">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-    <!-- Label yang dipilih (akan ditampilkan setelah dipilih) -->
-    <div id="selectedLabels" class="d-flex flex-wrap gap-2 mt-3">
-        <!-- Label yang dipilih akan muncul di sini -->
-    </div>
-</div>
+                        <!-- Label yang dipilih (akan ditampilkan setelah dipilih) -->
+                        <div id="selectedLabels" class="d-flex flex-wrap gap-2 mt-3">
+                            <!-- Label yang dipilih akan muncul di sini -->
+                        </div>
+                    </div>
                     <!-- Buttons -->
                     <div class="d-flex justify-content-end gap-2">
                         <button type="button" class="btn btn-outline-secondary rounded-3  px-4"
@@ -354,7 +354,16 @@
 
     // ==================== LABEL MANAGEMENT FUNCTIONALITY ====================
     document.addEventListener("DOMContentLoaded", async () => {
-        const token = localStorage.getItem("token");
+        // PERBAIKAN: Gunakan token dari session PHP, bukan localStorage
+        const token = "{{ session('token') }}";
+
+        // Jika token tidak ada, redirect ke login
+        if (!token) {
+            console.error('No token available in session');
+            window.location.href = "{{ route('signin') }}";
+            return;
+        }
+
         const existingLabelsContainer = document.getElementById("existingLabels");
         const selectedLabelsContainer = document.getElementById("selectedLabels");
         const addLabelBtn = document.getElementById("addLabelBtn");
@@ -391,6 +400,16 @@
                         "Authorization": "Bearer " + token
                     }
                 });
+
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        // Token expired, redirect ke login
+                        window.location.href = "{{ route('signin') }}";
+                        return;
+                    }
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
                 const data = await res.json();
                 allLabels = data.data || [];
 
@@ -398,6 +417,7 @@
                 renderSelectedLabels();
             } catch (err) {
                 console.error("Gagal memuat label:", err);
+                alert("Failed to load labels. Please try again.");
             }
         }
 
@@ -486,74 +506,83 @@
         }
 
         // 🔘 Klik tombol Add → ganti dengan input
-addLabelBtn.addEventListener("click", () => {
-    addLabelBtn.classList.add("d-none");
-    newLabelContainer.classList.remove("d-none");
-    newLabelInput.focus();
-});
-
-// 💾 Simpan label baru
-saveNewLabelBtn.addEventListener("click", async () => {
-    const name = newLabelInput.value.trim();
-    if (!name) {
-        alert("Label name cannot be empty");
-        return;
-    }
-
-    const color = labelColors[Math.floor(Math.random() * labelColors.length)];
-
-    try {
-        const res = await fetch("https://pdu-dms.my.id/api/create-label", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token
-            },
-            body: JSON.stringify({
-                name,
-                color
-            })
+        addLabelBtn.addEventListener("click", () => {
+            addLabelBtn.classList.add("d-none");
+            newLabelContainer.classList.remove("d-none");
+            newLabelInput.focus();
         });
-        const result = await res.json();
 
-        if (!res.ok) throw new Error(result.message || "Failed to create label");
+        // 💾 Simpan label baru
+        saveNewLabelBtn.addEventListener("click", async () => {
+            const name = newLabelInput.value.trim();
+            if (!name) {
+                alert("Label name cannot be empty");
+                return;
+            }
 
-        // Refresh labels
-        await loadLabels();
+            const color = labelColors[Math.floor(Math.random() * labelColors.length)];
 
-        // Otomatis pilih label yang baru dibuat
-        if (result.data && result.data.id) {
-            selectedLabelIds.push(result.data.id);
-            renderSelectedLabels();
+            try {
+                const res = await fetch("https://pdu-dms.my.id/api/create-label", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + token
+                    },
+                    body: JSON.stringify({
+                        name,
+                        color
+                    })
+                });
+
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        window.location.href = "{{ route('signin') }}";
+                        return;
+                    }
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const result = await res.json();
+
+                if (!res.ok) throw new Error(result.message || "Failed to create label");
+
+                // Refresh labels
+                await loadLabels();
+
+                // Otomatis pilih label yang baru dibuat
+                if (result.data && result.data.id) {
+                    selectedLabelIds.push(result.data.id);
+                    renderSelectedLabels();
+                }
+
+                // Kembalikan ke tombol Add
+                resetAddLabelForm();
+
+            } catch (err) {
+                alert("Failed to create label: " + err.message);
+            }
+        });
+
+        // ❌ Cancel pembuatan label baru
+        cancelNewLabelBtn.addEventListener("click", () => {
+            resetAddLabelForm();
+        });
+
+        // Fungsi untuk reset form add label
+        function resetAddLabelForm() {
+            newLabelInput.value = "";
+            newLabelContainer.classList.add("d-none");
+            addLabelBtn.classList.remove("d-none");
         }
 
-        // Kembalikan ke tombol Add
-        resetAddLabelForm();
-
-    } catch (err) {
-        alert("Failed to create label: " + err.message);
-    }
-});
-
-// ❌ Cancel pembuatan label baru
-cancelNewLabelBtn.addEventListener("click", () => {
-    resetAddLabelForm();
-});
-
-// Fungsi untuk reset form add label
-function resetAddLabelForm() {
-    newLabelInput.value = "";
-    newLabelContainer.classList.add("d-none");
-    addLabelBtn.classList.remove("d-none");
-}
-
-// Submit dengan Enter di input label baru
-newLabelInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-        e.preventDefault();
-        saveNewLabelBtn.click();
-    }
-});
+        // Submit dengan Enter di input label baru
+        newLabelInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                saveNewLabelBtn.click();
+            }
+        });
 
         // Jalankan load awal
         loadLabels();
@@ -568,10 +597,18 @@ newLabelInput.addEventListener("keypress", (e) => {
     uploadArea.addEventListener("click", () => fileInput.click());
 
     // Preview nama file
+    // Preview nama file DAN auto-fill title
     fileInput.addEventListener("change", () => {
         if (fileInput.files.length > 0) {
-            const fileNames = Array.from(fileInput.files).map(f => f.name).join(", ");
-            fileNameDisplay.textContent = fileNames;
+            const file = fileInput.files[0];
+            fileNameDisplay.textContent = file.name;
+
+            // Auto-fill title dengan nama file tanpa extension
+            const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+            document.getElementById("title").value = fileNameWithoutExt;
+        } else {
+            fileNameDisplay.textContent = "";
+            document.getElementById("title").value = "";
         }
     });
 
@@ -593,44 +630,64 @@ newLabelInput.addEventListener("keypress", (e) => {
         uploadArea.style.backgroundColor = "transparent";
 
         fileInput.files = e.dataTransfer.files;
-        const fileNames = Array.from(fileInput.files).map(f => f.name).join(", ");
-        fileNameDisplay.textContent = fileNames;
+
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            fileNameDisplay.textContent = file.name;
+
+            // Auto-fill title dengan nama file tanpa extension
+            const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+            document.getElementById("title").value = fileNameWithoutExt;
+        }
     });
 
     // Submit form upload file
+    // Submit form upload file - DIPERBAIKI (Single file only)
     document.getElementById("uploadForm").addEventListener("submit", async function(e) {
         e.preventDefault();
 
-        const formData = new FormData();
-        const files = fileInput.files;
-        const parentId = getParentIdFromUrl();
-
-        if (files.length === 0) {
-            alert("Please select at least one file to upload");
+        const token = "{{ session('token') }}";
+        if (!token) {
+            alert("Session expired. Please login again.");
+            window.location.href = "{{ route('signin') }}";
             return;
         }
 
-        for (let file of files) {
-            formData.append("files[]", file);
-            formData.append("relative_paths[]", file.name);
+        const file = fileInput.files[0];
+        const parentId = getParentIdFromUrl();
+
+        if (!file) {
+            alert("Please select a file to upload");
+            return;
         }
-
-        if (parentId) formData.append("parent_id", parentId);
-
-        const title = document.getElementById("title").value;
-        if (title) formData.append("title", title);
-
-        // ✅ PERBAIKAN: Kirim labels[] sebagai array (sesuai Postman)
-        // Sekarang selectedLabelIds bisa diakses karena di global scope
-        if (selectedLabelIds.length > 0) {
-            selectedLabelIds.forEach(labelId => {
-                formData.append("labels[]", labelId);
-            });
-        }
-
-        const token = localStorage.getItem("token");
 
         try {
+            const formData = new FormData();
+            const title = document.getElementById("title").value.trim();
+
+            // Jika title diisi, gunakan sebagai custom filename
+            if (title) {
+                // Tambahkan extension asli file
+                const originalExtension = file.name.split('.').pop();
+                const customFileName = `${title}.${originalExtension}`;
+
+                formData.append("files[]", file, customFileName); // Custom filename
+                formData.append("relative_paths[]", customFileName);
+            } else {
+                // Gunakan nama file asli
+                formData.append("files[]", file);
+                formData.append("relative_paths[]", file.name);
+            }
+
+            if (parentId) formData.append("parent_id", parentId);
+
+            // Tambahkan labels jika ada (multiple labels work)
+            if (selectedLabelIds.length > 0) {
+                selectedLabelIds.forEach(labelId => {
+                    formData.append("labels[]", labelId);
+                });
+            }
+
             const res = await fetch("https://pdu-dms.my.id/api/upload-files", {
                 method: "POST",
                 headers: {
@@ -638,12 +695,23 @@ newLabelInput.addEventListener("keypress", (e) => {
                 },
                 body: formData
             });
-            const result = await res.json();
-            if (!res.ok) throw new Error(result.message || "Failed to upload files");
 
-            alert("Files uploaded successfully!");
+            if (!res.ok) {
+                if (res.status === 401) {
+                    alert("Session expired. Please login again.");
+                    window.location.href = "{{ route('signin') }}";
+                    return;
+                }
+                throw new Error(`HTTP ${res.status}`);
+            }
+
+            const result = await res.json();
+            if (!res.ok) throw new Error(result.message || "Failed to upload file");
+
+            alert("File uploaded successfully!");
             bootstrap.Modal.getInstance(document.getElementById("uploadFileModal")).hide();
             location.reload();
+
         } catch (err) {
             alert("Failed to upload: " + err.message);
         }
@@ -674,9 +742,17 @@ newLabelInput.addEventListener("keypress", (e) => {
 
     // Fungsi untuk membuat folder baru
     document.getElementById("createFolderBtn").addEventListener("click", async function() {
+        // PERBAIKAN: Gunakan token dari session PHP
+        const token = "{{ session('token') }}";
+
+        if (!token) {
+            alert("Session expired. Please login again.");
+            window.location.href = "{{ route('signin') }}";
+            return;
+        }
+
         const folderName = document.getElementById("folderName").value.trim();
         const messageDiv = document.getElementById("folderMessage");
-        const token = localStorage.getItem("token");
 
         // Validasi input
         if (!folderName) {
@@ -712,6 +788,15 @@ newLabelInput.addEventListener("keypress", (e) => {
                 body: JSON.stringify(folderData)
             });
 
+            if (!res.ok) {
+                if (res.status === 401) {
+                    alert("Session expired. Please login again.");
+                    window.location.href = "{{ route('signin') }}";
+                    return;
+                }
+                throw new Error(`HTTP ${res.status}`);
+            }
+
             const result = await res.json();
 
             if (res.ok) {
@@ -722,7 +807,7 @@ newLabelInput.addEventListener("keypress", (e) => {
                 setTimeout(() => {
                     document.getElementById("createFolderForm").reset();
                     bootstrap.Modal.getInstance(document.getElementById("uploadFolderModal"))
-                .hide();
+                        .hide();
 
                     // Refresh halaman untuk menampilkan folder baru
                     location.reload();

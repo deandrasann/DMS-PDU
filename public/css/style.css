@@ -1,24 +1,24 @@
-/* FIX FONT SFT SCHRIFTED SANS */
+/* FIX FONT SFT SCHRIFTED SANS - PATH CORRECTION */
 /* 100 - Thin / Hairline */
 @font-face {
     font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-Var.ttf') format('truetype');
+    src: url('../fonts/SFTSchriftedSansTRIAL-Var.ttf') format('truetype');
     font-weight: 100;
     font-style: normal;
-    font-display: swap; /* Tambahkan untuk performa loading */
+    font-display: swap;
 }
 
 /* 200 - ExtraLight */
 @font-face {
     font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-ExLight.ttf') format('truetype');
+    src: url('../fonts/SFTSchriftedSansTRIAL-ExLight.ttf') format('truetype');
     font-weight: 200;
     font-style: normal;
     font-display: swap;
 }
 @font-face {
     font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-ExLightItalic.ttf') format('truetype');
+    src: url('../fonts/SFTSchriftedSansTRIAL-ExLightItalic.ttf') format('truetype');
     font-weight: 200;
     font-style: italic;
     font-display: swap;
@@ -27,14 +27,14 @@
 /* 300 - Light */
 @font-face {
     font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-Light.ttf') format('truetype');
+    src: url('../fonts/SFTSchriftedSansTRIAL-Light.ttf') format('truetype');
     font-weight: 300;
     font-style: normal;
     font-display: swap;
 }
 @font-face {
     font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-LightItalic.ttf') format('truetype');
+    src: url('../fonts/SFTSchriftedSansTRIAL-LightItalic.ttf') format('truetype');
     font-weight: 300;
     font-style: italic;
     font-display: swap;
@@ -43,14 +43,14 @@
 /* 400 - Regular */
 @font-face {
     font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-Regular.ttf') format('truetype');
+    src: url('../fonts/SFTSchriftedSansTRIAL-Regular.ttf') format('truetype');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
 }
 @font-face {
     font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-Italic.ttf') format('truetype');
+    src: url('../fonts/SFTSchriftedSansTRIAL-Italic.ttf') format('truetype');
     font-weight: 400;
     font-style: italic;
     font-display: swap;
@@ -59,14 +59,14 @@
 /* 500 - Medium */
 @font-face {
     font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-Medium.ttf') format('truetype');
+    src: url('../fonts/SFTSchriftedSansTRIAL-Medium.ttf') format('truetype');
     font-weight: 500;
     font-style: normal;
     font-display: swap;
 }
 @font-face {
     font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-MediumItalic.ttf') format('truetype');
+    src: url('../fonts/SFTSchriftedSansTRIAL-MediumItalic.ttf') format('truetype');
     font-weight: 500;
     font-style: italic;
     font-display: swap;
@@ -75,14 +75,14 @@
 /* 600 - DemiBold / SemiBold */
 @font-face {
     font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-DemiBold.ttf') format('truetype');
+    src: url('../fonts/SFTSchriftedSansTRIAL-DemiBold.ttf') format('truetype');
     font-weight: 600;
     font-style: normal;
     font-display: swap;
 }
 @font-face {
     font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-DemiBoldItalic.ttf') format('truetype');
+    src: url('../fonts/SFTSchriftedSansTRIAL-DemiBoldItalic.ttf') format('truetype');
     font-weight: 600;
     font-style: italic;
     font-display: swap;
@@ -91,14 +91,14 @@
 /* 700 - Bold */
 @font-face {
     font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-Bold.ttf') format('truetype');
+    src: url('../fonts/SFTSchriftedSansTRIAL-Bold.ttf') format('truetype');
     font-weight: 700;
     font-style: normal;
     font-display: swap;
 }
 @font-face {
     font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-BoldItalic.ttf') format('truetype');
+    src: url('../fonts/SFTSchriftedSansTRIAL-BoldItalic.ttf') format('truetype');
     font-weight: 700;
     font-style: italic;
     font-display: swap;
@@ -107,14 +107,14 @@
 /* 800 - ExtraBold */
 @font-face {
     font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-ExBold.ttf') format('truetype');
+    src: url('../fonts/SFTSchriftedSansTRIAL-ExBold.ttf') format('truetype');
     font-weight: 800;
     font-style: normal;
     font-display: swap;
 }
 @font-face {
     font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-ExBoldItalic.ttf') format('truetype');
+    src: url('../fonts/SFTSchriftedSansTRIAL-ExBoldItalic.ttf') format('truetype');
     font-weight: 800;
     font-style: italic;
     font-display: swap;
@@ -123,20 +123,24 @@
 /* 900 - Black */
 @font-face {
     font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-Black.ttf') format('truetype');
+    src: url('../fonts/SFTSchriftedSansTRIAL-Black.ttf') format('truetype');
     font-weight: 900;
     font-style: normal;
     font-display: swap;
 }
 @font-face {
     font-family: 'SFT Schrifted Sans';
-    src: url('fonts/SFTSchriftedSansTRIAL-BlackItalic.ttf') format('truetype');
+    src: url('../fonts/SFTSchriftedSansTRIAL-BlackItalic.ttf') format('truetype');
     font-weight: 900;
     font-style: italic;
     font-display: swap;
 }
 
 /* Typography - FIX FONT FAMILY */
+* {
+    font-family: 'SFT Schrifted Sans', Arial, sans-serif !important;
+}
+
 body {
     font-family: 'SFT Schrifted Sans', Arial, sans-serif !important;
     font-weight: 400;
@@ -192,6 +196,8 @@ small {
     font-weight: 400;
     line-height: normal;
 }
+
+
 
 /* FIX Z-INDEX STRUCTURE UNTUK MODAL DAN FOLDER */
 /* Pastikan modal memiliki z-index tertinggi */
