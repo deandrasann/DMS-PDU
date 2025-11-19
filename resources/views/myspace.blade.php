@@ -150,6 +150,55 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- Advanced Share Modal -->
+                            <div class="modal fade" id="advancedShareModal" tabindex="-1" aria-labelledby="advancedShareModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title fw-bold" id="advancedShareModalLabel">Advanced Share</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="position-relative d-flex justify-center">
+                                                <img src="{{ asset('img/folder.svg') }}" alt="Folder"
+                                                    class="img-fluid w-25 h-25 object-fit-contain" style="min-height: 100px; min-width:120px">
+                                                <!-- Overlay isi folder -->
+                                                <div
+                                                    class="position-absolute top-0 start-0 p-2 p-sm-3 w-100 h-100 d-flex flex-column justify-content-between">
+                                                    <div>
+                                                        <p class="fw-normal mt-2 mb-0 " id="folder-title">Folder Title</p>
+                                                        <small class="fw-light" id="folder-items">19 items</small>
+                                                        <div class="d-flex justify-content-end">
+                                                            <button class="btn btn-link ms-auto text-dark p-0" data-bs-toggle="dropdown">
+                                                                <ul class="dropdown-menu">
+                                                                    <li><a class="dropdown-item" href="#">Download</a></li>
+                                                                    <li><a class="dropdown-item" href="#">Share</a></li>
+                                                                    <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
+                                                                </ul>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                            <!-- Who can access -->
+                                            <div class="mb-4">
+                                                <label class="form-label fw-semibold">Who can access</label>
+                                                <div class="input-group">
+                                                    <input type="email" class="form-control" placeholder="Add Email">
+                                                    <button class="btn btn-primary">Add</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="button" class="btn btn-primary">Done</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         `;
                         folderContainer.appendChild(col);
                     });
