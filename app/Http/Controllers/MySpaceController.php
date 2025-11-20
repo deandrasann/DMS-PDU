@@ -97,37 +97,38 @@ class MySpaceController extends Controller
 {
     $breadcrumb = [];
 
-    // Always start with root
+    // Root item
     $breadcrumb[] = [
         'id' => '',
-        'path' => '' // Pastikan path kosong untuk root
+        'name' => 'MySpace',
+        'path' => ''
     ];
 
-    // Add ancestors
+    // Ancestor folders
     foreach ($ancestors as $ancestor) {
-        if (isset($ancestor['id']) && isset($ancestor['name'])) {
-            $breadcrumb[] = [
-                'id' => $ancestor['id'],
-                'name' => $ancestor['name'],
-                'path' => $this->buildPath($breadcrumb, $ancestor['id'])
-            ];
+        if (!isset($ancestor['id'], $ancestor['name'])) {
+            continue; // Skip data yang tidak lengkap
         }
+
+        $breadcrumb[] = [
+            'id' => $ancestor['id'],
+            'name' => $ancestor['name'],
+            'path' => $ancestor['id']
+        ];
     }
 
-    // Add current folder if exists
-    if ($currentFolder && isset($currentFolder['id']) && isset($currentFolder['name'])) {
-        $lastItem = end($breadcrumb);
-        if (!$lastItem || $lastItem['id'] !== $currentFolder['id']) {
-            $breadcrumb[] = [
-                'id' => $currentFolder['id'],
-                'name' => $currentFolder['name'],
-                'path' => $currentPath ?: '' // Pastikan tidak null
-            ];
-        }
+    // Current folder
+    if ($currentFolder && isset($currentFolder['id'], $currentFolder['name'])) {
+        $breadcrumb[] = [
+            'id' => $currentFolder['id'],
+            'name' => $currentFolder['name'],
+            'path' => $currentPath
+        ];
     }
 
     return $breadcrumb;
 }
+
 
 
     private function buildPath($breadcrumb, $newId)

@@ -11,32 +11,18 @@
 @if (!empty($breadcrumb) && $currentPath !== '')
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="{{ route('myspace') }}" class="text-dark text-decoration-none">
-                    MySpace
-                </a>
-            </li>
             @foreach ($breadcrumb as $crumb)
                 @if ($loop->last)
-                    <li class="breadcrumb-item active text-dark">
-                        {{ $crumb['name'] }}
-                    </li>
+                    <li class="breadcrumb-item active">{{ $crumb['name'] }}</li>
                 @else
                     <li class="breadcrumb-item">
-                        @if(!empty($crumb['path']))
-                            <a href="{{ route('myspace.subfolder', ['path' => $crumb['path']]) }}"
-                                class="text-dark text-decoration-none">
-                                {{ $crumb['name'] }}
-                            </a>
-                        @else
-                            <a href="{{ route('myspace') }}"
-                                class="text-dark text-decoration-none">
-                                {{ $crumb['name'] }}
-                            </a>
-                        @endif
+                        <a href="{{ $crumb['path'] ? route('myspace.subfolder', ['path' => $crumb['path']]) : route('myspace') }}">
+                            {{ $crumb['name'] }}
+                        </a>
                     </li>
                 @endif
             @endforeach
+
         </ol>
     </nav>
 @endif
@@ -62,7 +48,6 @@
         <p class="mt-3">Tidak ada item di sini.</p>
     </div>
 </template>
-
 
 
 {{-- Load PDF.js --}}
@@ -163,7 +148,7 @@
                                                        data-folder-name="${folder.name}">
                                                         <i class="ph ph-info fs-5"></i>Get Info
                                                     </a>
-                                                    <div class="folder-info-panel" style="display: none; position: absolute; left: 100%; top: 0; width: 320px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 10000; border: 1px solid #e9ecef;">
+                                                    <div class="folder-info-panel" style="display: none; position: absolute; left: 100%; top: 0; width: 320px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #e9ecef;">
                                                         <div class="p-3">
                                                             <div class="d-flex justify-content-between align-items-center mb-3">
                                                                 <h6 class="fw-semibold mb-0">Folder Information</h6>
@@ -340,7 +325,7 @@
                                             data-file-id="${file.id}">
                                                 <i class="ph ph-info fs-5"></i> Get Info
                                             </a>
-                                            <div class="file-info-panel" style="display: none; position: absolute; left: 100%; top: 0; width: 320px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 10000; border: 1px solid #e9ecef;">
+                                            <div class="file-info-panel" style="display: none; position: absolute; left: 100%; top: 0; width: 320px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #e9ecef;">
                                                 <div class="p-3">
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                                         <h6 class="fw-semibold mb-0">File Information</h6>
@@ -404,17 +389,17 @@
                                                 </div>
                                             </div>
                                         </li>
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center gap-2 edit-file-btn" href="#"
+                                        data-id="${file.id}" data-name="${file.name}" data-labels='${JSON.stringify(file.labels)}'>
+                                            <i class="ph ph-pencil-simple fs-5"></i> Edit File
+                                        </a>
+                                    </li>
                                         <li>
                                             <a href="#"
                                             class="dropdown-item text-danger d-flex align-items-center gap-2 delete-btn"
                                             data-id="${file.id}">
                                             <i class="ph ph-trash fs-5"></i> Delete
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item d-flex align-items-center gap-2" href="#"
-                                                data-bs-toggle="modal" data-bs-target="#editFileModal">
-                                                <i class="ph ph-pencil-simple fs-5"></i> Edit File
                                             </a>
                                         </li>
                                     </ul>
@@ -437,6 +422,9 @@
                     }
                 });
             }
+
+            // Initialize edit functionality setelah files dirender
+            initializeEditFunctionality();
 
         } catch (err) {
             console.error('Error:', err);
