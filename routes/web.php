@@ -29,7 +29,7 @@ Route::post('/new-password', [AuthController::class, 'setNewPassword'])->name('s
 
 // Dashboard routes
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('/last-opened', [DashboardController::class, 'lastOpen'])->name('last');
+Route::get('/last-opened', [MySpaceController::class, 'lastOpened'])->name('last');
 Route::get('/shared-with-me', [DashboardController::class, 'sharedWithMe'])->name('shared');
 Route::get('/upload', [DashboardController::class, 'uploadFile'])->name('upload');
 

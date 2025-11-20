@@ -182,7 +182,7 @@
 </div>
 
 <!-- Modal Upload Folder -->
-<div class="modal fade" id="uploadFolderModal" data-bs-backdrop="true" tabindex="-1"
+<div class="modal fade" id="uploadFolderModal" data-bs-backdrop="false" tabindex="-1"
     aria-labelledby="uploadFolderModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content border-0 rounded-4 shadow-lg">

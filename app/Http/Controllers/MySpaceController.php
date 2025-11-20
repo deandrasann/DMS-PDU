@@ -55,7 +55,8 @@ class MySpaceController extends Controller
                     'currentPath' => $currentPath,
                     'breadcrumb' => $breadcrumb,
                     'files' => $data['files'] ?? [],
-                    'token' => $token // Kirim token ke view
+                    'token' => $token,
+                    'isLastOpenedPage' => false
                 ]);
             }
 
@@ -74,7 +75,8 @@ class MySpaceController extends Controller
                 'currentPath' => $currentPath,
                 'breadcrumb' => [],
                 'error' => 'Failed to load data from server. Please try again.',
-                'token' => $token
+                'token' => $token,
+                'isLastOpenedPage' => false
             ]);
 
         } catch (\Exception $e) {
@@ -88,59 +90,179 @@ class MySpaceController extends Controller
                 'currentPath' => $currentPath,
                 'breadcrumb' => [],
                 'error' => 'Connection error: ' . $e->getMessage(),
-                'token' => $token
+                'token' => $token,
+                'isLastOpenedPage' => false
             ]);
         }
     }
 
-    private function buildBreadcrumb($ancestors, $currentFolder, $currentPath)
-{
-    $breadcrumb = [];
+    public function lastOpened()
+    {
+        $token = session('token');
 
-    // Root item
-    $breadcrumb[] = [
-        'id' => '',
-        'name' => 'MySpace',
-        'path' => ''
-    ];
-
-    // Ancestor folders
-    foreach ($ancestors as $ancestor) {
-        if (!isset($ancestor['id'], $ancestor['name'])) {
-            continue; // Skip data yang tidak lengkap
+        if (!$token) {
+            Log::warning('No token provided in session, redirecting to login');
+            return redirect()->route('signin')->with('error', 'Please login first');
         }
 
-        $breadcrumb[] = [
-            'id' => $ancestor['id'],
-            'name' => $ancestor['name'],
-            'path' => $ancestor['id']
-        ];
+        Log::info('Accessing Last Opened Page');
+
+        try {
+            $url = "https://pdu-dms.my.id/api/last-opened";
+
+            $response = Http::withToken($token)
+                ->withOptions([
+                    'verify' => false,
+                    'timeout' => 30,
+                ])->get($url);
+
+            Log::info('Last Opened API Response Status', ['status' => $response->status()]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+
+                $allFiles = $this->transformLastOpenedData($data);
+
+                Log::info('Last Opened Data', [
+                    'folders_count' => count($data['last_opened_folders'] ?? []),
+                    'files_count' => count($data['last_opened_files'] ?? []),
+                    'total_items' => count($allFiles)
+                ]);
+
+                return view('last-opened', [
+                    'files' => $allFiles,
+                    'token' => $token,
+                    'isLastOpenedPage' => true
+                ]);
+            }
+
+            if ($response->status() === 401) {
+                Log::warning('API returned 401, token invalid');
+                return redirect()->route('signin')->with('error', 'Session expired. Please login again.');
+            }
+
+            Log::error('Last Opened API Error', [
+                'status' => $response->status(),
+                'response' => $response->body()
+            ]);
+
+            return view('last-opened', [
+                'files' => [],
+                'error' => 'Failed to load last opened items.',
+                'token' => $token,
+                'isLastOpenedPage' => true
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Last Opened Error', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return view('last-opened', [
+                'files' => [],
+                'error' => 'Connection error: ' . $e->getMessage(),
+                'token' => $token,
+                'isLastOpenedPage' => true
+            ]);
+        }
     }
 
-    // Current folder
-    if ($currentFolder && isset($currentFolder['id'], $currentFolder['name'])) {
-        $breadcrumb[] = [
-            'id' => $currentFolder['id'],
-            'name' => $currentFolder['name'],
-            'path' => $currentPath
-        ];
+    /**
+     * Transform data dari last-opened endpoint ke format yang kompatibel
+     */
+    private function transformLastOpenedData($data)
+    {
+        $transformed = [];
+
+        // Process folders
+        if (isset($data['last_opened_folders']) && is_array($data['last_opened_folders'])) {
+            foreach ($data['last_opened_folders'] as $folder) {
+                $transformed[] = [
+                    'id' => $folder['id'] ?? null,
+                    'name' => $folder['name'] ?? 'Unknown Folder',
+                    'path' => $folder['path'] ?? '',
+                    'storage_path' => $folder['storage_path'] ?? null,
+                    'url' => $folder['url'] ?? null,
+                    'parent_id' => $folder['parent_id'] ?? null,
+                    'is_folder' => true,
+                    'mime' => $folder['mime'] ?? null,
+                    'size' => $folder['size'] ?? '0.00 B',
+                    'type' => $folder['type'] ?? 'Folder',
+                    'owner' => $folder['owner'] ?? 'me',
+                    'created_at' => $folder['created_at'] ?? null,
+                    'updated_at' => $folder['updated_at'] ?? null,
+                    'created_by' => $folder['created_by'] ?? null,
+                    'updated_by' => $folder['updated_by'] ?? null,
+                    'deleted_at' => $folder['deleted_at'] ?? null
+                ];
+            }
+        }
+
+        // Process files
+        if (isset($data['last_opened_files']) && is_array($data['last_opened_files'])) {
+            foreach ($data['last_opened_files'] as $file) {
+                $transformed[] = [
+                    'id' => $file['id'] ?? null,
+                    'name' => $file['name'] ?? 'Unknown File',
+                    'path' => $file['path'] ?? '',
+                    'storage_path' => $file['storage_path'] ?? null,
+                    'url' => $file['url'] ?? null,
+                    'parent_id' => $file['parent_id'] ?? null,
+                    'is_folder' => false,
+                    'mime' => $file['mime'] ?? null,
+                    'size' => $file['size'] ?? '0.00 B',
+                    'type' => $file['type'] ?? 'File',
+                    'owner' => $file['owner'] ?? 'me',
+                    'created_at' => $file['created_at'] ?? null,
+                    'updated_at' => $file['updated_at'] ?? null,
+                    'created_by' => $file['created_by'] ?? null,
+                    'updated_by' => $file['updated_by'] ?? null,
+                    'deleted_at' => $file['deleted_at'] ?? null,
+                    'labels' => $file['labels'] ?? []
+                ];
+            }
+        }
+
+        return $transformed;
     }
 
-    return $breadcrumb;
-}
+    private function buildBreadcrumb($ancestors, $currentFolder, $currentPath)
+    {
+        $breadcrumb = [];
 
+        // Root item
+        $breadcrumb[] = [
+            'id' => '',
+            'name' => 'MySpace',
+            'path' => ''
+        ];
 
+        // Ancestor folders
+        foreach ($ancestors as $ancestor) {
+            if (!isset($ancestor['id'], $ancestor['name'])) {
+                continue; // Skip data yang tidak lengkap
+            }
 
-    // private function buildPath($breadcrumb, $newId)
-    // {
-    //     $path = '';
-    //     foreach ($breadcrumb as $item) {
-    //         if ($item['id'] && $item['id'] !== '') {
-    //             $path .= $item['id'] . '/';
-    //         }
-    //     }
-    //     return rtrim($path . $newId, '/');
-    // }
+            $breadcrumb[] = [
+                'id' => $ancestor['id'],
+                'name' => $ancestor['name'],
+                'path' => $ancestor['id']
+            ];
+        }
+
+        // Current folder
+        if ($currentFolder && isset($currentFolder['id'], $currentFolder['name'])) {
+            $breadcrumb[] = [
+                'id' => $currentFolder['id'],
+                'name' => $currentFolder['name'],
+                'path' => $currentPath
+            ];
+        }
+
+        return $breadcrumb;
+    }
 
     // API routes handler
     public function getFiles(Request $request)
@@ -250,7 +372,7 @@ class MySpaceController extends Controller
             return view('file-view', [
                 'fileId' => $fileId,
                 'file' => $fileData,
-                'token' => $token // Kirim token ke view
+                'token' => $token
             ]);
 
         } catch (\Exception $e) {
@@ -376,93 +498,94 @@ class MySpaceController extends Controller
             return response()->json(['error' => 'Service unavailable'], 500);
         }
     }
+
     // Method untuk menampilkan form edit file
-public function editFile($fileId)
-{
-    $token = session('token');
+    public function editFile($fileId)
+    {
+        $token = session('token');
 
-    if (!$token) {
-        return response()->json(['error' => 'Unauthorized'], 401);
-    }
-
-    try {
-        // Get file details
-        $fileResponse = Http::withToken($token)
-            ->withOptions(['verify' => false])
-            ->get("https://pdu-dms.my.id/api/my-files");
-
-        if (!$fileResponse->successful()) {
-            return response()->json(['error' => 'Failed to fetch file'], 500);
+        if (!$token) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $data = $fileResponse->json();
-        $files = $data['files'] ?? [];
-        $file = collect($files)->firstWhere('id', (int) $fileId);
+        try {
+            // Get file details
+            $fileResponse = Http::withToken($token)
+                ->withOptions(['verify' => false])
+                ->get("https://pdu-dms.my.id/api/my-files");
 
-        if (!$file) {
-            return response()->json(['error' => 'File not found'], 404);
-        }
+            if (!$fileResponse->successful()) {
+                return response()->json(['error' => 'Failed to fetch file'], 500);
+            }
 
-        // Get all labels
-        $labelsResponse = Http::withToken($token)
-            ->withOptions(['verify' => false])
-            ->get("https://pdu-dms.my.id/api/labels");
+            $data = $fileResponse->json();
+            $files = $data['files'] ?? [];
+            $file = collect($files)->firstWhere('id', (int) $fileId);
 
-        $labels = $labelsResponse->successful() ? $labelsResponse->json()['data'] ?? [] : [];
+            if (!$file) {
+                return response()->json(['error' => 'File not found'], 404);
+            }
 
-        return response()->json([
-            'file' => $file,
-            'labels' => $labels
-        ]);
+            // Get all labels
+            $labelsResponse = Http::withToken($token)
+                ->withOptions(['verify' => false])
+                ->get("https://pdu-dms.my.id/api/labels");
 
-    } catch (\Exception $e) {
-        Log::error('Edit file error:', ['error' => $e->getMessage()]);
-        return response()->json(['error' => 'Service unavailable'], 500);
-    }
-}
+            $labels = $labelsResponse->successful() ? $labelsResponse->json()['data'] ?? [] : [];
 
-// Method untuk update file - DIPERBAIKI untuk FormData
-public function updateFile(Request $request, $fileId)
-{
-    $token = session('token');
-
-    if (!$token) {
-        return response()->json(['error' => 'Unauthorized'], 401);
-    }
-
-    try {
-        // Handle labels dari FormData
-        $labels = [];
-        if ($request->has('labels')) {
-            $labels = is_array($request->labels) ? $request->labels : json_decode($request->labels, true) ?? [];
-        }
-
-        $updateData = [
-            'title' => $request->title,
-            'labels' => $labels
-        ];
-
-        Log::info('Updating file:', ['file_id' => $fileId, 'data' => $updateData]);
-
-        $response = Http::withToken($token)
-            ->withOptions(['verify' => false])
-            ->timeout(30)
-            ->put("https://pdu-dms.my.id/api/update-file/{$fileId}", $updateData);
-
-        if ($response->successful()) {
             return response()->json([
-                'success' => true,
-                'message' => 'File updated successfully'
+                'file' => $file,
+                'labels' => $labels
             ]);
+
+        } catch (\Exception $e) {
+            Log::error('Edit file error:', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Service unavailable'], 500);
+        }
+    }
+
+    // Method untuk update file - DIPERBAIKI untuk FormData
+    public function updateFile(Request $request, $fileId)
+    {
+        $token = session('token');
+
+        if (!$token) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        return response()->json([
-            'error' => 'Update failed: ' . ($response->body() ?? 'Unknown error')
-        ], $response->status());
+        try {
+            // Handle labels dari FormData
+            $labels = [];
+            if ($request->has('labels')) {
+                $labels = is_array($request->labels) ? $request->labels : json_decode($request->labels, true) ?? [];
+            }
 
-    } catch (\Exception $e) {
-        Log::error('Update file exception:', ['error' => $e->getMessage()]);
-        return response()->json(['error' => 'Service unavailable'], 500);
+            $updateData = [
+                'title' => $request->title,
+                'labels' => $labels
+            ];
+
+            Log::info('Updating file:', ['file_id' => $fileId, 'data' => $updateData]);
+
+            $response = Http::withToken($token)
+                ->withOptions(['verify' => false])
+                ->timeout(30)
+                ->put("https://pdu-dms.my.id/api/update-file/{$fileId}", $updateData);
+
+            if ($response->successful()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'File updated successfully'
+                ]);
+            }
+
+            return response()->json([
+                'error' => 'Update failed: ' . ($response->body() ?? 'Unknown error')
+            ], $response->status());
+
+        } catch (\Exception $e) {
+            Log::error('Update file exception:', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Service unavailable'], 500);
+        }
     }
-}
 }
