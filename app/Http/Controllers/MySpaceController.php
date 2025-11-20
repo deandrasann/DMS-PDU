@@ -131,16 +131,16 @@ class MySpaceController extends Controller
 
 
 
-    private function buildPath($breadcrumb, $newId)
-    {
-        $path = '';
-        foreach ($breadcrumb as $item) {
-            if ($item['id'] && $item['id'] !== '') {
-                $path .= $item['id'] . '/';
-            }
-        }
-        return rtrim($path . $newId, '/');
-    }
+    // private function buildPath($breadcrumb, $newId)
+    // {
+    //     $path = '';
+    //     foreach ($breadcrumb as $item) {
+    //         if ($item['id'] && $item['id'] !== '') {
+    //             $path .= $item['id'] . '/';
+    //         }
+    //     }
+    //     return rtrim($path . $newId, '/');
+    // }
 
     // API routes handler
     public function getFiles(Request $request)

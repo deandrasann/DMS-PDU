@@ -49,6 +49,36 @@
     </div>
 </template>
 
+{{-- ========== MODAL RENAME FOLDER ========== --}}
+<div class="modal fade" id="renameFolderModal" tabindex="-1" aria-labelledby="renameFolderModalLabel" aria-hidden="true" data-bs-backdrop="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-semibold" id="renameFolderModalLabel">Rename Folder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form id="renameFolderForm">
+                    <input type="hidden" id="renameFolderId" name="folder_id">
+                    <div class="mb-3">
+                        <label for="newFolderName" class="form-label fw-medium">New Folder Name</label>
+                        <input type="text" class="form-control rounded-3 border-dark-subtle"
+                               id="newFolderName" name="new_name" required
+                               placeholder="Enter new folder name">
+                        <div class="form-text text-muted">
+                            Folder name cannot contain special characters.
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-blue rounded-3 px-4" id="confirmRenameFolder">Rename</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 {{-- Load PDF.js --}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
@@ -223,6 +253,14 @@
                                                        data-id="${folder.id}"
                                                        data-name="${folder.name}">
                                                         <i class="ph ph-download fs-5"></i> Download
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex align-items-center gap-2 folder-rename-btn"
+                                                    href="#"
+                                                    data-id="${folder.id}"
+                                                    data-name="${folder.name}">
+                                                        <i class="ph ph-pencil-simple fs-5"></i> Rename
                                                     </a>
                                                 </li>
                                                 <li>
@@ -950,5 +988,179 @@
             }
         }
     });
+    // ==================== RENAME FOLDER FUNCTIONALITY ====================
+
+// Event listener untuk rename folder button
+document.addEventListener("click", function(e) {
+    const renameBtn = e.target.closest(".folder-rename-btn");
+    if (renameBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const folderId = renameBtn.getAttribute("data-id");
+        const currentName = renameBtn.getAttribute("data-name");
+
+        openRenameFolderModal(folderId, currentName);
+    }
+});
+
+// Fungsi untuk membuka modal rename folder
+function openRenameFolderModal(folderId, currentName) {
+    document.getElementById('renameFolderId').value = folderId;
+    document.getElementById('newFolderName').value = currentName;
+
+    const modal = new bootstrap.Modal(document.getElementById('renameFolderModal'));
+    modal.show();
+
+    // Focus pada input field
+    setTimeout(() => {
+        document.getElementById('newFolderName').focus();
+        document.getElementById('newFolderName').select();
+    }, 500);
+}
+
+// Event listener untuk confirm rename
+document.getElementById('confirmRenameFolder').addEventListener('click', async function() {
+    await renameFolder();
+});
+
+// Fungsi untuk rename folder
+// Fungsi untuk rename folder
+async function renameFolder() {
+    const folderId = document.getElementById('renameFolderId').value;
+    const newName = document.getElementById('newFolderName').value.trim();
+    const token = "{{ $token }}";
+
+    if (!newName) {
+        alert('Folder name cannot be empty');
+        return;
+    }
+
+    // Validasi nama folder
+    if (!isValidFolderName(newName)) {
+        alert('Folder name contains invalid characters. Please use only letters, numbers, spaces, hyphens, and underscores.');
+        return;
+    }
+
+    try {
+        const renameBtn = document.getElementById('confirmRenameFolder');
+        const originalText = renameBtn.innerHTML;
+
+        // Show loading state
+        renameBtn.innerHTML = '<i class="ph ph-spinner ph-spin fs-5"></i> Renaming...';
+        renameBtn.disabled = true;
+
+        // Gunakan endpoint yang benar untuk update file/folder
+        const response = await fetch(`https://pdu-dms.my.id/api/update-file/${folderId}`, {
+            method: "PATCH",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: newName
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('renameFolderModal'));
+            modal.hide();
+
+            // Update UI - find and update the folder name in the DOM
+            const folderElement = document.querySelector(`.folder-rename-btn[data-id="${folderId}"]`).closest('.folder-item');
+            if (folderElement) {
+                // Update folder name in the card
+                const folderNameElement = folderElement.querySelector('.fw-normal');
+                if (folderNameElement) {
+                    folderNameElement.textContent = newName;
+                    folderNameElement.setAttribute('title', newName);
+                }
+
+                // Update folder path in the open button
+                const openBtn = folderElement.querySelector('.folder-open-btn');
+                if (openBtn) {
+                    // Update href untuk open folder dengan path baru
+                    const currentHref = openBtn.getAttribute('href');
+                    const basePath = currentHref.split('/').slice(0, -1).join('/');
+                    openBtn.setAttribute('href', `${basePath}/${newName}`);
+                }
+
+                // Update data attributes in rename button
+                const renameBtn = folderElement.querySelector('.folder-rename-btn');
+                renameBtn.setAttribute('data-name', newName);
+
+                // Update data attributes in info button if exists
+                const infoBtn = folderElement.querySelector('.folder-info-btn');
+                if (infoBtn) {
+                    infoBtn.setAttribute('data-folder-name', newName);
+
+                    // Update nama folder di info panel
+                    const infoPanel = infoBtn.closest('.dropdown-submenu').querySelector('.folder-info-panel');
+                    if (infoPanel) {
+                        const folderNameInPanel = infoPanel.querySelector('h6.fw-semibold');
+                        if (folderNameInPanel) {
+                            folderNameInPanel.textContent = newName;
+                        }
+
+                        const folderDetailName = infoPanel.querySelector('.folder-details .detail-item:first-child p');
+                        if (folderDetailName) {
+                            folderDetailName.textContent = newName;
+                        }
+                    }
+                }
+
+                // Update data attributes in delete button
+                const deleteBtn = folderElement.querySelector('.folder-delete-btn');
+                if (deleteBtn) {
+                    deleteBtn.setAttribute('data-name', newName);
+                }
+
+                // Update data attributes in download button
+                const downloadBtn = folderElement.querySelector('.folder-download-btn');
+                if (downloadBtn) {
+                    downloadBtn.setAttribute('data-name', newName);
+                }
+            }
+
+            alert('Folder renamed successfully!');
+
+        } else {
+            throw new Error(result.message || 'Failed to rename folder');
+        }
+
+    } catch (error) {
+        console.error('Error renaming folder:', error);
+        alert('Failed to rename folder: ' + error.message);
+    } finally {
+        // Reset button state
+        const renameBtn = document.getElementById('confirmRenameFolder');
+        renameBtn.innerHTML = 'Rename';
+        renameBtn.disabled = false;
+    }
+}
+
+// Fungsi validasi nama folder
+function isValidFolderName(name) {
+    // Allow letters, numbers, spaces, hyphens, underscores, and parentheses
+    const regex = /^[a-zA-Z0-9\s\-_()]+$/;
+    return regex.test(name);
+}
+
+// Event listener untuk Enter key pada input field
+document.getElementById('newFolderName').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        renameFolder();
+    }
+});
+
+// Reset form ketika modal ditutup
+document.getElementById('renameFolderModal').addEventListener('hidden.bs.modal', function() {
+    document.getElementById('renameFolderForm').reset();
+});
 </script>
 @endsection
