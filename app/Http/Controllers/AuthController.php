@@ -46,7 +46,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $response = Http::post('http://127.0.0.1:8000/api/login-user', [
+        $response = Http::post('https://pdu-dms.my.id/api/login-user', [
             'email' => $request->email,
             'password' => $request->password,
         ]);
