@@ -25,7 +25,7 @@ class ShareController extends Controller
         $url = "https://pdu-dms.my.id/api/share/{$shareToken}";
 
         try {
-            $response = Http::withHeaders([
+            $response = Http::timeout(60)->withHeaders([
                 'Authorization' => 'Bearer ' . $userToken,
                 'Accept' => 'application/json'
             ])->get($url);
