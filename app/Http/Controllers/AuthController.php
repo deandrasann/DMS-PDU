@@ -45,38 +45,46 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
-{
-    $response = Http::post('https://pdu-dms.my.id/api/login-user', [
-        'email' => $request->email,
-        'password' => $request->password,
-    ]);
+    {
+        $response = Http::post('http://127.0.0.1:8000/api/login-user', [
+            'email' => $request->email,
+            'password' => $request->password,
+        ]);
 
-    if ($response->successful()) {
-        $data = $response->json();
+        if ($response->successful()) {
+            $data = $response->json();
 
-        // Ambil token sesuai key yang benar
-        $token = $data['access_token'] ?? null;
+            // Ambil token sesuai key yang benar
+            $token = $data['access_token'] ?? null;
 
-        if (!$token) {
-            return back()->withErrors(['login' => 'Token tidak ditemukan dalam respons API.']);
+            if (!$token) {
+                return back()->withErrors(['login' => 'Token tidak ditemukan dalam respons API.']);
+            }
+
+            // ✅ Simpan token secara permanen ke session
+            session()->put('token', $token);
+
+            // (Opsional) simpan juga nama user biar mudah diakses di view
+            if (isset($data['user'])) {
+                session()->put('user', $data['user']);
+            }
+
+            $redirectUrl = session('after_login_redirect');
+
+            session()->forget('after_login_redirect');
+
+            if ($redirectUrl) {
+                return redirect()->to($redirectUrl);
+            }
+
+            // ✅ Redirect langsung tanpa flash data
+            return redirect()->route('dashboard');
         }
 
-        // ✅ Simpan token secara permanen ke session
-        session()->put('token', $token);
-
-        // (Opsional) simpan juga nama user biar mudah diakses di view
-        if (isset($data['user'])) {
-            session()->put('user', $data['user']);
-        }
-
-        // ✅ Redirect langsung tanpa flash data
-        return redirect()->route('dashboard');
+        return back()->withErrors([
+            'email' => 'Invalid credentials or server error.',
+        ]);
     }
-
-    return back()->withErrors([
-        'email' => 'Invalid credentials or server error.',
-    ]);
-}
 
 
 

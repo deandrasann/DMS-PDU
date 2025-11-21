@@ -5,8 +5,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MySpaceController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ShareController;
+use Illuminate\Http\Request;
 
-Route::get('/', function () {
+Route::get('/', function (Request $request) {
     return redirect()->route('signin');
 });
 
@@ -31,7 +33,14 @@ Route::get('/shared-with-me', [DashboardController::class, 'sharedWithMe'])->nam
 Route::get('/upload', [DashboardController::class, 'uploadFile'])->name('upload');
 
 // Auth routes
-Route::get('/signin', fn() => view('auth.signin'))->name('signin');
+Route::get('/signin', function (Request $request) {
+    if ($request->has('redirect')) {
+        session()->put('after_login_redirect', $request->redirect);
+    }
+
+    return view('auth.signin');
+})->name('signin');
+
 Route::post('/signin', [AuthController::class, 'login'])->name('signin.process');
 
 Route::get('/signup', [AuthController::class, 'showSignup'])->name('signup');
@@ -50,3 +59,5 @@ Route::post('/new-password', [AuthController::class, 'setNewPassword'])->name('s
 Route::patch('/profile/update', [HomeController::class, 'update'])->name('profile.update');
 Route::post('/profile/delete-photo', [HomeController::class, 'deletePhoto'])->name('profile.delete.photo');
 Route::post('/change-password', [HomeController::class, 'updatePassword'])->name('password.update');
+
+Route::get('share/{token}', ShareController::class);
