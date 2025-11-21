@@ -17,12 +17,12 @@ class ShareController extends Controller
         $userToken = Session::get('token');
 
         if (!$userToken) {
-            return redirect()->route('signin', ['redirect' => "http://127.0.0.1:3000/share/{$shareToken}"]);
+            return redirect()->route('signin', ['redirect' => "https://dms-pdu-production.up.railway.app/share/{$shareToken}"]);
         }
 
         Log::info("User token: " . $userToken);
 
-        $url = "http://127.0.0.1:8000/api/share/{$shareToken}";
+        $url = "https://pdu-dms.my.id/api/share/{$shareToken}";
 
         try {
             $response = Http::withHeaders([
