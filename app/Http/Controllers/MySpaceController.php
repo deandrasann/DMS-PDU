@@ -108,7 +108,7 @@ class MySpaceController extends Controller
         Log::info('Accessing Last Opened Page');
 
         try {
-            $url = "https://pdu-dms.my.id/api/last-opened";
+            $url = "https://pdu-dms.my.id/api/last-opened-files";
 
             $response = Http::withToken($token)
                 ->withOptions([

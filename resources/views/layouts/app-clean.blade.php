@@ -41,7 +41,6 @@
 
         // Pass PHP variables to JavaScript
         window.token = "{{ $token }}";
-        window.currentPath = "{{ $currentPath }}";
     </script>
 
 </body>
