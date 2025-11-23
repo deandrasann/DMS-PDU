@@ -94,9 +94,9 @@
                             </div>
 
                             <!-- PREVIEW FILE (Identik Card File di MySpace) -->
-                            <div id="file-preview" class="card rounded-4 border-dark-subtle border-1"
+                            <div id="file-preview" class="card rounded-4 border-dark-subtle border-1 shadow-sm overflow-hidden"
                                 style="width: 180px; height: 220px; background-color: #F2F2F0; display: none;">
-                                <div class="mt-3 mx-2 preview-container" style="height: 120px;">
+                                <div class="mt-3 mx-2 preview-container" style="height: 120px; overflow: hidden;">
                                     <div id="file-thumbnail-wrapper" class="d-flex justify-content-center align-items-center h-100 w-100">
                                         <!-- Thumbnail akan diisi otomatis oleh JS: img, canvas (PDF), atau video -->
                                     </div>
