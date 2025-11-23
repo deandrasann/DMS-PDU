@@ -18,17 +18,33 @@
     {{-- SECTION: RECENT FOLDERS --}}
     <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4">
         <h4 class="fw-semibold mb-4">
-            Recent Folders
+            <i class="ph ph-folder-open me-2"></i>Last Opened Folders
         </h4>
-        <div id="folderContainer" class="row g-3"></div>
+        <div id="folderContainer" class="row g-3">
+            {{-- Loading state --}}
+            <div class="col-12 text-center py-3">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="text-muted mt-2">Loading recent folders...</p>
+            </div>
+        </div>
     </div>
 
     {{-- SECTION: RECENT FILES --}}
     <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4">
         <h4 class="fw-semibold mb-4">
-          Recent Files
+            <i class="ph ph-file me-2"></i>Last Opened Files
         </h4>
-        <div id="fileContainer" class="row g-3 ms-1 me-2"></div>
+        <div id="fileContainer" class="row g-3 ms-1 me-2">
+            {{-- Loading state --}}
+            <div class="col-12 text-center py-3">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="text-muted mt-2">Loading recent files...</p>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -54,5 +70,11 @@
     window.token = "{{ $token ?? '' }}";
     window.currentPath = "";
     window.isLastOpenedPage = true;
+
+    // Debug info
+    console.log('Last Opened Page Initialized:', {
+        token: window.token ? 'exists' : 'missing',
+        isLastOpenedPage: window.isLastOpenedPage
+    });
 </script>
 @endsection
