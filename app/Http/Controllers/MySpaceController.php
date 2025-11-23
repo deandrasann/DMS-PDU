@@ -258,6 +258,76 @@ class MySpaceController extends Controller
         return $transformed;
     }
 
+    public function recommended()
+    {
+        $token = session('token');
+
+        if (!$token) {
+            Log::warning('No token provided in session, redirecting to login');
+            return redirect()->route('signin')->with('error', 'Please login first');
+        }
+
+        Log::info('Accessing Recommended Files Page');
+
+        try {
+            $url = 'https://pdu-dms.my.id/api/recommended-files';
+
+            $response = Http::withToken($token)
+                ->withOptions([
+                    'verify' => false,
+                    'timeout' => 30,
+                ])
+                ->get($url);
+
+            Log::info('Recommended Files API Response Status', ['status' => $response->status()]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+
+                Log::info('Recommended Files Data', [
+                    'files_count' => count($data['recommended_files'] ?? []),
+                ]);
+
+                return view('recommended', [
+                    'files' => $data['recommended_files'] ?? [],
+                    'token' => $token,
+                    'isRecommendedPage' => true,
+                ]);
+            }
+
+            if ($response->status() === 401) {
+                Log::warning('API returned 401, token invalid');
+                session()->forget('token');
+                return redirect()->route('signin')->with('error', 'Session expired. Please login again.');
+            }
+
+            Log::error('Recommended Files API Error', [
+                'status' => $response->status(),
+                'response' => $response->body(),
+            ]);
+
+            return view('recommended', [
+                'files' => [],
+                'error' => 'Failed to load recommended files.',
+                'token' => $token,
+                'isRecommendedPage' => true,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Recommended Files Error', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            return view('recommended', [
+                'files' => [],
+                'error' => 'Connection error: ' . $e->getMessage(),
+                'token' => $token,
+                'isRecommendedPage' => true,
+            ]);
+        }
+    }
+
     private function buildBreadcrumb($ancestors, $currentFolder, $currentPath)
     {
         $breadcrumb = [];
@@ -268,7 +338,6 @@ class MySpaceController extends Controller
                 'id' => '',
                 'name' => 'MySpace',
                 'path' => '',
-                'url' => route('myspace'), // ✅ Tambahkan URL
             ];
 
             // ✅ Ancestor folders - dengan validasi lebih ketat

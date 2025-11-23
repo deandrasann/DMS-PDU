@@ -5,15 +5,17 @@ class MySpaceManager {
         this.token = window.token || '';
         this.currentPath = window.currentPath || '';
         this.isLastOpenedPage = window.isLastOpenedPage || false;
+        this.isRecommendedPage = window.isRecommendedPage || false;
 
         console.log('MySpaceManager initialized:', {
             isLastOpenedPage: this.isLastOpenedPage,
+            isRecommendedPage: this.isRecommendedPage,
             currentPath: this.currentPath
         });
 
         this.init();
     }
-        // ✅ TAMBAHKAN METHOD init() YANG HILANG
+
     init() {
         console.log('MySpaceManager init called');
         this.loadFilesAndFolders();
@@ -21,103 +23,152 @@ class MySpaceManager {
     }
 
     async loadFilesAndFolders() {
-    const folderContainer = document.getElementById("folderContainer");
-    const fileContainer = document.getElementById("fileContainer");
-    const emptyTemplate = document.getElementById("empty-template").content.cloneNode(true);
+        const folderContainer = document.getElementById("folderContainer");
+        const fileContainer = document.getElementById("fileContainer");
+        const emptyTemplate = document.getElementById("empty-template");
 
-    try {
-        let url;
-        let transformData = false;
-
-        // DETECT LAST OPENED PAGE
-        if (this.isLastOpenedPage) {
-            url = "https://pdu-dms.my.id/api/last-opened-files";
-            transformData = true;
-        } else {
-            const baseUrl = "https://pdu-dms.my.id/api/my-files";
-            url = this.currentPath ? `${baseUrl}/${this.currentPath}` : baseUrl;
-            transformData = false;
+        if (!emptyTemplate) {
+            console.error('Empty template not found!');
+            return;
         }
 
-        console.log('Fetching from:', url);
-        console.log('Is Last Opened Page:', this.isLastOpenedPage);
+        try {
+            let url;
+            let transformData = false;
 
-        const response = await fetch(url, {
-            headers: {
-                "Authorization": "Bearer " + this.token,
-                "Accept": "application/json",
-                "Content-Type": "application/json"
+            // ✅ DETECT RECOMMENDED PAGE
+            if (this.isRecommendedPage) {
+                url = "https://pdu-dms.my.id/api/recommended-files";
+                transformData = true;
             }
-        });
-
-        if (!response.ok) {
-            if (response.status === 401) {
-                this.handleUnauthorized();
-                return;
+            // DETECT LAST OPENED PAGE
+            else if (this.isLastOpenedPage) {
+                url = "https://pdu-dms.my.id/api/last-opened-files";
+                transformData = true;
+            } else {
+                const baseUrl = "https://pdu-dms.my.id/api/my-files";
+                url = this.currentPath ? `${baseUrl}/${this.currentPath}` : baseUrl;
+                transformData = false;
             }
-            throw new Error(`Gagal memuat data: ${response.status} ${response.statusText}`);
+
+            console.log('Fetching from:', url);
+            console.log('Page Type:', {
+                isRecommendedPage: this.isRecommendedPage,
+                isLastOpenedPage: this.isLastOpenedPage
+            });
+
+            const response = await fetch(url, {
+                headers: {
+                    "Authorization": "Bearer " + this.token,
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    this.handleUnauthorized();
+                    return;
+                }
+                throw new Error(`Gagal memuat data: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+
+            let folders = [];
+            let files = [];
+
+            if (transformData) {
+                if (this.isRecommendedPage) {
+                    // ✅ DATA DARI RECOMMENDED-FILES ENDPOINT (HANYA FILE)
+                    files = data.recommended_files || [];
+                    folders = []; // Recommended page hanya menampilkan files
+                } else {
+                    // DATA DARI LAST-OPENED-FILES ENDPOINT
+                    folders = data.last_opened_folders || [];
+                    files = data.last_opened_files || [];
+                }
+            } else {
+                // DATA DARI MY-FILES ENDPOINT (ORIGINAL)
+                folders = data.files?.filter(f => f.is_folder) || [];
+                files = data.files?.filter(f => !f.is_folder) || [];
+            }
+
+            // ✅ UNTUK RECOMMENDED PAGE: Hanya render files, hide folder container
+            if (this.isRecommendedPage) {
+                if (folderContainer) {
+                    folderContainer.style.display = 'none'; // Sembunyikan folder section
+                }
+                this.renderFiles(files, fileContainer, emptyTemplate.content.cloneNode(true));
+            } else {
+                // Untuk halaman lain: render normal
+                if (folderContainer) {
+                    this.renderFolders(folders, folderContainer, emptyTemplate.content.cloneNode(true));
+                }
+                this.renderFiles(files, fileContainer, emptyTemplate.content.cloneNode(true));
+            }
+
+        } catch (err) {
+            console.error('Error:', err);
+            this.showError(folderContainer, fileContainer, err.message);
         }
+    }
 
-        const data = await response.json();
+    renderFolders(folders, container, emptyTemplate) {
+        if (!container) return;
 
-        let folders = [];
-        let files = [];
+        container.innerHTML = '';
 
-        if (transformData) {
-            // DATA DARI LAST-OPENED-FILES ENDPOINT
-            folders = data.last_opened_folders || [];
-            files = data.last_opened_files || [];
+        if (folders.length === 0) {
+            const empty = emptyTemplate.cloneNode(true);
+            if (this.isLastOpenedPage) {
+                empty.querySelector("i").className = "ph ph-folder-open";
+                empty.querySelector("p").textContent = "No recently opened folders";
+            } else {
+                empty.querySelector("i").className = "ph ph-folder-open";
+                empty.querySelector("p").textContent = "Create a folder to get organized";
+            }
+            container.appendChild(empty);
         } else {
-            // DATA DARI MY-FILES ENDPOINT (ORIGINAL)
-            folders = data.files?.filter(f => f.is_folder) || [];
-            files = data.files?.filter(f => !f.is_folder) || [];
+            folders.forEach(folder => {
+                const col = this.createFolderElement(folder);
+                container.appendChild(col);
+            });
         }
-
-        this.renderFolders(folders, folderContainer, emptyTemplate);
-        this.renderFiles(files, fileContainer, emptyTemplate);
-
-    } catch (err) {
-        console.error('Error:', err);
-        this.showError(folderContainer, fileContainer, err.message);
     }
-}
 
-renderFolders(folders, container, emptyTemplate) {
-    container.innerHTML = '';
+    renderFiles(files, container, emptyTemplate) {
+        if (!container) return;
 
-    if (folders.length === 0) {
-        const empty = emptyTemplate.cloneNode(true);
-        empty.querySelector("i").className = "ph ph-folder-open";
-        empty.querySelector("p").textContent = this.isLastOpenedPage
-            ? "No recently opened folders"
-            : "Create a folder to get organized";
-        container.appendChild(empty);
-    } else {
-        folders.forEach(folder => {
-            const col = this.createFolderElement(folder);
-            container.appendChild(col);
-        });
+        container.innerHTML = '';
+
+        if (files.length === 0) {
+            const empty = emptyTemplate.cloneNode(true);
+
+            // ✅ CUSTOM MESSAGE UNTUK RECOMMENDED PAGE
+            if (this.isRecommendedPage) {
+                empty.querySelector("i").className = "ph ph-star";
+                empty.querySelector("p").textContent = "No recommended files available";
+            }
+            // CUSTOM MESSAGE UNTUK LAST OPENED PAGE
+            else if (this.isLastOpenedPage) {
+                empty.querySelector("i").className = "ph ph-file";
+                empty.querySelector("p").textContent = "No recently opened files";
+            }
+            // DEFAULT UNTUK MYSPACE
+            else {
+                empty.querySelector("i").className = "ph ph-file";
+                empty.querySelector("p").textContent = "Upload your first file to begin";
+            }
+
+            container.appendChild(empty);
+        } else {
+            files.forEach(file => {
+                const card = this.createFileElement(file);
+                container.appendChild(card);
+            });
+        }
     }
-}
-
-
-renderFiles(files, container, emptyTemplate) {
-    container.innerHTML = '';
-
-    if (files.length === 0) {
-        const empty = emptyTemplate.cloneNode(true);
-        empty.querySelector("i").className = "ph ph-file";
-        empty.querySelector("p").textContent = this.isLastOpenedPage
-            ? "No recently opened files"
-            : "Upload your first file to begin";
-        container.appendChild(empty);
-    } else {
-        files.forEach(file => {
-            const card = this.createFileElement(file);
-            container.appendChild(card);
-        });
-    }
-}
 
     createFolderElement(folder) {
         const col = document.createElement("div");
@@ -193,102 +244,101 @@ renderFiles(files, container, emptyTemplate) {
         return col;
     }
 
-createFileElement(file) {
-    const card = document.createElement("div");
-    card.className = "card rounded-4 border-dark-subtle border-1 me-3 file-card";
-    card.style.width = "180px";
-    card.style.height = "220px";
-    card.style.backgroundColor = "#F2F2F0";
-    card.style.cursor = "pointer";
+    createFileElement(file) {
+        const card = document.createElement("div");
+        card.className = "card rounded-4 border-dark-subtle border-1 me-3 file-card";
+        card.style.width = "180px";
+        card.style.height = "220px";
+        card.style.backgroundColor = "#F2F2F0";
+        card.style.cursor = "pointer";
 
-    const fileInfo = this.getFileIconAndType(file.mime);
-    const openUrl = file.mime && file.mime.includes('pdf') ?
-        `/files/${file.id}` :
-        `/file-view/${file.id}`;
+        const fileInfo = this.getFileIconAndType(file.mime);
+        const openUrl = file.mime && file.mime.includes('pdf') ?
+            `/files/${file.id}` :
+            `/file-view/${file.id}`;
 
-    card.innerHTML = `
-        <div class="mt-3 mx-2 preview-container" style="height: 120px;">
-            <div id="preview-${file.id}" class="d-flex justify-content-center align-items-center h-100 w-100">
-                <i class="ph ${fileInfo.icon} fs-1 text-muted"></i>
-            </div>
-        </div>
-        <div class="card-body p-2">
-            <div class="d-flex align-items-center mb-1">
-                <i class="ph ${fileInfo.icon} me-2 text-dark"></i>
-                <span class="fw-semibold text-truncate small" title="${file.name}">${file.name}</span>
-            </div>
-            <div class="d-flex gap-2 align-items-center">
-                <span class="badge bg-secondary rounded-2 px-2"><small>${fileInfo.type}</small></span>
-                <span class="text-muted small">${file.size}</span>
-                <div class="dropdown">
-                    <button class="btn btn-link ms-auto text-dark p-0"
-                            data-bs-toggle="dropdown"
-                            data-bs-display="static">
-                        <i class="ph ph-dots-three-vertical fs-6 text-muted"></i>
-                    </button>
-                    <ul class="dropdown-menu shadow rounded-3 border-0 p-2">
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center gap-2"
-                            href="${openUrl}"
-                            target="_blank">
-                                <i class="ph ph-arrow-up-right fs-5"></i> Open
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#"
-                            class="dropdown-item d-flex align-items-center gap-2 download-btn"
-                            data-id="${file.id}"
-                            data-name="${file.name}">
-                            <i class="ph ph-download fs-5"></i> Download
-                            </a>
-                        </li>
-                        <li class="dropdown-submenu position-relative">
-                            <a class="dropdown-item d-flex align-items-center gap-2 info-btn"
-                            href="#"
-                            data-file-id="${file.id}">
-                                <i class="ph ph-info fs-5"></i> Get Info
-                            </a>
-                            <div class="file-info-panel" style="display: none; position: absolute; left: 100%; top: 0; width: 320px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #e9ecef;">
-                                ${this.getFileInfoPanelHTML(file, fileInfo)}
-                            </div>
-                        </li>
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center gap-2 edit-file-btn" href="#"
-                            data-id="${file.id}" data-name="${file.name}" data-labels='${JSON.stringify(file.labels || [])}'>
-                                <i class="ph ph-pencil-simple fs-5"></i> Edit File
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#"
-                            class="dropdown-item text-danger d-flex align-items-center gap-2 delete-btn"
-                            data-id="${file.id}">
-                            <i class="ph ph-trash fs-5"></i> Delete
-                            </a>
-                        </li>
-                    </ul>
+        card.innerHTML = `
+            <div class="mt-3 mx-2 preview-container" style="height: 120px;">
+                <div id="preview-${file.id}" class="d-flex justify-content-center align-items-center h-100 w-100">
+                    <i class="ph ${fileInfo.icon} fs-1 text-muted"></i>
                 </div>
             </div>
-        </div>
-    `;
+            <div class="card-body p-2">
+                <div class="d-flex align-items-center mb-1">
+                    <i class="ph ${fileInfo.icon} me-2 text-dark"></i>
+                    <span class="fw-semibold text-truncate small" title="${file.name}">${file.name}</span>
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                    <span class="badge bg-secondary rounded-2 px-2"><small>${fileInfo.type}</small></span>
+                    <span class="text-muted small">${file.size}</span>
+                    <div class="dropdown">
+                        <button class="btn btn-link ms-auto text-dark p-0"
+                                data-bs-toggle="dropdown"
+                                data-bs-display="static">
+                            <i class="ph ph-dots-three-vertical fs-6 text-muted"></i>
+                        </button>
+                        <ul class="dropdown-menu shadow rounded-3 border-0 p-2">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2"
+                                href="${openUrl}"
+                                target="_blank">
+                                    <i class="ph ph-arrow-up-right fs-5"></i> Open
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                class="dropdown-item d-flex align-items-center gap-2 download-btn"
+                                data-id="${file.id}"
+                                data-name="${file.name}">
+                                <i class="ph ph-download fs-5"></i> Download
+                                </a>
+                            </li>
+                            <li class="dropdown-submenu position-relative">
+                                <a class="dropdown-item d-flex align-items-center gap-2 info-btn"
+                                href="#"
+                                data-file-id="${file.id}">
+                                    <i class="ph ph-info fs-5"></i> Get Info
+                                </a>
+                                <div class="file-info-panel" style="display: none; position: absolute; left: 100%; top: 0; width: 320px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #e9ecef;">
+                                    ${this.getFileInfoPanelHTML(file, fileInfo)}
+                                </div>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2 edit-file-btn" href="#"
+                                data-id="${file.id}" data-name="${file.name}" data-labels='${JSON.stringify(file.labels || [])}'>
+                                    <i class="ph ph-pencil-simple fs-5"></i> Edit File
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                class="dropdown-item text-danger d-flex align-items-center gap-2 delete-btn"
+                                data-id="${file.id}">
+                                <i class="ph ph-trash fs-5"></i> Delete
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        `;
 
-    // Add click event for card
-    card.addEventListener('click', (e) => {
-        if (e.target.closest('.dropdown') || e.target.closest('.dropdown-menu')) {
-            return;
+        // Add click event for card
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('.dropdown') || e.target.closest('.dropdown-menu')) {
+                return;
+            }
+            window.open(openUrl, '_blank');
+        });
+
+        // Render PDF preview if applicable
+        if (file.mime && file.mime.includes("pdf") && file.url) {
+            setTimeout(() => {
+                this.renderPDFPreview(file.url, `preview-${file.id}`);
+            }, 100);
         }
-        window.open(openUrl, '_blank');
-    });
 
-    // Render PDF preview if applicable - FIXED VERSION
-    if (file.mime && file.mime.includes("pdf") && file.url) {
-        // Gunakan setTimeout untuk memastikan DOM sudah ter-render
-        setTimeout(() => {
-            this.renderPDFPreview(file.url, `preview-${file.id}`);
-        }, 100);
+        return card;
     }
-
-    return card;
-}
 
     getFileIconAndType(mime) {
         if (!mime) return { icon: "ph-file", type: "File" };
@@ -1126,8 +1176,12 @@ createFileElement(file) {
     }
 
     showError(folderContainer, fileContainer, message) {
-        folderContainer.innerHTML = `<p class="text-danger">Gagal memuat data: ${message}</p>`;
-        fileContainer.innerHTML = `<p class="text-danger">Gagal memuat data: ${message}</p>`;
+        if (folderContainer) {
+            folderContainer.innerHTML = `<p class="text-danger">Gagal memuat data: ${message}</p>`;
+        }
+        if (fileContainer) {
+            fileContainer.innerHTML = `<p class="text-danger">Gagal memuat data: ${message}</p>`;
+        }
     }
 }
 

@@ -37,8 +37,8 @@
     <!-- Menu -->
     <ul class="nav nav-pills mt-2">
         <li class="nav-item  w-100 ">
-            <a href="{{ route('dashboard') }}"
-                class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+            <a href="{{ route('recommended') }}"
+                class="nav-link d-flex align-items-center text-dark {{ request()->routeIs('recommended') ? 'active' : '' }}">
                 <i class="ph ph-house pe-2 fs-5"></i>
                 <span class="sidebar-text fw-normal">Home</span>
             </a>
