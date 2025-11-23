@@ -4,78 +4,120 @@ class MySpaceManager {
     constructor() {
         this.token = window.token || '';
         this.currentPath = window.currentPath || '';
+        this.isLastOpenedPage = window.isLastOpenedPage || false;
+
+        console.log('MySpaceManager initialized:', {
+            isLastOpenedPage: this.isLastOpenedPage,
+            currentPath: this.currentPath
+        });
+
         this.init();
     }
-
+        // ✅ TAMBAHKAN METHOD init() YANG HILANG
     init() {
+        console.log('MySpaceManager init called');
         this.loadFilesAndFolders();
         this.attachEventListeners();
     }
 
     async loadFilesAndFolders() {
-        const folderContainer = document.getElementById("folderContainer");
-        const fileContainer = document.getElementById("fileContainer");
-        const emptyTemplate = document.getElementById("empty-template").content.cloneNode(true);
+    const folderContainer = document.getElementById("folderContainer");
+    const fileContainer = document.getElementById("fileContainer");
+    const emptyTemplate = document.getElementById("empty-template").content.cloneNode(true);
 
-        try {
+    try {
+        let url;
+        let transformData = false;
+
+        // DETECT LAST OPENED PAGE
+        if (this.isLastOpenedPage) {
+            url = "https://pdu-dms.my.id/api/last-opened-files";
+            transformData = true;
+        } else {
             const baseUrl = "https://pdu-dms.my.id/api/my-files";
-            const url = this.currentPath ? `${baseUrl}/${this.currentPath}` : baseUrl;
+            url = this.currentPath ? `${baseUrl}/${this.currentPath}` : baseUrl;
+            transformData = false;
+        }
 
-            const response = await fetch(url, {
-                headers: {
-                    "Authorization": "Bearer " + this.token
-                }
-            });
+        console.log('Fetching from:', url);
+        console.log('Is Last Opened Page:', this.isLastOpenedPage);
 
-            if (!response.ok) {
-                if (response.status === 401) {
-                    this.handleUnauthorized();
-                    return;
-                }
-                throw new Error(`Gagal memuat data: ${response.status} ${response.statusText}`);
+        const response = await fetch(url, {
+            headers: {
+                "Authorization": "Bearer " + this.token,
+                "Accept": "application/json",
+                "Content-Type": "application/json"
             }
+        });
 
-            const data = await response.json();
-            this.renderFolders(data.files?.filter(f => f.is_folder) || [], folderContainer, emptyTemplate);
-            this.renderFiles(data.files?.filter(f => !f.is_folder) || [], fileContainer, emptyTemplate);
-
-        } catch (err) {
-            console.error('Error:', err);
-            this.showError(folderContainer, fileContainer, err.message);
+        if (!response.ok) {
+            if (response.status === 401) {
+                this.handleUnauthorized();
+                return;
+            }
+            throw new Error(`Gagal memuat data: ${response.status} ${response.statusText}`);
         }
-    }
 
-    renderFolders(folders, container, emptyTemplate) {
-        container.innerHTML = '';
+        const data = await response.json();
 
-        if (folders.length === 0) {
-            const empty = emptyTemplate.cloneNode(true);
-            empty.querySelector("i").className = "ph ph-folder-open";
-            empty.querySelector("p").textContent = "Create a folder to get organized";
-            container.appendChild(empty);
+        let folders = [];
+        let files = [];
+
+        if (transformData) {
+            // DATA DARI LAST-OPENED-FILES ENDPOINT
+            folders = data.last_opened_folders || [];
+            files = data.last_opened_files || [];
         } else {
-            folders.forEach(folder => {
-                const col = this.createFolderElement(folder);
-                container.appendChild(col);
-            });
+            // DATA DARI MY-FILES ENDPOINT (ORIGINAL)
+            folders = data.files?.filter(f => f.is_folder) || [];
+            files = data.files?.filter(f => !f.is_folder) || [];
         }
-    }
 
-    renderFiles(files, container, emptyTemplate) {
-        container.innerHTML = '';
+        this.renderFolders(folders, folderContainer, emptyTemplate);
+        this.renderFiles(files, fileContainer, emptyTemplate);
 
-        if (files.length === 0) {
-            const empty = emptyTemplate.cloneNode(true);
-            empty.querySelector("i").className = "ph ph-file";
-            empty.querySelector("p").textContent = "Upload your first file to begin";
-            container.appendChild(empty);
-        } else {
-            files.forEach(file => {
-                const card = this.createFileElement(file);
-                container.appendChild(card);
-            });
-        }
+    } catch (err) {
+        console.error('Error:', err);
+        this.showError(folderContainer, fileContainer, err.message);
     }
+}
+
+renderFolders(folders, container, emptyTemplate) {
+    container.innerHTML = '';
+
+    if (folders.length === 0) {
+        const empty = emptyTemplate.cloneNode(true);
+        empty.querySelector("i").className = "ph ph-folder-open";
+        empty.querySelector("p").textContent = this.isLastOpenedPage
+            ? "No recently opened folders"
+            : "Create a folder to get organized";
+        container.appendChild(empty);
+    } else {
+        folders.forEach(folder => {
+            const col = this.createFolderElement(folder);
+            container.appendChild(col);
+        });
+    }
+}
+
+
+renderFiles(files, container, emptyTemplate) {
+    container.innerHTML = '';
+
+    if (files.length === 0) {
+        const empty = emptyTemplate.cloneNode(true);
+        empty.querySelector("i").className = "ph ph-file";
+        empty.querySelector("p").textContent = this.isLastOpenedPage
+            ? "No recently opened files"
+            : "Upload your first file to begin";
+        container.appendChild(empty);
+    } else {
+        files.forEach(file => {
+            const card = this.createFileElement(file);
+            container.appendChild(card);
+        });
+    }
+}
 
     createFolderElement(folder) {
         const col = document.createElement("div");
