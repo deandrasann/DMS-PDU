@@ -5,13 +5,22 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MySpaceController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ShareController;
+use Illuminate\Http\Request;
 
-Route::get('/', function () {
+Route::get('/', function (Request $request) {
     return redirect()->route('signin');
 });
 
 // Auth routes
-Route::get('/signin', fn() => view('auth.signin'))->name('signin');
+Route::get('/signin', function (Request $request) {
+    if ($request->has('redirect')) {
+        session()->put('after_login_redirect', $request->redirect);
+    }
+
+    return view('auth.signin');
+})->name('signin');
+
 Route::post('/signin', [AuthController::class, 'login'])->name('signin.process');
 
 Route::get('/signup', [AuthController::class, 'showSignup'])->name('signup');
@@ -29,7 +38,7 @@ Route::post('/new-password', [AuthController::class, 'setNewPassword'])->name('s
 
 // Dashboard routes
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('/last-opened', [DashboardController::class, 'lastOpen'])->name('last');
+Route::get('/last-opened', [MySpaceController::class, 'lastOpened'])->name('last');
 Route::get('/shared-with-me', [DashboardController::class, 'sharedWithMe'])->name('shared');
 Route::get('/upload', [DashboardController::class, 'uploadFile'])->name('upload');
 
@@ -62,3 +71,5 @@ Route::middleware(['web'])->group(function () {
     Route::get('/file/{fileId}/edit', [MySpaceController::class, 'editFile'])->name('file.edit');
     Route::put('/file/{fileId}/update', [MySpaceController::class, 'updateFile'])->name('file.update');
 });
+
+Route::get('/share/{token}', ShareController::class);
