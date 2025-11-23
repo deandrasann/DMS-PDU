@@ -1,319 +1,416 @@
-/* 100 - Thin / Hairline (kalau ada Var) */
+/* FIX FONT SFT SCHRIFTED SANS - PATH CORRECTION */
+/* 100 - Thin / Hairline */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('fonts/SFTSchriftedSansTRIAL-Var.ttf') format('truetype');
-font-weight: 100;
-font-style: normal;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-Var.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
 }
 
 /* 200 - ExtraLight */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('fonts/SFTSchriftedSansTRIAL-ExLight.ttf') format('truetype');
-font-weight: 200;
-font-style: normal;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-ExLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('fonts/SFTSchriftedSansTRIAL-ExLightItalic.ttf') format('truetype');
-font-weight: 200;
-font-style: italic;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-ExLightItalic.ttf') format('truetype');
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* 300 - Light */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('fonts/SFTSchriftedSansTRIAL-Light.ttf') format('truetype');
-font-weight: 300;
-font-style: normal;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('fonts/SFTSchriftedSansTRIAL-LightItalic.ttf') format('truetype');
-font-weight: 300;
-font-style: italic;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-LightItalic.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* 400 - Regular */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('fonts/SFTSchriftedSansTRIAL-Regular.ttf') format('truetype');
-font-weight: 400;
-font-style: normal;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('fonts/SFTSchriftedSansTRIAL-Italic.ttf') format('truetype');
-font-weight: 400;
-font-style: italic;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* 500 - Medium */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('fonts/SFTSchriftedSansTRIAL-Medium.ttf') format('truetype');
-font-weight: 500;
-font-style: normal;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('fonts/SFTSchriftedSansTRIAL-MediumItalic.ttf') format('truetype');
-font-weight: 500;
-font-style: italic;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* 600 - DemiBold / SemiBold */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('fonts/SFTSchriftedSansTRIAL-DemiBold.ttf') format('truetype');
-font-weight: 600;
-font-style: normal;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-DemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('fonts/SFTSchriftedSansTRIAL-DemiBoldItalic.ttf') format('truetype');
-font-weight: 600;
-font-style: italic;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-DemiBoldItalic.ttf') format('truetype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* 700 - Bold */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('fonts/SFTSchriftedSansTRIAL-Bold.ttf') format('truetype');
-font-weight: 700;
-font-style: normal;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('fonts/SFTSchriftedSansTRIAL-BoldItalic.ttf') format('truetype');
-font-weight: 700;
-font-style: italic;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* 800 - ExtraBold */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('fonts/SFTSchriftedSansTRIAL-ExBold.ttf') format('truetype');
-font-weight: 800;
-font-style: normal;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-ExBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('fonts/SFTSchriftedSansTRIAL-ExBoldItalic.ttf') format('truetype');
-font-weight: 800;
-font-style: italic;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-ExBoldItalic.ttf') format('truetype');
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* 900 - Black */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('fonts/SFTSchriftedSansTRIAL-Black.ttf') format('truetype');
-font-weight: 900;
-font-style: normal;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('fonts/SFTSchriftedSansTRIAL-BlackItalic.ttf') format('truetype');
-font-weight: 900;
-font-style: italic;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-BlackItalic.ttf') format('truetype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
 }
 
-
-
-/* Typography */
+/* Typography - FIX FONT FAMILY */
+* {
+  font-family: 'SFT Schrifted Sans', Arial, sans-serif !important;
+}
 
 body {
-font-family: 'SFT Schrifted Sans', Arial, sans-serif;
-font-weight: 400; /* Regular*/
+  font-family: 'SFT Schrifted Sans', Arial, sans-serif !important;
+  font-weight: 400;
 }
 
 h1 {
-font-family: 'SFT Schrifted Sans', sans-serif;
-font-weight: 900; /* Black */
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-weight: 900;
 }
 
 h2 {
-font-family: 'SFT Schrifted Sans', sans-serif;
-font-weight: 700; /* Bold */
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-weight: 700;
 }
 
 h3 {
-font-family: 'SFT Schrifted Sans', sans-serif;
-font-weight: 500; /* Medium */
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-weight: 500;
 }
 
 h4 {
-font-family: 'SFT Schrifted Sans', sans-serif;
-font-weight: 500; /* Medium */
-font-size: 20px;
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-weight: 500;
+  font-size: 20px;
 }
 
-h4, h5, h6 {
-font-family: 'SFT Schrifted Sans', sans-serif;
-font-weight: 400; /* Regular */
+h5,
+h6 {
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-weight: 400;
 }
 
 p {
-font-family: 'SFT Schrifted Sans', sans-serif;
-font-weight: 300; /* Light */
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-weight: 300;
 }
 
 small {
-font-family: 'Rubik', sans-serif;
-font-weight: 100; /* Light */
-font-size: 12px;
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-weight: 300;
+  font-size: 12px;
 }
 
 .small {
-font-family: 'Rubik', sans-serif;
-font-weight: 100; /* Light */
-font-size: 12px;
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-weight: 300;
+  font-size: 12px;
 }
 
+.text-orange {
+  color: #F6602E !important;
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
+}
+
+
+
+/* FIX Z-INDEX STRUCTURE UNTUK MODAL DAN FOLDER */
+/* Pastikan modal memiliki z-index tertinggi */
+.modal-backdrop {
+  z-index: 1045 !important;
+}
+
+.modal {
+  z-index: 1050 !important;
+}
+
+.modal-content {
+  z-index: 1051 !important;
+}
+
+/* SECTION FOLDERS - priority tinggi TAPI DI BAWAH MODAL */
+.container.py-4>div:nth-child(1) {
+  position: relative;
+  z-index: 10 !important;
+  /* Kurangi dari 100 ke 10 */
+}
+
+/* SECTION FILES - priority rendah */
+.container.py-4>div:nth-child(2) {
+  position: relative;
+  z-index: 1 !important;
+}
+
+/* Dropdown folder - pastikan tidak lebih tinggi dari modal */
+.folder-item .dropdown-menu {
+  z-index: 1040 !important;
+  /* Kurangi dari 10050 ke 1040 */
+}
+
+/* NAVBAR & SIDEBAR Z-INDEX */
+.sidebar-desktop {
+  position: fixed !important;
+  height: 100vh !important;
+  z-index: 1030 !important;
+}
+
+.navbar-mobile {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  z-index: 1030 !important;
+}
+
+.navbar-desktop {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1030 !important;
+}
+
+.content-area {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* MYSPACE CONTENT */
 .sidebar-collapse-content {
-margin-left: 280px;
-transition: margin-left 0.3s ease;
+  margin-left: 280px;
+  transition: margin-left 0.3s ease;
+  position: relative;
+  z-index: 1;
 }
+
 .sidebar-collapse-content.collapsed {
-margin-left: 80px;
+  margin-left: 80px;
 }
 
-.text-orange{
-color: #F6602E;
-font-family: Rubik;
-font-size: 16px;
-font-style: normal;
-font-weight: 400;
-line-height: normal;
+/* Pastikan content myspace tidak terpengaruh oleh modal */
+body.modal-open .sidebar-collapse-content {
+  filter: none !important;
+  opacity: 1 !important;
+  pointer-events: none;
+  /* Biarkan konten di belakang tetap bisa di-scroll */
 }
 
+body.modal-open .sidebar-collapse-content * {
+  pointer-events: auto;
+  /* Reset pointer events untuk child elements */
+}
 
-.bg-light-orange{
-background: var(--P01, #FFD2B9);
+/* STYLING LAINNYA YANG SUDAH ADA */
+.bg-light-orange {
+  background: var(--P01, #FFD2B9);
 }
 
 .nav-link.active {
-border-radius: 16px !important;
-border: 1px solid rgba(246, 96, 46, 0.10) !important;
-background: linear-gradient(90deg, rgba(246, 96, 46, 0.50) 0%, rgba(255, 159, 101, 0.50) 100%) !important;
-box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25) !important;
-padding-right: 4px;
-
+  border-radius: 16px !important;
+  border: 1px solid rgba(246, 96, 46, 0.10) !important;
+  background: linear-gradient(90deg, rgba(246, 96, 46, 0.50) 0%, rgba(255, 159, 101, 0.50) 100%) !important;
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25) !important;
+  padding-right: 4px;
 }
 
 .search-box {
-transition: all 0.25s ease-in-out;
-border-radius: 1rem;
+  transition: all 0.25s ease-in-out;
+  border-radius: 1rem;
 }
 
-/* Hilangkan efek biru dari Bootstrap */
 .search-box .form-control:focus {
-box-shadow: none !important;
-border: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
-/* Warna muncul saat input aktif */
 .search-box:focus-within {
-box-shadow: 0 0 0 0.5px #F6602E; /* biar lebih tebal keliatan */
-border-radius: -1rem;
+  box-shadow: 0 0 0 0.5px #F6602E;
+  border-radius: -1rem;
 }
 
-
-
-.btn-badge{
-background-color: #FDDCD9;
-color: #262625
+.btn-badge {
+  background-color: #FDDCD9;
+  color: #262625
 }
 
 .pdf-inner-shadow {
-background-color: #F2F2F0 !important;
-box-shadow: inset 0 2px 6px rgba(0,0,0,0.25) !important; /* arah bayangan ke dalam */
-border-radius: 8px !important;
+  background-color: #F2F2F0 !important;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+  border-radius: 8px !important;
 }
 
-.btn-primary{
-background: linear-gradient(180deg, #FFB98F 0%, #FF9F65 100%);
-border:none;
-
+.btn-primary {
+  background: linear-gradient(180deg, #FFB98F 0%, #FF9F65 100%);
+  border: none;
 }
 
-.shadow{
-background: rgba(255, 255, 255, 0.25) !important;
-box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.15) !important;
-backdrop-filter: blur(8px) !important;
+.shadow {
+  background: rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.15) !important;
+  backdrop-filter: blur(8px) !important;
 }
+
 #sidebar {
-transition: width 0.3s ease;
-width: 280px;
-overflow-x: hidden;
-white-space: nowrap;
+  transition: width 0.3s ease;
+  width: 280px;
+  overflow-x: hidden;
+  white-space: nowrap;
 }
 
-/* LOGO BESAR & KECIL */
 #sidebarLogoBig {
-display: block;
-width: 120px;
-transition: opacity 0.3s ease;
+  display: block;
+  width: 120px;
+  transition: opacity 0.3s ease;
 }
+
 #sidebarLogoSmall {
-width: 40px;
-opacity: 0;
-visibility: hidden;
-transition: opacity 0.3s ease;
+  width: 40px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
 }
 
-/* COLLAPSED MODE */
 #sidebar.collapsed {
-width: 80px !important;
+  width: 80px !important;
 }
 
-/* pas collapsed → logo besar ilang, logo kecil muncul */
 #sidebar.collapsed #sidebarLogoBig {
-opacity: 0;
-visibility: hidden;
+  opacity: 0;
+  visibility: hidden;
 }
+
 #sidebar.collapsed #sidebarLogoSmall {
-opacity: 1;
-visibility: visible;
+  opacity: 1;
+  visibility: visible;
 }
 
-/* TOGGLE BUTTON */
 #toggleBtn {
-opacity: 1;
-visibility: visible;
-transition: opacity 0.3s ease;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease;
 }
 
-/* collapsed → tombol hilang */
 #sidebar.collapsed #toggleBtn {
-opacity: 0;
-visibility: hidden;
-position: absolute;
-right: 10px;
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  right: 10px;
 }
 
-/* collapsed + hover → tombol muncul, logo kecil ilang */
 #sidebar.collapsed:hover #toggleBtn {
-opacity: 1;
-visibility: visible;
-}
-#sidebar.collapsed:hover #sidebarLogoSmall {
-opacity: 0;
-visibility: hidden;
+  opacity: 1;
+  visibility: visible;
 }
 
-.btn-light:hover{
-background: linear-gradient(90deg, rgba(246, 96, 46, 0.50) 0%, rgba(255, 159, 101, 0.50) 100%);
-border:none;
+#sidebar.collapsed:hover #sidebarLogoSmall {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.btn-light:hover {
+  background: linear-gradient(90deg, rgba(246, 96, 46, 0.50) 0%, rgba(255, 159, 101, 0.50) 100%);
+  border: none;
 }
 
 .filter-panel {
-position: absolute;
-top: 100%; /* muncul di bawah search bar */
-left: 0;
-width: 100%;
-z-index: 1065;
-display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 1065;
+  display: none;
 }
 
 .modal-backdrop.show {
@@ -321,111 +418,79 @@ display: none;
   backdrop-filter: blur(0px) !important;
 }
 
-body.modal-open .sidebar-collapse-content {
-  filter: none !important;
-  opacity: 1 !important;
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-left: 0.25rem;
+  margin-top: -0.25rem;
+  display: none;
 }
 
-
-.dropdown-submenu > .dropdown-menu {
-top: 0;
-left: 100%;
-margin-left: 0.25rem;
-margin-top: -0.25rem;
-display: none;
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
 }
 
-.dropdown-submenu:hover > .dropdown-menu {
-display: block;
-}
-
-/* Gaya tambahan opsional biar halus dan rapi */
 .dropdown-menu {
-border-radius: 10px;
+  border-radius: 10px;
 }
 
 .dropdown-item:hover {
-background-color: #f8f9fa;
-border-radius: 8px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
 }
 
-.modal-backdrop.show {
-  opacity: 0.5 !important; /* Background abu-abu transparan normal */
-  backdrop-filter: blur(0px) !important;
-}
-
-
-body.modal-open .sidebar-collapse-content {
-  filter: none !important;
-  opacity: 1 !important;
-}
 .border-dashed {
-border-style: dashed !important;
-}
-
-.text-orange {
-color: #fd7e14 !important;
+  border-style: dashed !important;
 }
 
 #uploadArea:hover {
-border-color: #fd7e14 !important;
-background-color: rgba(253, 126, 20, 0.05) !important;
+  border-color: #fd7e14 !important;
+  background-color: rgba(253, 126, 20, 0.05) !important;
 }
 
-.btn-blue{
-border-radius: 12px;
-background: #3B82F6;
-box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.10);
-backdrop-filter: blur(8px);
-color: white;
-}
-.modal-content {
-    background-color: #fff !important;
-    /* atau warna lain */
-    opacity: 1 !important;
+.btn-blue {
+  border-radius: 12px;
+  background: #3B82F6;
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.10);
+  backdrop-filter: blur(8px);
+  color: white;
 }
 
-/* Efek shimmer skeleton */
 .skeleton {
-    position: relative;
-    overflow: hidden;
-    background: #e0e0e0;
+  position: relative;
+  overflow: hidden;
+  background: #e0e0e0;
 }
 
 .skeleton::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-    animation: shimmer 1.5s infinite;
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: shimmer 1.5s infinite;
 }
+
 #logoutConfirmationModal {
   z-index: 1060 !important;
 }
+
 .account-btn {
   transition: background-color 0.2s ease;
 }
 
-.account-btn:hover, .account-btn:active {
+.account-btn:hover,
+.account-btn:active {
   background-color: #E6E6E4 !important;
 }
+
 .modal-backdrop.show {
   background-color: rgba(0, 0, 0, 0.4) !important;
-  /* hanya latar belakang yang gelap */
   opacity: 1 !important;
-  z-index: 1040 !important;
-  /* backdrop di bawah modal */
 }
 
-/* Pastikan modal selalu lebih tinggi dari backdrop */
-.modal {
-  z-index: 1050 !important;
-}
-
-/* Pastikan modal tetap cerah dan tidak ikut meredup */
 .modal-content {
   background-color: #ffffff !important;
   filter: none !important;
@@ -456,17 +521,16 @@ color: white;
   transition: all 0.2s ease;
 }
 
-/* Efek saat hover */
 .modal-content .btn:hover {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
   transform: translateY(-1px);
 }
 
-/* Efek saat ditekan */
 .modal-content .btn:active {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
   transform: translateY(0);
 }
+
 #profilePreviewModal,
 #profilePreviewDropdown,
 #profilePreviewBtn {
@@ -485,6 +549,7 @@ color: white;
   background-color: #dc3545;
   border: none;
 }
+
 #autoLogoutLoader {
   display: none;
   align-items: center;
@@ -492,134 +557,49 @@ color: white;
 }
 
 @keyframes shimmer {
-    100% {
-        left: 100%;
-    }
+  100% {
+    left: 100%;
+  }
 }
+
 .dropdown:hover .dropdown-menu {
-    display: block;
-    margin-top: 0;
+  display: block;
+  margin-top: 0;
 }
 
-@media (max-width: 991.98px) {
-.sidebar-collapse-content {
-margin-left: 0 !important;
-}
-.content-wrapper {
-margin-top: 80px !important; /* tinggi navbar mobile */
-}
-
-.card {
-  overflow: visible;
-}
-
-/* FIX UNTUK DROPDOWN FOLDER */
 .folder-item {
-    position: relative !important;
-    z-index: 100;
-    overflow: visible !important;
+  position: relative !important;
+  z-index: 10;
+  overflow: visible !important;
 }
 
 .folder-card {
-    position: relative;
-    overflow: visible !important;
-    z-index: 1;
+  position: relative;
+  overflow: visible !important;
+  z-index: 1;
 }
 
-/* Dropdown menu styling */
 .folder-dropdown-menu {
-    position: absolute !important;
-    z-index: 9999 !important;
-    top: 100% !important;
-    right: 0 !important;
-    left: auto !important;
-    transform: none !important;
-    margin-top: 0.25rem !important;
-    display: none;
+  position: absolute !important;
+  z-index: 1040 !important;
+  top: 100% !important;
+  right: 0 !important;
+  left: auto !important;
+  transform: none !important;
+  margin-top: 0.25rem !important;
+  display: none;
 }
 
 .folder-dropdown-menu.show {
-    display: block !important;
+  display: block !important;
 }
 
-/* Pastikan container tidak memotong dropdown */
-#folderContainer {
-    position: relative;
-    z-index: 1;
-    overflow: visible !important;
-}
-
-#fileContainer {
-    position: relative;
-    z-index: 1; /* Turunkan z-index file container */
-}
-
-/* Hilangkan overflow hidden dari parent */
 .bg-light.shadow.rounded-4 {
-    overflow: visible !important;
+  overflow: visible !important;
 }
 
 .container.py-4 {
-    overflow: visible !important;
-    z-index: 1 !important;
-}
-
-.z-3 {
-  z-index: 9999 !important;
-}
-
-/* 1 */
-.text-accent-1 { color: #CB564A; }
-.bg-accent-1 { background-color: #FDDCD9; }
-
-/* 2 */
-.text-accent-2 { color: #763E1A; }
-.bg-accent-2 { background-color: #EBE0D9; }
-
-/* 3 */
-.text-accent-3 { color: #C2825D; }
-.bg-accent-3 { background-color: #FDE9DD; }
-
-/* 4 */
-.text-accent-4 { color: #7762BB; }
-.bg-accent-4 { background-color: #EFEAFF; }
-
-/* 5 */
-.text-accent-5 { color: #BDB470; }
-.bg-accent-5 { background-color: #FCF9DE; }
-
-/* 6 */
-.text-accent-6 { color: #5F92B6; }
-.bg-accent-6 { background-color: #E4F3FE; }
-
-/* 7 */
-.text-accent-7 { color: #CA8499; }
-.bg-accent-7 { background-color: #FCE7ED; }
-
-/* 8 */
-.text-accent-8 { color: #989797; }
-.bg-accent-8 { background-color: #E6E5E3; }
-
-/* 9 */
-.text-accent-9 { color: #8ABB93; }
-.bg-accent-9 { background-color: #EEFEF1; }
-
-/* 10 */
-.text-accent-10 { color: #729D9C; }
-.bg-accent-10 { background-color: #F0EFED; }
-
-/* 11 */
-.text-accent-11 { color: #617418; }
-.bg-accent-11 { background-color: #EEFEF1; }
-
-/* 12 */
-.text-accent-12 { color: #668F68; }
-.bg-accent-12 { background-color: #F3FFC3; }
-
-/* 13 */
-.text-accent-13 { color: #1F5780; }
-.bg-accent-13 { background-color: #DAEBF8; }
-
+  overflow: visible !important;
 }
 
 .dropdown-menu .label-badge {
@@ -628,9 +608,196 @@ margin-top: 80px !important; /* tinggi navbar mobile */
   border-radius: 50px;
   font-weight: 500;
 }
+
 .dropdown-menu .label-badge:hover {
   transform: scale(1.05);
   opacity: 0.85;
 }
 
+/* ACCENT COLORS (tetap sama) */
+.text-accent-1 {
+  color: #CB564A;
+}
 
+.bg-accent-1 {
+  background-color: #FDDCD9;
+}
+
+.text-accent-2 {
+  color: #763E1A;
+}
+
+.bg-accent-2 {
+  background-color: #EBE0D9;
+}
+
+.text-accent-3 {
+  color: #C2825D;
+}
+
+.bg-accent-3 {
+  background-color: #FDE9DD;
+}
+
+.text-accent-4 {
+  color: #7762BB;
+}
+
+.bg-accent-4 {
+  background-color: #EFEAFF;
+}
+
+.text-accent-5 {
+  color: #BDB470;
+}
+
+.bg-accent-5 {
+  background-color: #FCF9DE;
+}
+
+.text-accent-6 {
+  color: #5F92B6;
+}
+
+.bg-accent-6 {
+  background-color: #E4F3FE;
+}
+
+.text-accent-7 {
+  color: #CA8499;
+}
+
+.bg-accent-7 {
+  background-color: #FCE7ED;
+}
+
+.text-accent-8 {
+  color: #989797;
+}
+
+.bg-accent-8 {
+  background-color: #E6E5E3;
+}
+
+.text-accent-9 {
+  color: #8ABB93;
+}
+
+.bg-accent-9 {
+  background-color: #EEFEF1;
+}
+
+.text-accent-10 {
+  color: #729D9C;
+}
+
+.bg-accent-10 {
+  background-color: #F0EFED;
+}
+
+.text-accent-11 {
+  color: #617418;
+}
+
+.bg-accent-11 {
+  background-color: #EEFEF1;
+}
+
+.text-accent-12 {
+  color: #668F68;
+}
+
+.bg-accent-12 {
+  background-color: #F3FFC3;
+}
+
+.text-accent-13 {
+  color: #1F5780;
+}
+
+.bg-accent-13 {
+  background-color: #DAEBF8;
+}
+.dropdown-menu .dropend .dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-left: 0.5rem;
+  margin-top: -0.5rem;
+}
+.dropend>.dropdown-menu {
+  display: none !important;
+  top: 0;
+  left: 100%;
+  margin-left: 0.5rem;
+  min-width: 200px;
+}
+
+.dropend:hover>.dropdown-menu,
+.dropend .dropdown-toggle[aria-expanded="true"]+.dropdown-menu,
+.dropend.show>.dropdown-menu {
+  display: block !important;
+}
+
+/* Optional: panah ke kanan */
+.dropend .dropdown-toggle::after {
+  content: "›";
+  border: none;
+  margin-left: 8px;
+  font-size: 1.2em;
+  vertical-align: middle;
+}
+
+.modal {
+        z-index: 99999 !important;
+    }
+    .modal-backdrop {
+        z-index: 99998 !important;
+    }
+    .folder-info-panel,
+    .dropdown-menu {
+        z-index: 2000 !important;
+    }
+
+#advancedShareModal .modal-content {
+  background: #ffffff;
+  border-radius: 24px !important;
+}
+
+#advancedShareModal .modal-header .btn-close {
+  margin: -1rem -1rem -1rem auto;
+}
+
+#advancedShareModal .input-group .form-control:focus {
+  box-shadow: none;
+  border-color: #F6602E;
+}
+
+#advancedShareModal .btn-primary {
+  background: #3B82F6;
+  border: none;
+}
+@media (max-width: 991.98px) {
+  .sidebar-collapse-content {
+    margin-left: 0 !important;
+  }
+
+  .content-wrapper {
+    margin-top: 80px !important;
+  }
+
+  .card {
+    overflow: visible;
+  }
+  .dropdown:hover > .dropdown-menu,
+    .dropend:hover > .dropdown-menu {
+        display: block;
+    }
+    
+    .dropend .dropdown-toggle::after {
+        content: "›";
+        border: none;
+        margin-left: 8px;
+        font-size: 1.2em;
+        vertical-align: middle;
+    }
+}

@@ -91,7 +91,7 @@
 
             <!-- Account Settings Modal -->
             <div class="modal fade" id="accountSettingsModal" tabindex="-1" aria-labelledby="accountSettingsLabel"
-                aria-hidden="true">
+                aria-hidden="true" data-bs-backdrop="false">
                 <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content border-0 shadow-lg rounded-4">
                         <form id="profileUpdateForm" action="{{ route('profile.update') }}" method="POST"
@@ -216,7 +216,7 @@
             </div>
             <!-- Change Password Modal -->
             <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordLabel"
-                aria-hidden="true">
+                aria-hidden="true" data-bs-backdrop="false">
                 <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content border-0 shadow-lg rounded-4">
 
@@ -236,7 +236,7 @@
                                 </h3>
                                 <!-- Old Password -->
                                 <div class="mb-3" style="padding-left: 2rem;">
-                                    <label class="form-label">Old Password</label>
+                                    <label class="form-label">Current Password</label>
                                     <input type="password" name="current_password"
                                         class="form-control bg-light rounded-3" style="height: 44px; font-size: 14px;"
                                         placeholder="Enter old password" required>
