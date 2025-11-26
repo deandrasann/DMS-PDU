@@ -158,6 +158,18 @@ renderFiles(files, container, emptyTemplate) {
                                             ${this.getFolderInfoPanelHTML(folder)}
                                         </div>
                                     </li>
+                                        <a class="dropdown-item d-flex align-items-center gap-2 advanced-share-btn"
+                                            href="#"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#advancedShareModal"
+                                            data-item-id="${folder.id}"
+                                            data-item-type="folder"
+                                            data-folder-id="${folder.id}"
+                                            data-folder-name="${folder.name}"
+                                            data-folder-items="${folder.size}">
+                                             <i class="ph ph-share-network fs-5"></i> Share
+                                        </a>
+                                    </li>
                                     <li>
                                         <a class="dropdown-item d-flex align-items-center gap-2 folder-download-btn"
                                            href="#"
@@ -232,6 +244,20 @@ createFileElement(file) {
                             href="${openUrl}"
                             target="_blank">
                                 <i class="ph ph-arrow-up-right fs-5"></i> Open
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 advanced-share-btn"
+                            href="#"
+                            data-bs-toggle="modal"
+                            data-bs-target="#advancedShareModal"
+                            data-item-id="${file.id}"
+                            data-item-type="file"
+                            data-file-id="${file.id}"
+                            data-file-name="${file.name}"
+                            data-file-items="${file.size}"
+                            data-mime="${file.mime || ''}">
+                                <i class="ph ph-share-network fs-5"></i> Share
                             </a>
                         </li>
                         <li>
@@ -443,6 +469,183 @@ createFileElement(file) {
         `;
     }
 
+    // Tambahkan ini sebagai method di dalam class MySpaceManager
+    async renderFileThumbnail(fileId, mimeType = '') {
+        const wrapper = document.getElementById('file-thumbnail-wrapper');
+        const loading = document.getElementById('file-thumbnail-loading');
+        if (!wrapper || !loading) return;
+
+        wrapper.innerHTML = '';
+        loading.classList.remove('d-none');
+
+        let url = null;
+
+        try {
+            const response = await fetch(`https://pdu-dms.my.id/api/view-file/${fileId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + this.token
+                }
+            });
+
+            if (!response.ok) throw new Error('Failed to load file');
+
+            const blob = await response.blob();
+            url = URL.createObjectURL(blob);
+            const type = blob.type || mimeType;
+
+            let element;
+
+            // === GAMBAR ===
+            if (type.startsWith('image/') && !type.includes('svg')) {
+                element = document.createElement('img');
+                element.src = url;
+                element.className = 'w-100 h-100';
+                element.style.objectFit = 'cover';
+                element.style.borderRadius = '8px';
+            }
+
+            // === PDF ===
+            else if (type === 'application/pdf') {
+                const loadingTask = pdfjsLib.getDocument({ url });
+                const pdf = await loadingTask.promise;
+                const page = await pdf.getPage(1);
+
+                // Auto-scale agar pas di 120px tinggi
+                const viewport = page.getViewport({ scale: 1 });
+                let scale = 120 / viewport.height;
+                if (scale > 2) scale = 2; // batas atas biar gak blur
+
+                const finalViewport = page.getViewport({ scale });
+
+                const canvas = document.createElement('canvas');
+                canvas.width = finalViewport.width;
+                canvas.height = finalViewport.height;
+                canvas.style.width = '100%';
+                canvas.style.height = '100%';
+                canvas.style.objectFit = 'contain';
+                canvas.style.background = 'white';
+                canvas.style.borderRadius = '8px';
+
+                const context = canvas.getContext('2d');
+                await page.render({ canvasContext: context, viewport: finalViewport }).promise;
+
+                element = canvas;
+            }
+
+            // === VIDEO ===
+            else if (type.startsWith('video/')) {
+                element = document.createElement('video');
+                element.src = url;
+                element.muted = true;
+                element.preload = 'metadata';
+                element.playsInline = true;
+                element.className = 'w-100 h-100';
+                element.style.objectFit = 'cover';
+                element.style.borderRadius = '8px';
+
+                // Ambil poster otomatis dari frame pertama
+                element.addEventListener('loadeddata', () => {
+                    element.currentTime = 0.1;
+                });
+                element.addEventListener('seeked', () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = element.videoWidth;
+                    canvas.height = element.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(element, 0, 0, canvas.width, canvas.height);
+                    element.poster = canvas.toDataURL();
+                });
+            }
+
+            // === TIDAK DIDUKUNG ===
+            else {
+                throw new Error('No visual preview');
+            }
+
+            wrapper.appendChild(element);
+
+        } catch (error) {
+            console.warn('Preview gagal:', error.message);
+
+            // Fallback icon cerdas (sama persis seperti kode lama)
+            const iconMap = {
+                'pdf': 'ph-file-pdf',
+                'word': 'ph-file-doc',
+                'document': 'ph-file-doc',
+                'excel': 'ph-file-xls',
+                'sheet': 'ph-file-xls',
+                'powerpoint': 'ph-file-ppt',
+                'ppt': 'ph-file-ppt',
+                'video': 'ph-file-video',
+                'audio': 'ph-file-audio',
+                'zip': 'ph-file-zip',
+                'default': 'ph-file'
+            };
+
+            let icon = iconMap.default;
+            const lowerMime = (mimeType || '').toLowerCase();
+
+            if (lowerMime.includes('pdf')) icon = iconMap.pdf;
+            else if (lowerMime.includes('word') || lowerMime.includes('document')) icon = iconMap.word;
+            else if (lowerMime.includes('excel') || lowerMime.includes('sheet')) icon = iconMap.excel;
+            else if (lowerMime.includes('powerpoint') || lowerMime.includes('ppt')) icon = iconMap.powerpoint;
+            else if (lowerMime.includes('video')) icon = iconMap.video;
+            else if (lowerMime.includes('audio')) icon = iconMap.audio;
+            else if (lowerMime.includes('zip') || lowerMime.includes('rar')) icon = iconMap.zip;
+
+            wrapper.innerHTML = `<i class="ph ${icon} fs-1 text-muted"></i>`;
+
+        } finally {
+            loading.classList.add('d-none');
+            // Bersihkan memory setelah 10 detik
+            if (url) {
+                setTimeout(() => URL.revokeObjectURL(url), 10000);
+            }
+        }
+    }
+    openAdvancedShareModal(data) {
+        const folderPreview = document.getElementById('folder-preview');
+        const filePreview = document.getElementById('file-preview');
+        const wrapper = document.getElementById('file-thumbnail-wrapper');
+
+        // Reset
+        folderPreview.style.display = 'none';
+        filePreview.style.display = 'none';
+        wrapper.innerHTML = '';
+
+        if (data.type === 'folder') {
+            folderPreview.style.display = 'block';
+            document.getElementById('preview-title').textContent = data.name;
+            document.getElementById('preview-subtitle').textContent = data.items ? `${data.items} items` : 'Empty folder';
+        } else {
+            filePreview.style.display = 'block';
+            document.getElementById('file-name-display').textContent = data.name;
+            document.getElementById('file-size-display').textContent = data.size || '—';
+
+            let badgeText = 'File';
+            let iconClass = 'ph-file';
+
+            if (data.mime) {
+                if (data.mime.includes('pdf')) { badgeText = 'PDF'; iconClass = 'ph-file-pdf'; }
+                else if (data.mime.includes('image/')) { badgeText = 'Image'; iconClass = 'ph-file-image'; }
+                else if (data.mime.includes('word')) { badgeText = 'DOC'; iconClass = 'ph-file-doc'; }
+                else if (data.mime.includes('excel') || data.mime.includes('sheet')) { badgeText = 'XLS'; iconClass = 'ph-file-xls'; }
+            }
+
+            document.querySelector('#file-badge small').textContent = badgeText;
+            document.getElementById('file-small-icon').className = `${iconClass} me-2 text-dark`;
+
+            // Render thumbnail
+            if (data.mime && (data.mime.includes('pdf') || data.mime.includes('image/'))) {
+                this.renderFileThumbnail(data.id, data.mime);
+            } else {
+                wrapper.innerHTML = `<i class="ph ${iconClass} fs-1 text-muted"></i>`;
+            }
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('advancedShareModal'));
+        modal.show();
+    }
     async renderPDFPreview(pdfUrl, containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -585,6 +788,33 @@ createFileElement(file) {
                 });
             }
         });
+
+        // Ganti yang lama dengan ini
+document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.advanced-share-btn');
+    if (!btn) return;
+    e.preventDefault();
+
+    const isFolder = btn.hasAttribute('data-folder-id');
+    const isFile = btn.hasAttribute('data-file-id');
+
+    if (isFolder) {
+        this.openAdvancedShareModal({
+            type: 'folder',
+            id: btn.dataset.folderId,
+            name: btn.dataset.folderName,
+            items: btn.dataset.folderItems
+        });
+    } else if (isFile) {
+        this.openAdvancedShareModal({
+            type: 'file',
+            id: btn.dataset.fileId,
+            name: btn.dataset.fileName,
+            size: btn.dataset.fileItems,
+            mime: btn.dataset.mime || ''
+        });
+    }
+});
     }
 
     attachFileOperationsListeners() {
@@ -1134,4 +1364,218 @@ createFileElement(file) {
 // Inisialisasi ketika DOM siap
 document.addEventListener("DOMContentLoaded", function() {
     window.mySpaceManager = new MySpaceManager();
+});
+
+class ShareManager {
+    constructor() {
+        this.selectedUsers = [];
+        this.token = window.token || '';
+        this.itemId = null;      // ID file/folder yang sedang dishare
+        this.itemType = null;    // 'file' atau 'folder'
+        this.debounceTimer = null;
+
+        this.init();
+    }
+
+    init() {
+        const modalEl = document.getElementById('advancedShareModal');
+        if (!modalEl) return;
+
+        // Ambil data dari trigger button saat modal dibuka
+        modalEl.addEventListener('show.bs.modal', (e) => {
+            const button = e.relatedTarget;
+            this.itemId = button.getAttribute('data-item-id');
+            this.itemType = button.getAttribute('data-item-type') || 'file';
+            this.selectedUsers = []; // reset
+            document.getElementById('selected-emails-container').innerHTML = '';
+        });
+
+        modalEl.addEventListener('shown.bs.modal', () => {
+            this.setupInputEvents();
+        });
+
+        // Tombol Done
+        document.getElementById('share-done-btn')?.addEventListener('click', () => {
+            this.shareItem();
+        });
+    }
+
+    setupInputEvents() {
+        const wrapper = document.getElementById('email-input-wrapper');
+        const input = document.getElementById('add-email-input');
+        const suggestions = document.getElementById('email-suggestions');
+
+        if (!wrapper || !input) return;
+
+        wrapper.addEventListener('click', () => input.focus());
+
+        input.addEventListener('input', () => {
+            clearTimeout(this.debounceTimer);
+            const q = input.value.trim();
+            if (q.length < 2) {
+                suggestions.style.display = 'none';
+                return;
+            }
+            this.debounceTimer = setTimeout(() => this.searchUsers(q), 300);
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const first = suggestions.querySelector('.suggestion-item');
+                if (first) first.click();
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!wrapper.contains(e.target)) {
+                suggestions.style.display = 'none';
+            }
+        });
+    }
+
+    async searchUsers(query) {
+        const list = document.getElementById('suggestions-list');
+        const suggestions = document.getElementById('email-suggestions');
+
+        try {
+            list.innerHTML = '<div class="text-center py-3"><small class="text-muted">Searching...</small></div>';
+            suggestions.style.display = 'block';
+
+            const res = await fetch(`https://pdu-dms.my.id/api/search-users?q=${encodeURIComponent(query)}`, {
+                headers: { 'Authorization': 'Bearer ' + this.token }
+            });
+
+            if (!res.ok) throw new Error('Failed');
+
+            const users = await res.json();
+            list.innerHTML = '';
+
+            users.forEach(user => {
+                if (this.selectedUsers.find(u => u.id === user.id)) return;
+
+                const item = document.createElement('div');
+                item.className = 'suggestion-item d-flex align-items-center gap-3 p-3 rounded-3 hover-bg-light cursor-pointer';
+                item.innerHTML = `
+                    <img src="${user.photo_profile_path 
+                    ? 'https://pdu-dms.my.id/storage/profile_photos/' + user.photo_profile_path 
+                    : '/images/profile-pict.jpg'}" 
+                    class="rounded-circle object-fit-cover flex-shrink-0" width="36" height="36" 
+                    onerror="this.src='/images/profile-pict.jpg'">
+            
+                    <div>
+                        <div class="fw-semibold small">${user.fullname || 'No Name'}</div>
+                        <div class="text-muted small">${user.email}</div>
+                    </div>
+                `;
+
+                item.onclick = () => {
+                    this.addUserPill(user);
+                    document.getElementById('add-email-input').value = '';
+                    suggestions.style.display = 'none';
+                };
+
+                list.appendChild(item);
+            });
+
+            if (users.length === 0) {
+                list.innerHTML = '<div class="text-center py-3 text-muted small">No users found</div>';
+            }
+
+        } catch (err) {
+            list.innerHTML = '<div class="text-center py-3 text-danger small">Error loading users</div>';
+        }
+    }
+
+    addUserPill(user) {
+        if (this.selectedUsers.find(u => u.id === user.id)) return;
+
+        this.selectedUsers.push(user);
+
+        const pill = document.createElement('div');
+        pill.className = 'd-inline-flex align-items-center bg-white border rounded-pill px-3 py-1 gap-2 shadow-sm';
+        pill.innerHTML = `
+            <img src="${user.photo_profile_path 
+            ? 'https://pdu-dms.my.id/storage/profile_photos/' + user.photo_profile_path 
+            : '/images/profile-pict.jpg'}" 
+             class="rounded-circle object-fit-cover flex-shrink-0" width="22" height="22" 
+             onerror="this.src='/images/profile-pict.jpg'">
+            <span class="small fw-medium text-dark">${user.email}</span>
+            <button type="button" class="btn-close btn-close-sm" style="font-size: 0.55rem;"></button>
+        `;
+
+        pill.querySelector('.btn-close').onclick = (e) => {
+            e.stopPropagation();
+            this.selectedUsers = this.selectedUsers.filter(u => u.id !== user.id);
+            pill.remove();
+        };
+
+        document.getElementById('selected-emails-container').appendChild(pill);
+    }
+
+    // INI YANG PALING PENTING: KIRIM SHARE KE API
+    async shareItem() {
+    if (!this.itemId) {
+        alert('Item tidak ditemukan!');
+        return;
+    }
+
+    if (this.selectedUsers.length === 0) {
+        alert('Tambahkan minimal satu orang');
+        return;
+    }
+
+    const btn = document.getElementById('share-done-btn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Sharing...';
+
+    try {
+        const payload = {
+            user_id: this.selectedUsers.map(u => u.id),
+            permission_id: 4, // viewer (ubah sesuai kebutuhan)
+            // Kirim keduanya, backend yang pilih mana yang dipakai
+            file_id: this.itemType === 'file' ? parseInt(this.itemId) : null,
+            folder_id: this.itemType === 'folder' ? parseInt(this.itemId) : null,
+        };
+
+        // PAKAI SATU ENDPOINT SAJA → /api/share-file/{id}
+        const response = await fetch(`https://pdu-dms.my.id/api/share-file/${this.itemId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + this.token,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Gagal membagikan');
+        }
+
+        // Sukses!
+        alert(`Berhasil dibagikan ke ${this.selectedUsers.length} orang!`);
+        
+        const modal = bootstrap.Modal.getInstance(document.getElementById('advancedShareModal'));
+        modal.hide();
+
+        // Optional: reload atau update UI
+        // location.reload();
+
+    } catch (err) {
+        console.error('Share error:', err);
+        alert('Gagal: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+}
+
+// Inisialisasi global
+document.addEventListener('DOMContentLoaded', () => {
+    window.shareManager = new ShareManager();
 });

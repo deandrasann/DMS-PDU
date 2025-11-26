@@ -776,6 +776,24 @@ body.modal-open .sidebar-collapse-content * {
   background: #3B82F6;
   border: none;
 }
+#email-input-wrapper {
+  transition: all 0.2s ease;
+}
+
+#email-input-wrapper:focus-within {
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25) !important;
+  background: #ffffff !important;
+}
+
+/* Biar input tetap fokus saat klik wrapper */
+#email-input-wrapper {
+  cursor: text;
+}
+
+#email-input-wrapper input::placeholder {
+  color: #6c757d;
+  opacity: 0.8;
+}
 @media (max-width: 991.98px) {
   .sidebar-collapse-content {
     margin-left: 0 !important;
