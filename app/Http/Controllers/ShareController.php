@@ -35,19 +35,20 @@ class ShareController extends Controller
                     'Accept' => 'application/json',
                 ])->get("https://pdu-dms.my.id/api/share/$token");
 
-            // $response = Http::connectTimeout(5)
-            //     ->withHeaders([
-            //     'Authorization' => 'Bearer ' . $userToken,
-            //         'Accept' => 'application/json',
-            //     ])->get("http://127.0.0.1:8000/api/share/$token");
-            
-            if ($response->status() >= 300 && $response->status() < 400) {
-                $redirectUrl = $response->header('Location');
-                Log::info("Forwarding redirect to: $redirectUrl");
-                return redirect()->away($redirectUrl);
+            if ($response->successful()) {
+                $data = $response->json();
+
+                $fileId = $data['data']['file_id'] ?? null;
+
+                return redirect()->route('file.view', $fileId);
+            } else {
+                Log::error("Failed to fetch share link", [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                return response($response->body(), $response->status());
             }
-            
-            return $response->body();
         } catch (\Illuminate\Http\Client\RequestException $e) {
             // Log ke laravel.log
             Log::error("Share API Error", [
