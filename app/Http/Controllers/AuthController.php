@@ -83,7 +83,7 @@ class AuthController extends Controller
             }
 
             // ✅ Redirect langsung tanpa flash data
-            return redirect()->route('dashboard');
+            return redirect()->route('recommended');
         }
 
         return back()->withErrors([
