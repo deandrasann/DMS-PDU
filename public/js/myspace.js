@@ -244,101 +244,165 @@ class MySpaceManager {
         return col;
     }
 
-    createFileElement(file) {
-        const card = document.createElement("div");
-        card.className = "card rounded-4 border-dark-subtle border-1 me-3 file-card";
-        card.style.width = "180px";
-        card.style.height = "220px";
-        card.style.backgroundColor = "#F2F2F0";
-        card.style.cursor = "pointer";
+createFileElement(file) {
+    const card = document.createElement("div");
+    card.className = "card rounded-4 border-dark-subtle border-1 me-3 file-card";
+    card.style.width = "160px";
+    card.style.height = "180px";
+    card.style.backgroundColor = "#F2F2F0";
+    card.style.cursor = "pointer";
 
-        const fileInfo = this.getFileIconAndType(file.mime);
-        const openUrl = file.mime && file.mime.includes('pdf') ?
-            `/files/${file.id}` :
-            `/file-view/${file.id}`;
+    const fileInfo = this.getFileIconAndType(file.mime);
+    const openUrl = file.mime && file.mime.includes('pdf') ?
+        `/files/${file.id}` :
+        `/file-view/${file.id}`;
 
-        card.innerHTML = `
-            <div class="mt-3 mx-2 preview-container" style="height: 120px;">
-                <div id="preview-${file.id}" class="d-flex justify-content-center align-items-center h-100 w-100">
-                    <i class="ph ${fileInfo.icon} fs-1 text-muted"></i>
+    const labelsHTML = this.createLabelsHTML(file.labels || []);
+
+    card.innerHTML = `
+        <!-- ✅ PREVIEW CONTAINER DENGAN FIXED HEIGHT -->
+        <div class="mt-3 mx-2 preview-container" style="height: 100px; display: flex; align-items: center; justify-content: center;">
+            <div id="preview-${file.id}" class="d-flex justify-content-center align-items-center w-100 h-100">
+                <i class="ph ${fileInfo.icon} fs-1 text-muted"></i>
+            </div>
+        </div>
+
+        <div class="card-body p-2 d-flex flex-column" style="height: calc(220px - 100px - 1rem);">
+            <!-- ✅ FILE NAME -->
+            <div class="d-flex align-items-center mb-1">
+                <i class="ph ${fileInfo.icon} me-2 text-dark"></i>
+                <span class="fw-semibold text-truncate small" title="${file.name}">${file.name}</span>
+            </div>
+
+            <!-- ✅ LABELS & ACTIONS SECTION - SEJAJAR -->
+            <div class="d-flex align-items-start justify-content-between mb-1 flex-grow-1" style="min-height: 30px;">
+                <!-- ✅ LABELS SECTION -->
+                <div class="labels-section flex-grow-1 me-2" style="overflow: hidden;">
+                    ${labelsHTML}
+                </div>
+
+                <!-- ✅ DROPDOWN ACTIONS -->
+                <div class="dropdown flex-shrink-0">
+                    <button class="btn btn-link text-dark p-0"
+                            data-bs-toggle="dropdown"
+                            data-bs-display="static">
+                        <i class="ph ph-dots-three-vertical fs-6 text-muted"></i>
+                    </button>
+                    <ul class="dropdown-menu shadow rounded-3 border-0 p-2">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2"
+                            href="${openUrl}"
+                            target="_blank">
+                                <i class="ph ph-arrow-up-right fs-5"></i> Open
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#"
+                            class="dropdown-item d-flex align-items-center gap-2 download-btn"
+                            data-id="${file.id}"
+                            data-name="${file.name}">
+                            <i class="ph ph-download fs-5"></i> Download
+                            </a>
+                        </li>
+                        <li class="dropdown-submenu position-relative">
+                            <a class="dropdown-item d-flex align-items-center gap-2 info-btn"
+                            href="#"
+                            data-file-id="${file.id}">
+                                <i class="ph ph-info fs-5"></i> Get Info
+                            </a>
+                            <div class="file-info-panel" style="display: none; position: absolute; left: 100%; top: 0; width: 320px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #e9ecef;">
+                                ${this.getFileInfoPanelHTML(file, fileInfo)}
+                            </div>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 edit-file-btn" href="#"
+                            data-id="${file.id}" data-name="${file.name}" data-labels='${JSON.stringify(file.labels || [])}'>
+                                <i class="ph ph-pencil-simple fs-5"></i> Edit File
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#"
+                            class="dropdown-item text-danger d-flex align-items-center gap-2 delete-btn"
+                            data-id="${file.id}">
+                            <i class="ph ph-trash fs-5"></i> Delete
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <div class="card-body p-2">
-                <div class="d-flex align-items-center mb-1">
-                    <i class="ph ${fileInfo.icon} me-2 text-dark"></i>
-                    <span class="fw-semibold text-truncate small" title="${file.name}">${file.name}</span>
-                </div>
-                <div class="d-flex gap-2 align-items-center">
-                    <span class="badge bg-secondary rounded-2 px-2"><small>${fileInfo.type}</small></span>
-                    <span class="text-muted small">${file.size}</span>
-                    <div class="dropdown">
-                        <button class="btn btn-link ms-auto text-dark p-0"
-                                data-bs-toggle="dropdown"
-                                data-bs-display="static">
-                            <i class="ph ph-dots-three-vertical fs-6 text-muted"></i>
-                        </button>
-                        <ul class="dropdown-menu shadow rounded-3 border-0 p-2">
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center gap-2"
-                                href="${openUrl}"
-                                target="_blank">
-                                    <i class="ph ph-arrow-up-right fs-5"></i> Open
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#"
-                                class="dropdown-item d-flex align-items-center gap-2 download-btn"
-                                data-id="${file.id}"
-                                data-name="${file.name}">
-                                <i class="ph ph-download fs-5"></i> Download
-                                </a>
-                            </li>
-                            <li class="dropdown-submenu position-relative">
-                                <a class="dropdown-item d-flex align-items-center gap-2 info-btn"
-                                href="#"
-                                data-file-id="${file.id}">
-                                    <i class="ph ph-info fs-5"></i> Get Info
-                                </a>
-                                <div class="file-info-panel" style="display: none; position: absolute; left: 100%; top: 0; width: 320px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #e9ecef;">
-                                    ${this.getFileInfoPanelHTML(file, fileInfo)}
-                                </div>
-                            </li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center gap-2 edit-file-btn" href="#"
-                                data-id="${file.id}" data-name="${file.name}" data-labels='${JSON.stringify(file.labels || [])}'>
-                                    <i class="ph ph-pencil-simple fs-5"></i> Edit File
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#"
-                                class="dropdown-item text-danger d-flex align-items-center gap-2 delete-btn"
-                                data-id="${file.id}">
-                                <i class="ph ph-trash fs-5"></i> Delete
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        `;
+        </div>
+    `;
 
-        // Add click event for card
-        card.addEventListener('click', (e) => {
-            if (e.target.closest('.dropdown') || e.target.closest('.dropdown-menu')) {
-                return;
-            }
-            window.open(openUrl, '_blank');
-        });
-
-        // Render PDF preview if applicable
-        if (file.mime && file.mime.includes("pdf") && file.url) {
-            setTimeout(() => {
-                this.renderPDFPreview(file.url, `preview-${file.id}`);
-            }, 100);
+    // Add click event for card
+    card.addEventListener('click', (e) => {
+        if (e.target.closest('.dropdown') || e.target.closest('.dropdown-menu')) {
+            return;
         }
+        window.open(openUrl, '_blank');
+    });
 
-        return card;
+    // Render PDF preview if applicable
+    if (file.mime && file.mime.includes("pdf") && file.url) {
+        setTimeout(() => {
+            this.renderPDFPreview(file.url, `preview-${file.id}`);
+        }, 100);
     }
+
+    return card;
+}
+
+/**
+ * Create HTML for labels - Tampilkan SEMUA labels dengan color mapping
+ */
+createLabelsHTML(labels) {
+    if (!labels || labels.length === 0) {
+        return '<span class="badge bg-secondary rounded-2 px-2"><small>File</small></span>';
+    }
+
+    const allLabelsHTML = labels.map(label => {
+        // ✅ PAKAI COLOR MAPPING YANG SUDAH ADA
+        const textColor = this.getMappedTextColor(label.color);
+        return `
+            <span class="badge rounded-2 px-2 mb-1 flex-shrink-0"
+                  style="background-color: #${label.color}; color: ${textColor}; border: 1px solid #ddd; font-size: 0.7rem; line-height: 1.2; font-family: 'Rubik', sans-serif; font-weight: 400;"
+                  title="${label.name}">
+                ${label.name}
+            </span>
+        `;
+    }).join('');
+
+    return `
+        <div class="labels-wrap-container" style="display: flex; flex-wrap: wrap; gap: 2px; max-height: 40px; overflow: hidden;">
+            ${allLabelsHTML}
+        </div>
+    `;
+}
+
+/**
+ * Get text color dari mapping yang sudah ada
+ */
+getMappedTextColor(backgroundColor) {
+    // 🎨 Map background → text color (sama seperti di sidebar)
+    const colorMap = {
+        "FDDCD9": "#CB564A",
+        "EBE0D9": "#763E1A",
+        "FDE9DD": "#C2825D",
+        "EFEAFF": "#7762BB",
+        "FCF9DE": "#BDB470",
+        "E4F3FE": "#5F92B6",
+        "FCE7ED": "#CA8499",
+        "E6E5E3": "#989797",
+        "EEFEF1": "#8ABB93",
+        "F0EFED": "#729D9C"
+    };
+
+    // Normalize color code (hilangkan # jika ada, uppercase)
+    const normalizedColor = backgroundColor.replace('#', '').toUpperCase();
+
+    // Return mapped color atau fallback ke hitam
+    return colorMap[normalizedColor] || '#000000';
+}
+
 
     getFileIconAndType(mime) {
         if (!mime) return { icon: "ph-file", type: "File" };
@@ -494,47 +558,63 @@ class MySpaceManager {
     }
 
     async renderPDFPreview(pdfUrl, containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
+    const container = document.getElementById(containerId);
+    if (!container) return;
 
-        try {
-            container.innerHTML = '<div class="spinner-border spinner-border-sm text-primary" role="status"></div>';
+    try {
+        container.innerHTML = '<div class="spinner-border spinner-border-sm text-primary" role="status"></div>';
 
-            const loadingTask = pdfjsLib.getDocument({
-                url: pdfUrl,
-                httpHeaders: {
-                    'Authorization': 'Bearer ' + this.token
-                }
-            });
+        const loadingTask = pdfjsLib.getDocument({
+            url: pdfUrl,
+            httpHeaders: {
+                'Authorization': 'Bearer ' + this.token
+            }
+        });
 
-            const pdf = await loadingTask.promise;
-            const page = await pdf.getPage(1);
-            const scale = 0.3;
-            const viewport = page.getViewport({ scale });
+        const pdf = await loadingTask.promise;
+        const page = await pdf.getPage(1);
 
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = viewport.width;
-            canvas.height = viewport.height / 1.8;
-            canvas.style.maxWidth = '8em';
-            canvas.style.height = 'auto';
-            canvas.style.borderRadius = '4px';
-            canvas.style.padding = '16px 0';
+        // ✅ FIXED CONTAINER DIMENSIONS
+        const containerWidth = 120; // Lebar maksimal container
+        const containerHeight = 80; // Tinggi maksimal container
 
-            const renderContext = {
-                canvasContext: context,
-                viewport: viewport
-            };
+        const originalViewport = page.getViewport({ scale: 1 });
+        const scale = Math.min(
+            containerWidth / originalViewport.width,
+            containerHeight / originalViewport.height
+        );
 
-            await page.render(renderContext).promise;
-            container.innerHTML = '';
-            container.appendChild(canvas);
+        const viewport = page.getViewport({ scale });
 
-        } catch (error) {
-            console.error('Error rendering PDF preview:', error);
-            container.innerHTML = '<i class="ph ph-file-pdf fs-1 text-muted"></i>';
-        }
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        // ✅ STYLE KONSISTEN DENGAN FIXED CONTAINER
+        canvas.style.width = `${viewport.width}px`;
+        canvas.style.height = `${viewport.height}px`;
+        canvas.style.maxWidth = '100%';
+        canvas.style.objectFit = 'contain';
+        canvas.style.borderRadius = '4px';
+        canvas.style.backgroundColor = '#f8f9fa';
+        canvas.style.display = 'block';
+        canvas.style.margin = '0 auto';
+
+        const renderContext = {
+            canvasContext: context,
+            viewport: viewport
+        };
+
+        await page.render(renderContext).promise;
+        container.innerHTML = '';
+        container.appendChild(canvas);
+
+    } catch (error) {
+        console.error('Error rendering PDF preview:', error);
+        container.innerHTML = '<i class="ph ph-file-pdf fs-1 text-muted"></i>';
     }
+}
 
     attachEventListeners() {
         this.attachInfoPanelListeners();
@@ -676,7 +756,7 @@ class MySpaceManager {
                             fileContainer.appendChild(emptyTemplate);
                         }
                     }
-                    alert("File berhasil dihapus");
+                    // alert("File berhasil dihapus");
                 } else {
                     let errorMessage = "Gagal menghapus file";
                     if (result.message) {

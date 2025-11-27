@@ -100,6 +100,9 @@
                 <form id="uploadForm">
                     @csrf
 
+                    <!-- Feedback Message -->
+                    <div id="uploadMessage" class="alert d-none"></div>
+
                     <!-- Drop Zone -->
                     <div id="uploadArea" class="upload-box text-center mb-4 border border-2 border-dashed rounded-4 p-4"
                         style="border-color: #dee2e6; cursor: pointer; transition: all 0.2s ease;">
@@ -284,6 +287,9 @@
                     @csrf
                     <input type="hidden" name="file_id" id="editFileId">
 
+                    <!-- Feedback Message -->
+                    <div id="editFileMessage" class="alert d-none"></div>
+
                     <!-- File Info Display -->
                     <div class="file-info-box border border-2 border-dashed rounded-4 p-4 mb-4"
                         style="border-color: #dee2e6;">
@@ -362,6 +368,36 @@
     </div>
 </div>
 
+{{-- MODAL RENAME FOLDER --}}
+<div class="modal fade" id="renameFolderModal" tabindex="-1" aria-labelledby="renameFolderModalLabel" aria-hidden="true" data-bs-backdrop="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-semibold" id="renameFolderModalLabel">Rename Folder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form id="renameFolderForm">
+                    <input type="hidden" id="renameFolderId" name="folder_id">
+                    <div class="mb-3">
+                        <label for="newFolderName" class="form-label fw-medium">New Folder Name</label>
+                        <input type="text" class="form-control rounded-3 border-dark-subtle"
+                               id="newFolderName" name="new_name" required
+                               placeholder="Enter new folder name">
+                        <div class="form-text text-muted">
+                            Folder name cannot contain special characters.
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-blue rounded-3 px-4" id="confirmRenameFolder">Rename</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     // ==================== GLOBAL VARIABLES ====================
     let selectedLabelIds = []; // Untuk upload modal
@@ -393,6 +429,50 @@
     // Fungsi untuk mendapatkan token
     function getToken() {
         return "{{ session('token') }}";
+    }
+
+    // Fungsi untuk menampilkan pesan feedback
+    function showMessage(message, type, containerId = null) {
+        let messageDiv;
+
+        if (containerId) {
+            messageDiv = document.getElementById(containerId);
+        } else {
+            // Default container untuk modal yang sedang aktif
+            const activeModal = document.querySelector('.modal.show');
+            if (activeModal) {
+                messageDiv = activeModal.querySelector('.alert');
+                if (!messageDiv) {
+                    // Buat elemen alert jika belum ada
+                    messageDiv = document.createElement('div');
+                    messageDiv.className = 'alert d-none';
+                    activeModal.querySelector('.modal-body').prepend(messageDiv);
+                }
+            } else {
+                // Fallback ke alert biasa jika tidak ada modal aktif
+                alert(message);
+                return;
+            }
+        }
+
+        if (!messageDiv) {
+            console.error('Message container not found');
+            return;
+        }
+
+        messageDiv.textContent = message;
+        messageDiv.className = `alert alert-${type} mt-3`;
+        messageDiv.classList.remove("d-none");
+
+        // Auto-hide untuk pesan sukses
+        if (type === "success") {
+            setTimeout(() => {
+                messageDiv.classList.add("d-none");
+            }, 5000);
+        }
+
+        // Scroll ke pesan
+        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     // 🟢 Ambil semua label dari API
@@ -568,6 +648,7 @@
         // Reset form dan labels
         document.getElementById("uploadForm").reset();
         document.getElementById("fileName").textContent = "";
+        document.getElementById("uploadMessage").classList.add("d-none");
 
         // Reset selected labels
         selectedLabelIds = [];
@@ -631,7 +712,7 @@
         saveNewLabelBtn.addEventListener("click", async () => {
             const name = newLabelInput.value.trim();
             if (!name) {
-                alert("Label name cannot be empty");
+                showMessage("Label name cannot be empty", "danger", "uploadMessage");
                 return;
             }
 
@@ -676,8 +757,10 @@
                 // Kembalikan ke tombol Add
                 resetAddLabelForm();
 
+                showMessage("Label created successfully!", "success", "uploadMessage");
+
             } catch (err) {
-                alert("Failed to create label: " + err.message);
+                showMessage("Failed to create label: " + err.message, "danger", "uploadMessage");
             }
         });
 
@@ -763,7 +846,7 @@
 
         const token = getToken();
         if (!token) {
-            alert("Session expired. Please login again.");
+            showMessage("Session expired. Please login again.", "danger", "uploadMessage");
             window.location.href = "{{ route('signin') }}";
             return;
         }
@@ -772,7 +855,7 @@
         const parentId = getParentIdFromUrl();
 
         if (!file) {
-            alert("Please select a file to upload");
+            showMessage("Please select a file to upload", "danger", "uploadMessage");
             return;
         }
 
@@ -800,6 +883,13 @@
                 });
             }
 
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+
+            // Tampilkan loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading...';
+
             const res = await fetch("https://pdu-dms.my.id/api/upload-files", {
                 method: "POST",
                 headers: {
@@ -810,7 +900,7 @@
 
             if (!res.ok) {
                 if (res.status === 401) {
-                    alert("Session expired. Please login again.");
+                    showMessage("Session expired. Please login again.", "danger", "uploadMessage");
                     window.location.href = "{{ route('signin') }}";
                     return;
                 }
@@ -820,12 +910,20 @@
             const result = await res.json();
             if (!res.ok) throw new Error(result.message || "Failed to upload file");
 
-            alert("File uploaded successfully!");
-            bootstrap.Modal.getInstance(document.getElementById("uploadFileModal")).hide();
-            location.reload();
+            showMessage("File uploaded successfully!", "success", "uploadMessage");
+
+            setTimeout(() => {
+                bootstrap.Modal.getInstance(document.getElementById("uploadFileModal")).hide();
+                location.reload();
+            }, 1500);
 
         } catch (err) {
-            alert("Failed to upload: " + err.message);
+            showMessage("Failed to upload: " + err.message, "danger", "uploadMessage");
+
+            // Reset button state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Upload';
         }
     });
 
@@ -851,7 +949,7 @@
     document.getElementById("createFolderBtn").addEventListener("click", async function() {
         const token = getToken();
         if (!token) {
-            alert("Session expired. Please login again.");
+            showMessage("Session expired. Please login again.", "danger", "folderMessage");
             window.location.href = "{{ route('signin') }}";
             return;
         }
@@ -860,7 +958,7 @@
         const messageDiv = document.getElementById("folderMessage");
 
         if (!folderName) {
-            showMessage("Please enter a folder name", "danger");
+            showMessage("Please enter a folder name", "danger", "folderMessage");
             return;
         }
 
@@ -889,7 +987,7 @@
 
             if (!res.ok) {
                 if (res.status === 401) {
-                    alert("Session expired. Please login again.");
+                    showMessage("Session expired. Please login again.", "danger", "folderMessage");
                     window.location.href = "{{ route('signin') }}";
                     return;
                 }
@@ -899,7 +997,7 @@
             const result = await res.json();
 
             if (res.ok) {
-                showMessage("Folder created successfully!", "success");
+                showMessage("Folder created successfully!", "success", "folderMessage");
 
                 setTimeout(() => {
                     document.getElementById("createFolderForm").reset();
@@ -911,26 +1009,12 @@
             }
         } catch (err) {
             console.error("Error creating folder:", err);
-            showMessage("Failed to create folder: " + err.message, "danger");
+            showMessage("Failed to create folder: " + err.message, "danger", "folderMessage");
         } finally {
             this.disabled = false;
             this.innerHTML = "Create Folder";
         }
     });
-
-    // Fungsi untuk menampilkan pesan feedback
-    function showMessage(message, type) {
-        const messageDiv = document.getElementById("folderMessage");
-        messageDiv.textContent = message;
-        messageDiv.className = `alert alert-${type} mt-3`;
-        messageDiv.classList.remove("d-none");
-
-        if (type === "success") {
-            setTimeout(() => {
-                messageDiv.classList.add("d-none");
-            }, 5000);
-        }
-    }
 
     // Submit form dengan tombol Enter
     document.getElementById("folderName").addEventListener("keypress", function(e) {
@@ -1127,14 +1211,14 @@
             editSaveNewLabelBtn.addEventListener("click", async () => {
                 const name = editNewLabelInput.value.trim();
                 if (!name) {
-                    alert("Label name cannot be empty");
+                    showMessage("Label name cannot be empty", "danger", "editFileMessage");
                     return;
                 }
 
                 // Cek apakah label sudah ada
                 const existingLabel = allLabels.find(l => l.name.toLowerCase() === name.toLowerCase());
                 if (existingLabel) {
-                    alert("Label with this name already exists");
+                    showMessage("Label with this name already exists", "danger", "editFileMessage");
                     return;
                 }
 
@@ -1181,9 +1265,11 @@
                     // Kembalikan ke tombol Add
                     resetEditAddLabelForm();
 
+                    showMessage("Label created successfully!", "success", "editFileMessage");
+
                 } catch (err) {
                     console.error('Error creating label:', err);
-                    alert("Failed to create label: " + err.message);
+                    showMessage("Failed to create label: " + err.message, "danger", "editFileMessage");
                 }
             });
         }
@@ -1228,7 +1314,7 @@
 
         const token = getToken();
         if (!token) {
-            alert("Session expired. Please login again.");
+            showMessage("Session expired. Please login again.", "danger", "editFileMessage");
             window.location.href = "{{ route('signin') }}";
             return;
         }
@@ -1239,7 +1325,7 @@
         const fileExtension = originalFileName.split('.').pop();
 
         if (!title) {
-            alert("Please enter a file name");
+            showMessage("Please enter a file name", "danger", "editFileMessage");
             return;
         }
 
@@ -1298,7 +1384,7 @@
                 throw new Error(result.message || "Failed to update file");
             }
 
-            alert("File updated successfully!");
+            showMessage("File updated successfully!", "success", "editFileMessage");
 
             // Tutup modal
             const modal = bootstrap.Modal.getInstance(document.getElementById("editFileModal"));
@@ -1311,7 +1397,7 @@
 
         } catch (err) {
             console.error('Error updating file:', err);
-            alert("Failed to update file: " + err.message);
+            showMessage("Failed to update file: " + err.message, "danger", "editFileMessage");
 
             // Reset button state
             const submitBtn = this.querySelector('button[type="submit"]');

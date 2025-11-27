@@ -7,7 +7,7 @@
     {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="fw-bold mb-1">Recommended Files</h2>
+            <h4 class="mb-1">Home</h4>
         </div>
     </div>
 
@@ -17,9 +17,9 @@
 
     {{-- SECTION: RECOMMENDED FILES --}}
     <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4">
-        <h4 class="fw-semibold mb-4">
+        <h5 class=" mb-4">
             Recommended Files
-        </h4>
+        </h5>
         <div id="fileContainer" class="row g-3 ms-1 me-2">
             {{-- Loading state --}}
             <div class="col-12 text-center py-3">
