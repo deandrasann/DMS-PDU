@@ -1,193 +1,201 @@
 /* FIX FONT SFT SCHRIFTED SANS - PATH CORRECTION */
 /* 100 - Thin / Hairline */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('../fonts/SFTSchriftedSansTRIAL-Var.ttf') format('truetype');
-font-weight: 100;
-font-style: normal;
-font-display: swap;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-Var.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
 }
 
 /* 200 - ExtraLight */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('../fonts/SFTSchriftedSansTRIAL-ExLight.ttf') format('truetype');
-font-weight: 200;
-font-style: normal;
-font-display: swap;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-ExLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('../fonts/SFTSchriftedSansTRIAL-ExLightItalic.ttf') format('truetype');
-font-weight: 200;
-font-style: italic;
-font-display: swap;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-ExLightItalic.ttf') format('truetype');
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* 300 - Light */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('../fonts/SFTSchriftedSansTRIAL-Light.ttf') format('truetype');
-font-weight: 300;
-font-style: normal;
-font-display: swap;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('../fonts/SFTSchriftedSansTRIAL-LightItalic.ttf') format('truetype');
-font-weight: 300;
-font-style: italic;
-font-display: swap;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-LightItalic.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* 400 - Regular */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('../fonts/SFTSchriftedSansTRIAL-Regular.ttf') format('truetype');
-font-weight: 400;
-font-style: normal;
-font-display: swap;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('../fonts/SFTSchriftedSansTRIAL-Italic.ttf') format('truetype');
-font-weight: 400;
-font-style: italic;
-font-display: swap;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* 500 - Medium */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('../fonts/SFTSchriftedSansTRIAL-Medium.ttf') format('truetype');
-font-weight: 500;
-font-style: normal;
-font-display: swap;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('../fonts/SFTSchriftedSansTRIAL-MediumItalic.ttf') format('truetype');
-font-weight: 500;
-font-style: italic;
-font-display: swap;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* 600 - DemiBold / SemiBold */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('../fonts/SFTSchriftedSansTRIAL-DemiBold.ttf') format('truetype');
-font-weight: 600;
-font-style: normal;
-font-display: swap;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-DemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('../fonts/SFTSchriftedSansTRIAL-DemiBoldItalic.ttf') format('truetype');
-font-weight: 600;
-font-style: italic;
-font-display: swap;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-DemiBoldItalic.ttf') format('truetype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* 700 - Bold */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('../fonts/SFTSchriftedSansTRIAL-Bold.ttf') format('truetype');
-font-weight: 700;
-font-style: normal;
-font-display: swap;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('../fonts/SFTSchriftedSansTRIAL-BoldItalic.ttf') format('truetype');
-font-weight: 700;
-font-style: italic;
-font-display: swap;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* 800 - ExtraBold */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('../fonts/SFTSchriftedSansTRIAL-ExBold.ttf') format('truetype');
-font-weight: 800;
-font-style: normal;
-font-display: swap;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-ExBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('../fonts/SFTSchriftedSansTRIAL-ExBoldItalic.ttf') format('truetype');
-font-weight: 800;
-font-style: italic;
-font-display: swap;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-ExBoldItalic.ttf') format('truetype');
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* 900 - Black */
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('../fonts/SFTSchriftedSansTRIAL-Black.ttf') format('truetype');
-font-weight: 900;
-font-style: normal;
-font-display: swap;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
-font-family: 'SFT Schrifted Sans';
-src: url('../fonts/SFTSchriftedSansTRIAL-BlackItalic.ttf') format('truetype');
-font-weight: 900;
-font-style: italic;
-font-display: swap;
+  font-family: 'SFT Schrifted Sans';
+  src: url('../fonts/SFTSchriftedSansTRIAL-BlackItalic.ttf') format('truetype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
 }
 
 /* Typography - FIX FONT FAMILY */
 * {
-font-family: 'SFT Schrifted Sans', Arial, sans-serif !important;
+  font-family: 'SFT Schrifted Sans', Arial, sans-serif !important;
 }
 
 body {
-font-family: 'SFT Schrifted Sans', Arial, sans-serif !important;
-font-weight: 400;
+  font-family: 'SFT Schrifted Sans', Arial, sans-serif !important;
+  font-weight: 400;
 }
 
 h1 {
-font-family: 'SFT Schrifted Sans', sans-serif !important;
-font-weight: 900;
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-weight: 900;
 }
 
 h2 {
-font-family: 'SFT Schrifted Sans', sans-serif !important;
-font-weight: 700;
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-weight: 700;
 }
 
 h3 {
-font-family: 'SFT Schrifted Sans', sans-serif !important;
-font-weight: 500;
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-weight: 500;
 }
 
 h4 {
-font-family: 'SFT Schrifted Sans', sans-serif !important;
-font-weight: 500;
-font-size: 24px;
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-weight: 500;
+  font-size: 20px;
 }
 
-h5, h6 {
-font-family: 'SFT Schrifted Sans', sans-serif !important;
-font-weight: 500;
-font-size: 20px;
+h5,
+h6 {
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-weight: 400;
 }
 
 p {
-font-family: 'SFT Schrifted Sans', sans-serif !important;
-font-weight: 300;
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-weight: 300;
 }
 
 small {
-font-family: 'SFT Schrifted Sans', sans-serif !important;
-font-weight: 300;
-font-size: 12px;
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-weight: 300;
+  font-size: 12px;
 }
 
 .small {
-font-family: 'Rubik', sans-serif !important;
-font-weight: 300;
-font-size: 12px;
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-weight: 300;
+  font-size: 12px;
 }
 
 /* ✅ TAMBAHKAN UNTUK BADGE LABELS */
@@ -201,11 +209,11 @@ font-family: 'Rubik', sans-serif !important;
 font-weight: 400;
 }
 .text-orange {
-color: #F6602E !important;
-font-family: 'SFT Schrifted Sans', sans-serif !important;
-font-size: 16px;
-font-weight: 400;
-line-height: normal;
+  color: #F6602E !important;
+  font-family: 'SFT Schrifted Sans', sans-serif !important;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
 }
 
 
@@ -213,489 +221,611 @@ line-height: normal;
 /* FIX Z-INDEX STRUCTURE UNTUK MODAL DAN FOLDER */
 /* Pastikan modal memiliki z-index tertinggi */
 .modal-backdrop {
-z-index: 1045 !important;
+  z-index: 1045 !important;
 }
 
 .modal {
-z-index: 1050 !important;
+  z-index: 1050 !important;
 }
 
 .modal-content {
-z-index: 1051 !important;
+  z-index: 1051 !important;
 }
 
 /* SECTION FOLDERS - priority tinggi TAPI DI BAWAH MODAL */
-.container.py-4 > div:nth-child(1) {
-position: relative;
-z-index: 10 !important; /* Kurangi dari 100 ke 10 */
+.container.py-4>div:nth-child(1) {
+  position: relative;
+  z-index: 10 !important;
+  /* Kurangi dari 100 ke 10 */
 }
 
 /* SECTION FILES - priority rendah */
-.container.py-4 > div:nth-child(2) {
-position: relative;
-z-index: 1 !important;
+.container.py-4>div:nth-child(2) {
+  position: relative;
+  z-index: 1 !important;
 }
 
 /* Dropdown folder - pastikan tidak lebih tinggi dari modal */
 .folder-item .dropdown-menu {
-z-index: 1040 !important; /* Kurangi dari 10050 ke 1040 */
+  z-index: 1040 !important;
+  /* Kurangi dari 10050 ke 1040 */
 }
 
 /* NAVBAR & SIDEBAR Z-INDEX */
 .sidebar-desktop {
-position: fixed !important;
-height: 100vh !important;
-z-index: 1030 !important;
+  position: fixed !important;
+  height: 100vh !important;
+  z-index: 1030 !important;
 }
 
 .navbar-mobile {
-position: fixed !important;
-top: 0 !important;
-left: 0 !important;
-width: 100% !important;
-z-index: 1030 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  z-index: 1030 !important;
 }
 
 .navbar-desktop {
-position: sticky !important;
-top: 0 !important;
-z-index: 1030 !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1030 !important;
 }
 
 .content-area {
-position: relative !important;
-z-index: 1 !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 /* MYSPACE CONTENT */
 .sidebar-collapse-content {
-margin-left: 280px;
-transition: margin-left 0.3s ease;
-position: relative;
-z-index: 1;
+  margin-left: 280px;
+  transition: margin-left 0.3s ease;
+  position: relative;
+  z-index: 1;
 }
+
 .sidebar-collapse-content.collapsed {
-margin-left: 80px;
+  margin-left: 80px;
 }
 
 /* Pastikan content myspace tidak terpengaruh oleh modal */
 body.modal-open .sidebar-collapse-content {
-filter: none !important;
-opacity: 1 !important;
-pointer-events: none; /* Biarkan konten di belakang tetap bisa di-scroll */
+  filter: none !important;
+  opacity: 1 !important;
+  pointer-events: none;
+  /* Biarkan konten di belakang tetap bisa di-scroll */
 }
 
 body.modal-open .sidebar-collapse-content * {
-pointer-events: auto; /* Reset pointer events untuk child elements */
+  pointer-events: auto;
+  /* Reset pointer events untuk child elements */
 }
 
 /* STYLING LAINNYA YANG SUDAH ADA */
-.bg-light-orange{
-background: var(--P01, #FFD2B9);
+.bg-light-orange {
+  background: var(--P01, #FFD2B9);
 }
 
 .nav-link.active {
-border-radius: 16px !important;
-border: 1px solid rgba(246, 96, 46, 0.10) !important;
-background: linear-gradient(90deg, rgba(246, 96, 46, 0.50) 0%, rgba(255, 159, 101, 0.50) 100%) !important;
-box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25) !important;
-padding-right: 4px;
+  border-radius: 16px !important;
+  border: 1px solid rgba(246, 96, 46, 0.10) !important;
+  background: linear-gradient(90deg, rgba(246, 96, 46, 0.50) 0%, rgba(255, 159, 101, 0.50) 100%) !important;
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25) !important;
+  padding-right: 4px;
 }
 
 .search-box {
-transition: all 0.25s ease-in-out;
-border-radius: 1rem;
+  transition: all 0.25s ease-in-out;
+  border-radius: 1rem;
 }
 
 .search-box .form-control:focus {
-box-shadow: none !important;
-border: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 .search-box:focus-within {
-box-shadow: 0 0 0 0.5px #F6602E;
-border-radius: -1rem;
+  box-shadow: 0 0 0 0.5px #F6602E;
+  border-radius: -1rem;
 }
 
-.btn-badge{
-background-color: #FDDCD9;
-color: #262625
+.btn-badge {
+  background-color: #FDDCD9;
+  color: #262625
 }
 
 .pdf-inner-shadow {
-background-color: #F2F2F0 !important;
-box-shadow: inset 0 2px 6px rgba(0,0,0,0.25) !important;
-border-radius: 8px !important;
+  background-color: #F2F2F0 !important;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+  border-radius: 8px !important;
 }
 
-.btn-primary{
-background: linear-gradient(180deg, #FFB98F 0%, #FF9F65 100%);
-border:none;
+.btn-primary {
+  background: linear-gradient(180deg, #FFB98F 0%, #FF9F65 100%);
+  border: none;
 }
 
-.shadow{
-background: rgba(255, 255, 255, 0.25) !important;
-box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.15) !important;
-backdrop-filter: blur(8px) !important;
+.shadow {
+  background: rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.15) !important;
+  backdrop-filter: blur(8px) !important;
 }
 
 #sidebar {
-transition: width 0.3s ease;
-width: 280px;
-overflow-x: hidden;
-white-space: nowrap;
+  transition: width 0.3s ease;
+  width: 280px;
+  overflow-x: hidden;
+  white-space: nowrap;
 }
 
 #sidebarLogoBig {
-display: block;
-width: 120px;
-transition: opacity 0.3s ease;
+  display: block;
+  width: 120px;
+  transition: opacity 0.3s ease;
 }
+
 #sidebarLogoSmall {
-width: 40px;
-opacity: 0;
-visibility: hidden;
-transition: opacity 0.3s ease;
+  width: 40px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
 }
 
 #sidebar.collapsed {
-width: 80px !important;
+  width: 80px !important;
 }
 
 #sidebar.collapsed #sidebarLogoBig {
-opacity: 0;
-visibility: hidden;
+  opacity: 0;
+  visibility: hidden;
 }
+
 #sidebar.collapsed #sidebarLogoSmall {
-opacity: 1;
-visibility: visible;
+  opacity: 1;
+  visibility: visible;
 }
 
 #toggleBtn {
-opacity: 1;
-visibility: visible;
-transition: opacity 0.3s ease;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease;
 }
 
 #sidebar.collapsed #toggleBtn {
-opacity: 0;
-visibility: hidden;
-position: absolute;
-right: 10px;
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  right: 10px;
 }
 
 #sidebar.collapsed:hover #toggleBtn {
-opacity: 1;
-visibility: visible;
-}
-#sidebar.collapsed:hover #sidebarLogoSmall {
-opacity: 0;
-visibility: hidden;
+  opacity: 1;
+  visibility: visible;
 }
 
-.btn-light:hover{
-background: linear-gradient(90deg, rgba(246, 96, 46, 0.50) 0%, rgba(255, 159, 101, 0.50) 100%);
-border:none;
+#sidebar.collapsed:hover #sidebarLogoSmall {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.btn-light:hover {
+  background: linear-gradient(90deg, rgba(246, 96, 46, 0.50) 0%, rgba(255, 159, 101, 0.50) 100%);
+  border: none;
 }
 
 .filter-panel {
-position: absolute;
-top: 100%;
-left: 0;
-width: 100%;
-z-index: 1065;
-display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 1065;
+  display: none;
 }
 
 .modal-backdrop.show {
-opacity: 0.5 !important;
-backdrop-filter: blur(0px) !important;
+  opacity: 0.5 !important;
+  backdrop-filter: blur(0px) !important;
 }
 
-.dropdown-submenu > .dropdown-menu {
-top: 0;
-left: 100%;
-margin-left: 0.25rem;
-margin-top: -0.25rem;
-display: none;
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-left: 0.25rem;
+  margin-top: -0.25rem;
+  display: none;
 }
 
-.dropdown-submenu:hover > .dropdown-menu {
-display: block;
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
 }
 
 .dropdown-menu {
-border-radius: 10px;
+  border-radius: 10px;
 }
 
 .dropdown-item:hover {
-background-color: #f8f9fa;
-border-radius: 8px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
 }
 
 .border-dashed {
-border-style: dashed !important;
+  border-style: dashed !important;
 }
 
 #uploadArea:hover {
-border-color: #fd7e14 !important;
-background-color: rgba(253, 126, 20, 0.05) !important;
+  border-color: #fd7e14 !important;
+  background-color: rgba(253, 126, 20, 0.05) !important;
 }
 
-.btn-blue{
-border-radius: 12px;
-background: #3B82F6;
-box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.10);
-backdrop-filter: blur(8px);
-color: white;
+.btn-blue {
+  border-radius: 12px;
+  background: #3B82F6;
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.10);
+  backdrop-filter: blur(8px);
+  color: white;
 }
 
 .skeleton {
-position: relative;
-overflow: hidden;
-background: #e0e0e0;
+  position: relative;
+  overflow: hidden;
+  background: #e0e0e0;
 }
 
 .skeleton::after {
-content: '';
-position: absolute;
-top: 0;
-left: -100%;
-width: 100%;
-height: 100%;
-background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-animation: shimmer 1.5s infinite;
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: shimmer 1.5s infinite;
 }
 
 #logoutConfirmationModal {
-z-index: 1060 !important;
+  z-index: 1060 !important;
 }
 
 .account-btn {
-transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
-.account-btn:hover, .account-btn:active {
-background-color: #E6E6E4 !important;
+.account-btn:hover,
+.account-btn:active {
+  background-color: #E6E6E4 !important;
 }
 
 .modal-backdrop.show {
-background-color: rgba(0, 0, 0, 0.4) !important;
-opacity: 1 !important;
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  opacity: 1 !important;
 }
 
 .modal-content {
-background-color: #ffffff !important;
-filter: none !important;
-opacity: 1 !important;
-box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-border-radius: 1rem;
+  background-color: #ffffff !important;
+  filter: none !important;
+  opacity: 1 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-radius: 1rem;
 }
 
 .modal-content {
-padding-top: 0 !important;
+  padding-top: 0 !important;
 }
 
 .modal-body,
 .modal-footer {
-padding-left: 1rem !important;
-padding-right: 3rem !important;
+  padding-left: 1rem !important;
+  padding-right: 3rem !important;
 }
 
 .modal-title {
-padding-left: 2.5rem;
-margin-bottom: 1.5rem;
+  padding-left: 2.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .modal-content .btn {
-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-outline: none !important;
-border: none;
-transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  outline: none !important;
+  border: none;
+  transition: all 0.2s ease;
 }
 
 .modal-content .btn:hover {
-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  transform: translateY(-1px);
 }
 
 .modal-content .btn:active {
-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
-transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  transform: translateY(0);
 }
 
 #profilePreviewModal,
 #profilePreviewDropdown,
 #profilePreviewBtn {
-transition: all 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 #deleteConfirmationModal .modal-content {
-border-radius: 1rem;
+  border-radius: 1rem;
 }
 
 #deleteConfirmationModal .btn {
-min-width: 90px;
+  min-width: 90px;
 }
 
 #deleteConfirmationModal .btn-danger {
-background-color: #dc3545;
-border: none;
+  background-color: #dc3545;
+  border: none;
 }
 
 #autoLogoutLoader {
-display: none;
-align-items: center;
-justify-content: center;
+  display: none;
+  align-items: center;
+  justify-content: center;
 }
 
 @keyframes shimmer {
-100% {
-left: 100%;
-}
+  100% {
+    left: 100%;
+  }
 }
 
 .dropdown:hover .dropdown-menu {
-display: block;
-margin-top: 0;
+  display: block;
+  margin-top: 0;
 }
 
 .folder-item {
-position: relative !important;
-z-index: 10;
-overflow: visible !important;
+  position: relative !important;
+  z-index: 10;
+  overflow: visible !important;
 }
 
 .folder-card {
-position: relative;
-overflow: visible !important;
-z-index: 1;
+  position: relative;
+  overflow: visible !important;
+  z-index: 1;
 }
 
 .folder-dropdown-menu {
-position: absolute !important;
-z-index: 1040 !important;
-top: 100% !important;
-right: 0 !important;
-left: auto !important;
-transform: none !important;
-margin-top: 0.25rem !important;
-display: none;
+  position: absolute !important;
+  z-index: 1040 !important;
+  top: 100% !important;
+  right: 0 !important;
+  left: auto !important;
+  transform: none !important;
+  margin-top: 0.25rem !important;
+  display: none;
 }
 
 .folder-dropdown-menu.show {
-display: block !important;
+  display: block !important;
 }
 
 .bg-light.shadow.rounded-4 {
-overflow: visible !important;
+  overflow: visible !important;
 }
 
 .container.py-4 {
-overflow: visible !important;
+  overflow: visible !important;
 }
 
 .dropdown-menu .label-badge {
-cursor: pointer;
-transition: transform 0.1s ease, opacity 0.1s ease;
-border-radius: 50px;
-font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.1s ease;
+  border-radius: 50px;
+  font-weight: 500;
 }
 
 .dropdown-menu .label-badge:hover {
-transform: scale(1.05);
-opacity: 0.85;
+  transform: scale(1.05);
+  opacity: 0.85;
 }
 
 /* ACCENT COLORS (tetap sama) */
-.text-accent-1 { color: #CB564A; }
-.bg-accent-1 { background-color: #FDDCD9; }
-.text-accent-2 { color: #763E1A; }
-.bg-accent-2 { background-color: #EBE0D9; }
-.text-accent-3 { color: #C2825D; }
-.bg-accent-3 { background-color: #FDE9DD; }
-.text-accent-4 { color: #7762BB; }
-.bg-accent-4 { background-color: #EFEAFF; }
-.text-accent-5 { color: #BDB470; }
-.bg-accent-5 { background-color: #FCF9DE; }
-.text-accent-6 { color: #5F92B6; }
-.bg-accent-6 { background-color: #E4F3FE; }
-.text-accent-7 { color: #CA8499; }
-.bg-accent-7 { background-color: #FCE7ED; }
-.text-accent-8 { color: #989797; }
-.bg-accent-8 { background-color: #E6E5E3; }
-.text-accent-9 { color: #8ABB93; }
-.bg-accent-9 { background-color: #EEFEF1; }
-.text-accent-10 { color: #729D9C; }
-.bg-accent-10 { background-color: #F0EFED; }
-.text-accent-11 { color: #617418; }
-.bg-accent-11 { background-color: #EEFEF1; }
-.text-accent-12 { color: #668F68; }
-.bg-accent-12 { background-color: #F3FFC3; }
-.text-accent-13 { color: #1F5780; }
-.bg-accent-13 { background-color: #DAEBF8; }
+.text-accent-1 {
+  color: #CB564A;
+}
 
-    .filter-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 0;
+.bg-accent-1 {
+  background-color: #FDDCD9;
+}
+
+.text-accent-2 {
+  color: #763E1A;
+}
+
+.bg-accent-2 {
+  background-color: #EBE0D9;
+}
+
+.text-accent-3 {
+  color: #C2825D;
+}
+
+.bg-accent-3 {
+  background-color: #FDE9DD;
+}
+
+.text-accent-4 {
+  color: #7762BB;
+}
+
+.bg-accent-4 {
+  background-color: #EFEAFF;
+}
+
+.text-accent-5 {
+  color: #BDB470;
+}
+
+.bg-accent-5 {
+  background-color: #FCF9DE;
+}
+
+.text-accent-6 {
+  color: #5F92B6;
+}
+
+.bg-accent-6 {
+  background-color: #E4F3FE;
+}
+
+.text-accent-7 {
+  color: #CA8499;
+}
+
+.bg-accent-7 {
+  background-color: #FCE7ED;
+}
+
+.text-accent-8 {
+  color: #989797;
+}
+
+.bg-accent-8 {
+  background-color: #E6E5E3;
+}
+
+.text-accent-9 {
+  color: #8ABB93;
+}
+
+.bg-accent-9 {
+  background-color: #EEFEF1;
+}
+
+.text-accent-10 {
+  color: #729D9C;
+}
+
+.bg-accent-10 {
+  background-color: #F0EFED;
+}
+
+.text-accent-11 {
+  color: #617418;
+}
+
+.bg-accent-11 {
+  background-color: #EEFEF1;
+}
+
+.text-accent-12 {
+  color: #668F68;
+}
+
+.bg-accent-12 {
+  background-color: #F3FFC3;
+}
+
+.text-accent-13 {
+  color: #1F5780;
+}
+
+.bg-accent-13 {
+  background-color: #DAEBF8;
+}
+.dropdown-menu .dropend .dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-left: 0.5rem;
+  margin-top: -0.5rem;
+}
+.dropend>.dropdown-menu {
+  display: none !important;
+  top: 0;
+  left: 100%;
+  margin-left: 0.5rem;
+  min-width: 200px;
+}
+
+.dropend:hover>.dropdown-menu,
+.dropend .dropdown-toggle[aria-expanded="true"]+.dropdown-menu,
+.dropend.show>.dropdown-menu {
+  display: block !important;
+}
+
+/* Optional: panah ke kanan */
+.dropend .dropdown-toggle::after {
+  content: "›";
+  border: none;
+  margin-left: 8px;
+  font-size: 1.2em;
+  vertical-align: middle;
+}
+
+.modal {
+        z-index: 99999 !important;
+    }
+    .modal-backdrop {
+        z-index: 99998 !important;
+    }
+    .folder-info-panel,
+    .dropdown-menu {
+        z-index: 2000 !important;
     }
 
-    .filter-row label {
-        font-weight: 600;
-        font-size: 14px;
-        min-width: 120px; /* panjang label fix, dropdown menyesuaikan */
-    }
+#advancedShareModal .modal-content {
+  background: #ffffff;
+  border-radius: 24px !important;
+}
 
-    .dropdown-container {
-        flex: 1; /* isi seluruh sisa ruang → fit dengan label */
-        position: relative;
-    }
+#advancedShareModal .modal-header .btn-close {
+  margin: -1rem -1rem -1rem auto;
+}
 
-    .dropdown-toggle-custom {
-        width: 100%;
-        border-radius: 12px;
-        padding: 8px 14px;
-        border: 1px solid #ddd;
-        background: #fff;
-        text-align: left;
-        font-size: 14px;
-        cursor: pointer;
-    }
+#advancedShareModal .input-group .form-control:focus {
+  box-shadow: none;
+  border-color: #F6602E;
+}
 
-    .dropdown-menu-custom {
-        position: relative;      /* penting agar mendorong layout */
-        display: none;           /* hide default */
-        width: 100%;
-        margin-top: 8px;
-        border-radius: 12px;
-        background: #fff;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-        overflow: hidden;
-    }
+#advancedShareModal .btn-primary {
+  background: #3B82F6;
+  border: none;
+}
+#email-input-wrapper {
+  transition: all 0.2s ease;
+}
 
-    .dropdown-menu-custom .item {
-        padding: 10px 16px;
-        cursor: pointer;
-        font-size: 14px;
-    }
+#email-input-wrapper:focus-within {
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25) !important;
+  background: #ffffff !important;
+}
 
-    .dropdown-menu-custom .item:hover {
-        background: #f3f3f3;
-    }
+/* Biar input tetap fokus saat klik wrapper */
+#email-input-wrapper {
+  cursor: text;
+}
 
-
+#email-input-wrapper input::placeholder {
+  color: #6c757d;
+  opacity: 0.8;
+}
 @media (max-width: 991.98px) {
-.sidebar-collapse-content {
-margin-left: 0 !important;
-}
-.content-wrapper {
-margin-top: 80px !important;
-}
-.card {
-overflow: visible;
-}
+  .sidebar-collapse-content {
+    margin-left: 0 !important;
+  }
 
+  .content-wrapper {
+    margin-top: 80px !important;
+  }
 
+  .card {
+    overflow: visible;
+  }
+  .dropdown:hover > .dropdown-menu,
+    .dropend:hover > .dropdown-menu {
+        display: block;
+    }
+    
+    .dropend .dropdown-toggle::after {
+        content: "›";
+        border: none;
+        margin-left: 8px;
+        font-size: 1.2em;
+        vertical-align: middle;
+    }
 }

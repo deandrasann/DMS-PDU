@@ -229,7 +229,7 @@
 </div>
 
 <!-- Logout Confirmation Modal -->
-<div class="modal fade" id="logoutConfirmationModal" tabindex="-1" data-bs-backdrop="true" aria-hidden="true">
+<div class="modal fade" id="logoutConfirmationModal" tabindex="-1" data-bs-backdrop="false" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 rounded-4 shadow-lg" style="background-color: #fff; max-width: 500px;">
 
