@@ -38,8 +38,6 @@ class ShareController extends Controller
             //     'Authorization' => 'Bearer ' . $userToken,
             //         'Accept' => 'application/json',
             //     ])->get("http://127.0.0.1:8000/api/share/$token");
-
-            $response->throw(); // ini akan memicu exception kalau gagal
         } catch (\Illuminate\Http\Client\RequestException $e) {
             // Log ke laravel.log
             Log::error("Share API Error", [
