@@ -258,75 +258,153 @@ class MySpaceController extends Controller
         return $transformed;
     }
 
-    private function buildBreadcrumb($ancestors, $currentFolder, $currentPath)
+    public function recommended()
     {
-        $breadcrumb = [];
+        $token = session('token');
+
+        if (!$token) {
+            Log::warning('No token provided in session, redirecting to login');
+            return redirect()->route('signin')->with('error', 'Please login first');
+        }
+
+        Log::info('Accessing Recommended Files Page');
 
         try {
-            // ✅ Root item - selalu ada
-            $breadcrumb[] = [
+            $url = 'https://pdu-dms.my.id/api/recommended-files';
+
+            $response = Http::withToken($token)
+                ->withOptions([
+                    'verify' => false,
+                    'timeout' => 30,
+                ])
+                ->get($url);
+
+            Log::info('Recommended Files API Response Status', ['status' => $response->status()]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+
+                Log::info('Recommended Files Data', [
+                    'files_count' => count($data['recommended_files'] ?? []),
+                ]);
+
+                return view('recommended', [
+                    'files' => $data['recommended_files'] ?? [],
+                    'token' => $token,
+                    'isRecommendedPage' => true,
+                ]);
+            }
+
+            if ($response->status() === 401) {
+                Log::warning('API returned 401, token invalid');
+                session()->forget('token');
+                return redirect()->route('signin')->with('error', 'Session expired. Please login again.');
+            }
+
+            Log::error('Recommended Files API Error', [
+                'status' => $response->status(),
+                'response' => $response->body(),
+            ]);
+
+            return view('recommended', [
+                'files' => [],
+                'error' => 'Failed to load recommended files.',
+                'token' => $token,
+                'isRecommendedPage' => true,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Recommended Files Error', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            return view('recommended', [
+                'files' => [],
+                'error' => 'Connection error: ' . $e->getMessage(),
+                'token' => $token,
+                'isRecommendedPage' => true,
+            ]);
+        }
+    }
+
+private function buildBreadcrumb($ancestors, $currentFolder, $currentPath)
+{
+    $breadcrumb = [];
+
+    try {
+        // ✅ Root item
+        $breadcrumb[] = [
+            'id' => '',
+            'name' => 'MySpace',
+            'path' => '',
+            'url' => route('myspace'),
+        ];
+
+        // Build accumulated path untuk nested folders
+        $accumulatedPath = '';
+
+        if (is_array($ancestors)) {
+            foreach ($ancestors as $index => $ancestor) {
+                if (!is_array($ancestor) || !isset($ancestor['id'], $ancestor['name'])) {
+                    continue;
+                }
+
+                // ✅ SKIP root folder (email)
+                if ($index === 0 && $this->isEmail($ancestor['name'])) {
+                    continue;
+                }
+
+                // ✅ Build accumulated path untuk nested URL
+                if ($accumulatedPath === '') {
+                    $accumulatedPath = (string) $ancestor['id'];
+                } else {
+                    $accumulatedPath .= '/' . (string) $ancestor['id'];
+                }
+
+                $breadcrumb[] = [
+                    'id' => (string) $ancestor['id'],
+                    'name' => $ancestor['name'],
+                    'path' => $accumulatedPath,
+                    'url' => route('myspace', ['path' => $accumulatedPath]), // ✅ PATH YANG BENAR
+                ];
+            }
+        }
+
+        Log::info('Breadcrumb built', [
+            'items_count' => count($breadcrumb),
+            'breadcrumb_names' => array_column($breadcrumb, 'name'),
+            'current_path' => $currentPath,
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('Breadcrumb build error', [
+            'message' => $e->getMessage(),
+            'current_path' => $currentPath,
+        ]);
+
+        $breadcrumb = [
+            [
                 'id' => '',
                 'name' => 'MySpace',
                 'path' => '',
-                'url' => route('myspace'), // ✅ Tambahkan URL
-            ];
-
-            // ✅ Ancestor folders - dengan validasi lebih ketat
-            if (is_array($ancestors)) {
-                foreach ($ancestors as $ancestor) {
-                    // Validasi data ancestor
-                    if (!is_array($ancestor) || !isset($ancestor['id']) || !isset($ancestor['name'])) {
-                        Log::warning('Invalid ancestor data', ['ancestor' => $ancestor]);
-                        continue;
-                    }
-
-                    $breadcrumb[] = [
-                        'id' => (string) $ancestor['id'],
-                        'name' => $ancestor['name'],
-                        'path' => (string) $ancestor['id'],
-                        'url' => route('myspace', ['path' => $ancestor['id']]),
-                    ];
-                }
-            }
-
-            // ✅ Current folder - hanya tambahkan jika ada currentPath
-            if ($currentPath && $currentFolder && is_array($currentFolder)) {
-                if (isset($currentFolder['id'], $currentFolder['name'])) {
-                    $breadcrumb[] = [
-                        'id' => (string) $currentFolder['id'],
-                        'name' => $currentFolder['name'],
-                        'path' => $currentPath,
-                        'url' => route('myspace', ['path' => $currentPath]),
-                    ];
-                }
-            }
-
-            Log::info('Breadcrumb built', [
-                'items_count' => count($breadcrumb),
-                'current_path' => $currentPath,
-                'has_current_folder' => !empty($currentFolder),
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Breadcrumb build error', [
-                'message' => $e->getMessage(),
-                'ancestors_count' => is_array($ancestors) ? count($ancestors) : 0,
-                'current_path' => $currentPath,
-            ]);
-
-            // Fallback: minimal breadcrumb
-            $breadcrumb = [
-                [
-                    'id' => '',
-                    'name' => 'MySpace',
-                    'path' => '',
-                    'url' => route('myspace'),
-                ],
-            ];
-        }
-
-        return $breadcrumb;
+                'url' => route('myspace'),
+            ],
+        ];
     }
 
+    return $breadcrumb;
+}
+
+/**
+ * Helper method untuk deteksi apakah nama folder adalah email
+ */
+private function isEmail($name)
+{
+    // Cek apakah string mengandung @ (email pattern)
+    return filter_var($name, FILTER_VALIDATE_EMAIL) !== false ||
+           strpos($name, '@') !== false;
+}
     // API routes handler
     public function getFiles(Request $request)
     {

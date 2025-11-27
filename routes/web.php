@@ -37,7 +37,7 @@ Route::get('/new-password', [AuthController::class, 'showNewPassword'])->name('n
 Route::post('/new-password', [AuthController::class, 'setNewPassword'])->name('set.new.password');
 
 // Dashboard routes
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/recommended', [MySpaceController::class, 'recommended'])->name('recommended');
 Route::get('/last-opened', [MySpaceController::class, 'lastOpened'])->name('last');
 Route::get('/shared-with-me', [DashboardController::class, 'sharedWithMe'])->name('shared');
 Route::get('/upload', [DashboardController::class, 'uploadFile'])->name('upload');
