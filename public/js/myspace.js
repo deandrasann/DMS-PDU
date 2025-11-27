@@ -5,15 +5,17 @@ class MySpaceManager {
         this.token = window.token || '';
         this.currentPath = window.currentPath || '';
         this.isLastOpenedPage = window.isLastOpenedPage || false;
+        this.isRecommendedPage = window.isRecommendedPage || false;
 
         console.log('MySpaceManager initialized:', {
             isLastOpenedPage: this.isLastOpenedPage,
+            isRecommendedPage: this.isRecommendedPage,
             currentPath: this.currentPath
         });
 
         this.init();
     }
-        // ✅ TAMBAHKAN METHOD init() YANG HILANG
+
     init() {
         console.log('MySpaceManager init called');
         this.loadFilesAndFolders();
@@ -21,103 +23,152 @@ class MySpaceManager {
     }
 
     async loadFilesAndFolders() {
-    const folderContainer = document.getElementById("folderContainer");
-    const fileContainer = document.getElementById("fileContainer");
-    const emptyTemplate = document.getElementById("empty-template").content.cloneNode(true);
+        const folderContainer = document.getElementById("folderContainer");
+        const fileContainer = document.getElementById("fileContainer");
+        const emptyTemplate = document.getElementById("empty-template");
 
-    try {
-        let url;
-        let transformData = false;
-
-        // DETECT LAST OPENED PAGE
-        if (this.isLastOpenedPage) {
-            url = "https://pdu-dms.my.id/api/last-opened-files";
-            transformData = true;
-        } else {
-            const baseUrl = "https://pdu-dms.my.id/api/my-files";
-            url = this.currentPath ? `${baseUrl}/${this.currentPath}` : baseUrl;
-            transformData = false;
+        if (!emptyTemplate) {
+            console.error('Empty template not found!');
+            return;
         }
 
-        console.log('Fetching from:', url);
-        console.log('Is Last Opened Page:', this.isLastOpenedPage);
+        try {
+            let url;
+            let transformData = false;
 
-        const response = await fetch(url, {
-            headers: {
-                "Authorization": "Bearer " + this.token,
-                "Accept": "application/json",
-                "Content-Type": "application/json"
+            // ✅ DETECT RECOMMENDED PAGE
+            if (this.isRecommendedPage) {
+                url = "https://pdu-dms.my.id/api/recommended-files";
+                transformData = true;
             }
-        });
-
-        if (!response.ok) {
-            if (response.status === 401) {
-                this.handleUnauthorized();
-                return;
+            // DETECT LAST OPENED PAGE
+            else if (this.isLastOpenedPage) {
+                url = "https://pdu-dms.my.id/api/last-opened-files";
+                transformData = true;
+            } else {
+                const baseUrl = "https://pdu-dms.my.id/api/my-files";
+                url = this.currentPath ? `${baseUrl}/${this.currentPath}` : baseUrl;
+                transformData = false;
             }
-            throw new Error(`Gagal memuat data: ${response.status} ${response.statusText}`);
+
+            console.log('Fetching from:', url);
+            console.log('Page Type:', {
+                isRecommendedPage: this.isRecommendedPage,
+                isLastOpenedPage: this.isLastOpenedPage
+            });
+
+            const response = await fetch(url, {
+                headers: {
+                    "Authorization": "Bearer " + this.token,
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    this.handleUnauthorized();
+                    return;
+                }
+                throw new Error(`Gagal memuat data: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+
+            let folders = [];
+            let files = [];
+
+            if (transformData) {
+                if (this.isRecommendedPage) {
+                    // ✅ DATA DARI RECOMMENDED-FILES ENDPOINT (HANYA FILE)
+                    files = data.recommended_files || [];
+                    folders = []; // Recommended page hanya menampilkan files
+                } else {
+                    // DATA DARI LAST-OPENED-FILES ENDPOINT
+                    folders = data.last_opened_folders || [];
+                    files = data.last_opened_files || [];
+                }
+            } else {
+                // DATA DARI MY-FILES ENDPOINT (ORIGINAL)
+                folders = data.files?.filter(f => f.is_folder) || [];
+                files = data.files?.filter(f => !f.is_folder) || [];
+            }
+
+            // ✅ UNTUK RECOMMENDED PAGE: Hanya render files, hide folder container
+            if (this.isRecommendedPage) {
+                if (folderContainer) {
+                    folderContainer.style.display = 'none'; // Sembunyikan folder section
+                }
+                this.renderFiles(files, fileContainer, emptyTemplate.content.cloneNode(true));
+            } else {
+                // Untuk halaman lain: render normal
+                if (folderContainer) {
+                    this.renderFolders(folders, folderContainer, emptyTemplate.content.cloneNode(true));
+                }
+                this.renderFiles(files, fileContainer, emptyTemplate.content.cloneNode(true));
+            }
+
+        } catch (err) {
+            console.error('Error:', err);
+            this.showError(folderContainer, fileContainer, err.message);
         }
+    }
 
-        const data = await response.json();
+    renderFolders(folders, container, emptyTemplate) {
+        if (!container) return;
 
-        let folders = [];
-        let files = [];
+        container.innerHTML = '';
 
-        if (transformData) {
-            // DATA DARI LAST-OPENED-FILES ENDPOINT
-            folders = data.last_opened_folders || [];
-            files = data.last_opened_files || [];
+        if (folders.length === 0) {
+            const empty = emptyTemplate.cloneNode(true);
+            if (this.isLastOpenedPage) {
+                empty.querySelector("i").className = "ph ph-folder-open";
+                empty.querySelector("p").textContent = "No recently opened folders";
+            } else {
+                empty.querySelector("i").className = "ph ph-folder-open";
+                empty.querySelector("p").textContent = "Create a folder to get organized";
+            }
+            container.appendChild(empty);
         } else {
-            // DATA DARI MY-FILES ENDPOINT (ORIGINAL)
-            folders = data.files?.filter(f => f.is_folder) || [];
-            files = data.files?.filter(f => !f.is_folder) || [];
+            folders.forEach(folder => {
+                const col = this.createFolderElement(folder);
+                container.appendChild(col);
+            });
         }
-
-        this.renderFolders(folders, folderContainer, emptyTemplate);
-        this.renderFiles(files, fileContainer, emptyTemplate);
-
-    } catch (err) {
-        console.error('Error:', err);
-        this.showError(folderContainer, fileContainer, err.message);
     }
-}
 
-renderFolders(folders, container, emptyTemplate) {
-    container.innerHTML = '';
+    renderFiles(files, container, emptyTemplate) {
+        if (!container) return;
 
-    if (folders.length === 0) {
-        const empty = emptyTemplate.cloneNode(true);
-        empty.querySelector("i").className = "ph ph-folder-open";
-        empty.querySelector("p").textContent = this.isLastOpenedPage
-            ? "No recently opened folders"
-            : "Create a folder to get organized";
-        container.appendChild(empty);
-    } else {
-        folders.forEach(folder => {
-            const col = this.createFolderElement(folder);
-            container.appendChild(col);
-        });
+        container.innerHTML = '';
+
+        if (files.length === 0) {
+            const empty = emptyTemplate.cloneNode(true);
+
+            // ✅ CUSTOM MESSAGE UNTUK RECOMMENDED PAGE
+            if (this.isRecommendedPage) {
+                empty.querySelector("i").className = "ph ph-star";
+                empty.querySelector("p").textContent = "No recommended files available";
+            }
+            // CUSTOM MESSAGE UNTUK LAST OPENED PAGE
+            else if (this.isLastOpenedPage) {
+                empty.querySelector("i").className = "ph ph-file";
+                empty.querySelector("p").textContent = "No recently opened files";
+            }
+            // DEFAULT UNTUK MYSPACE
+            else {
+                empty.querySelector("i").className = "ph ph-file";
+                empty.querySelector("p").textContent = "Upload your first file to begin";
+            }
+
+            container.appendChild(empty);
+        } else {
+            files.forEach(file => {
+                const card = this.createFileElement(file);
+                container.appendChild(card);
+            });
+        }
     }
-}
-
-
-renderFiles(files, container, emptyTemplate) {
-    container.innerHTML = '';
-
-    if (files.length === 0) {
-        const empty = emptyTemplate.cloneNode(true);
-        empty.querySelector("i").className = "ph ph-file";
-        empty.querySelector("p").textContent = this.isLastOpenedPage
-            ? "No recently opened files"
-            : "Upload your first file to begin";
-        container.appendChild(empty);
-    } else {
-        files.forEach(file => {
-            const card = this.createFileElement(file);
-            container.appendChild(card);
-        });
-    }
-}
 
     createFolderElement(folder) {
         const col = document.createElement("div");
@@ -158,6 +209,18 @@ renderFiles(files, container, emptyTemplate) {
                                             ${this.getFolderInfoPanelHTML(folder)}
                                         </div>
                                     </li>
+                                        <a class="dropdown-item d-flex align-items-center gap-2 advanced-share-btn"
+                                            href="#"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#advancedShareModal"
+                                            data-item-id="${folder.id}"
+                                            data-item-type="folder"
+                                            data-folder-id="${folder.id}"
+                                            data-folder-name="${folder.name}"
+                                            data-folder-items="${folder.size}">
+                                             <i class="ph ph-share-network fs-5"></i> Share
+                                        </a>
+                                    </li>
                                     <li>
                                         <a class="dropdown-item d-flex align-items-center gap-2 folder-download-btn"
                                            href="#"
@@ -196,8 +259,8 @@ renderFiles(files, container, emptyTemplate) {
 createFileElement(file) {
     const card = document.createElement("div");
     card.className = "card rounded-4 border-dark-subtle border-1 me-3 file-card";
-    card.style.width = "180px";
-    card.style.height = "220px";
+    card.style.width = "160px";
+    card.style.height = "180px";
     card.style.backgroundColor = "#F2F2F0";
     card.style.cursor = "pointer";
 
@@ -206,22 +269,33 @@ createFileElement(file) {
         `/files/${file.id}` :
         `/file-view/${file.id}`;
 
+    const labelsHTML = this.createLabelsHTML(file.labels || []);
+
     card.innerHTML = `
-        <div class="mt-3 mx-2 preview-container" style="height: 120px;">
-            <div id="preview-${file.id}" class="d-flex justify-content-center align-items-center h-100 w-100">
+        <!-- ✅ PREVIEW CONTAINER DENGAN FIXED HEIGHT -->
+        <div class="mt-3 mx-2 preview-container" style="height: 100px; display: flex; align-items: center; justify-content: center;">
+            <div id="preview-${file.id}" class="d-flex justify-content-center align-items-center w-100 h-100">
                 <i class="ph ${fileInfo.icon} fs-1 text-muted"></i>
             </div>
         </div>
-        <div class="card-body p-2">
+
+        <div class="card-body p-2 d-flex flex-column" style="height: calc(220px - 100px - 1rem);">
+            <!-- ✅ FILE NAME -->
             <div class="d-flex align-items-center mb-1">
                 <i class="ph ${fileInfo.icon} me-2 text-dark"></i>
                 <span class="fw-semibold text-truncate small" title="${file.name}">${file.name}</span>
             </div>
-            <div class="d-flex gap-2 align-items-center">
-                <span class="badge bg-secondary rounded-2 px-2"><small>${fileInfo.type}</small></span>
-                <span class="text-muted small">${file.size}</span>
-                <div class="dropdown">
-                    <button class="btn btn-link ms-auto text-dark p-0"
+
+            <!-- ✅ LABELS & ACTIONS SECTION - SEJAJAR -->
+            <div class="d-flex align-items-start justify-content-between mb-1 flex-grow-1" style="min-height: 30px;">
+                <!-- ✅ LABELS SECTION -->
+                <div class="labels-section flex-grow-1 me-2" style="overflow: hidden;">
+                    ${labelsHTML}
+                </div>
+
+                <!-- ✅ DROPDOWN ACTIONS -->
+                <div class="dropdown flex-shrink-0">
+                    <button class="btn btn-link text-dark p-0"
                             data-bs-toggle="dropdown"
                             data-bs-display="static">
                         <i class="ph ph-dots-three-vertical fs-6 text-muted"></i>
@@ -232,6 +306,20 @@ createFileElement(file) {
                             href="${openUrl}"
                             target="_blank">
                                 <i class="ph ph-arrow-up-right fs-5"></i> Open
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 advanced-share-btn"
+                            href="#"
+                            data-bs-toggle="modal"
+                            data-bs-target="#advancedShareModal"
+                            data-item-id="${file.id}"
+                            data-item-type="file"
+                            data-file-id="${file.id}"
+                            data-file-name="${file.name}"
+                            data-file-items="${file.size}"
+                            data-mime="${file.mime || ''}">
+                                <i class="ph ph-share-network fs-5"></i> Share
                             </a>
                         </li>
                         <li>
@@ -279,9 +367,8 @@ createFileElement(file) {
         window.open(openUrl, '_blank');
     });
 
-    // Render PDF preview if applicable - FIXED VERSION
+    // Render PDF preview if applicable
     if (file.mime && file.mime.includes("pdf") && file.url) {
-        // Gunakan setTimeout untuk memastikan DOM sudah ter-render
         setTimeout(() => {
             this.renderPDFPreview(file.url, `preview-${file.id}`);
         }, 100);
@@ -289,6 +376,59 @@ createFileElement(file) {
 
     return card;
 }
+
+/**
+ * Create HTML for labels - Tampilkan SEMUA labels dengan color mapping
+ */
+createLabelsHTML(labels) {
+    if (!labels || labels.length === 0) {
+        return '<span class="badge bg-secondary rounded-2 px-2"><small>File</small></span>';
+    }
+
+    const allLabelsHTML = labels.map(label => {
+        // ✅ PAKAI COLOR MAPPING YANG SUDAH ADA
+        const textColor = this.getMappedTextColor(label.color);
+        return `
+            <span class="badge rounded-2 px-2 mb-1 flex-shrink-0"
+                  style="background-color: #${label.color}; color: ${textColor}; border: 1px solid #ddd; font-size: 0.7rem; line-height: 1.2; font-family: 'Rubik', sans-serif; font-weight: 400;"
+                  title="${label.name}">
+                ${label.name}
+            </span>
+        `;
+    }).join('');
+
+    return `
+        <div class="labels-wrap-container" style="display: flex; flex-wrap: wrap; gap: 2px; max-height: 40px; overflow: hidden;">
+            ${allLabelsHTML}
+        </div>
+    `;
+}
+
+/**
+ * Get text color dari mapping yang sudah ada
+ */
+getMappedTextColor(backgroundColor) {
+    // 🎨 Map background → text color (sama seperti di sidebar)
+    const colorMap = {
+        "FDDCD9": "#CB564A",
+        "EBE0D9": "#763E1A",
+        "FDE9DD": "#C2825D",
+        "EFEAFF": "#7762BB",
+        "FCF9DE": "#BDB470",
+        "E4F3FE": "#5F92B6",
+        "FCE7ED": "#CA8499",
+        "E6E5E3": "#989797",
+        "EEFEF1": "#8ABB93",
+        "F0EFED": "#729D9C"
+    };
+
+    // Normalize color code (hilangkan # jika ada, uppercase)
+    const normalizedColor = backgroundColor.replace('#', '').toUpperCase();
+
+    // Return mapped color atau fallback ke hitam
+    return colorMap[normalizedColor] || '#000000';
+}
+
 
     getFileIconAndType(mime) {
         if (!mime) return { icon: "ph-file", type: "File" };
@@ -443,48 +583,241 @@ createFileElement(file) {
         `;
     }
 
-    async renderPDFPreview(pdfUrl, containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
+    // Tambahkan ini sebagai method di dalam class MySpaceManager
+    async renderFileThumbnail(fileId, mimeType = '') {
+        const wrapper = document.getElementById('file-thumbnail-wrapper');
+        const loading = document.getElementById('file-thumbnail-loading');
+        if (!wrapper || !loading) return;
+
+        wrapper.innerHTML = '';
+        loading.classList.remove('d-none');
+
+        let url = null;
 
         try {
-            container.innerHTML = '<div class="spinner-border spinner-border-sm text-primary" role="status"></div>';
-
-            const loadingTask = pdfjsLib.getDocument({
-                url: pdfUrl,
-                httpHeaders: {
+            const response = await fetch(`https://pdu-dms.my.id/api/view-file/${fileId}`, {
+                headers: {
                     'Authorization': 'Bearer ' + this.token
                 }
             });
 
-            const pdf = await loadingTask.promise;
-            const page = await pdf.getPage(1);
-            const scale = 0.3;
-            const viewport = page.getViewport({ scale });
+            if (!response.ok) throw new Error('Failed to load file');
 
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = viewport.width;
-            canvas.height = viewport.height / 1.8;
-            canvas.style.maxWidth = '8em';
-            canvas.style.height = 'auto';
-            canvas.style.borderRadius = '4px';
-            canvas.style.padding = '16px 0';
+            const blob = await response.blob();
+            url = URL.createObjectURL(blob);
+            const type = blob.type || mimeType;
 
-            const renderContext = {
-                canvasContext: context,
-                viewport: viewport
-            };
+            let element;
 
-            await page.render(renderContext).promise;
-            container.innerHTML = '';
-            container.appendChild(canvas);
+            // === GAMBAR ===
+            if (type.startsWith('image/') && !type.includes('svg')) {
+                element = document.createElement('img');
+                element.src = url;
+                element.className = 'w-100 h-100';
+                element.style.objectFit = 'cover';
+                element.style.borderRadius = '8px';
+            }
+
+            // === PDF ===
+            else if (type === 'application/pdf') {
+                const loadingTask = pdfjsLib.getDocument({ url });
+                const pdf = await loadingTask.promise;
+                const page = await pdf.getPage(1);
+
+                // Auto-scale agar pas di 120px tinggi
+                const viewport = page.getViewport({ scale: 1 });
+                let scale = 120 / viewport.height;
+                if (scale > 2) scale = 2; // batas atas biar gak blur
+
+                const finalViewport = page.getViewport({ scale });
+
+                const canvas = document.createElement('canvas');
+                canvas.width = finalViewport.width;
+                canvas.height = finalViewport.height;
+                canvas.style.width = '100%';
+                canvas.style.height = '100%';
+                canvas.style.objectFit = 'contain';
+                canvas.style.background = 'white';
+                canvas.style.borderRadius = '8px';
+
+                const context = canvas.getContext('2d');
+                await page.render({ canvasContext: context, viewport: finalViewport }).promise;
+
+                element = canvas;
+            }
+
+            // === VIDEO ===
+            else if (type.startsWith('video/')) {
+                element = document.createElement('video');
+                element.src = url;
+                element.muted = true;
+                element.preload = 'metadata';
+                element.playsInline = true;
+                element.className = 'w-100 h-100';
+                element.style.objectFit = 'cover';
+                element.style.borderRadius = '8px';
+
+                // Ambil poster otomatis dari frame pertama
+                element.addEventListener('loadeddata', () => {
+                    element.currentTime = 0.1;
+                });
+                element.addEventListener('seeked', () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = element.videoWidth;
+                    canvas.height = element.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(element, 0, 0, canvas.width, canvas.height);
+                    element.poster = canvas.toDataURL();
+                });
+            }
+
+            // === TIDAK DIDUKUNG ===
+            else {
+                throw new Error('No visual preview');
+            }
+
+            wrapper.appendChild(element);
 
         } catch (error) {
-            console.error('Error rendering PDF preview:', error);
-            container.innerHTML = '<i class="ph ph-file-pdf fs-1 text-muted"></i>';
+            console.warn('Preview gagal:', error.message);
+
+            // Fallback icon cerdas (sama persis seperti kode lama)
+            const iconMap = {
+                'pdf': 'ph-file-pdf',
+                'word': 'ph-file-doc',
+                'document': 'ph-file-doc',
+                'excel': 'ph-file-xls',
+                'sheet': 'ph-file-xls',
+                'powerpoint': 'ph-file-ppt',
+                'ppt': 'ph-file-ppt',
+                'video': 'ph-file-video',
+                'audio': 'ph-file-audio',
+                'zip': 'ph-file-zip',
+                'default': 'ph-file'
+            };
+
+            let icon = iconMap.default;
+            const lowerMime = (mimeType || '').toLowerCase();
+
+            if (lowerMime.includes('pdf')) icon = iconMap.pdf;
+            else if (lowerMime.includes('word') || lowerMime.includes('document')) icon = iconMap.word;
+            else if (lowerMime.includes('excel') || lowerMime.includes('sheet')) icon = iconMap.excel;
+            else if (lowerMime.includes('powerpoint') || lowerMime.includes('ppt')) icon = iconMap.powerpoint;
+            else if (lowerMime.includes('video')) icon = iconMap.video;
+            else if (lowerMime.includes('audio')) icon = iconMap.audio;
+            else if (lowerMime.includes('zip') || lowerMime.includes('rar')) icon = iconMap.zip;
+
+            wrapper.innerHTML = `<i class="ph ${icon} fs-1 text-muted"></i>`;
+
+        } finally {
+            loading.classList.add('d-none');
+            // Bersihkan memory setelah 10 detik
+            if (url) {
+                setTimeout(() => URL.revokeObjectURL(url), 10000);
+            }
         }
     }
+    openAdvancedShareModal(data) {
+        const folderPreview = document.getElementById('folder-preview');
+        const filePreview = document.getElementById('file-preview');
+        const wrapper = document.getElementById('file-thumbnail-wrapper');
+
+        // Reset
+        folderPreview.style.display = 'none';
+        filePreview.style.display = 'none';
+        wrapper.innerHTML = '';
+
+        if (data.type === 'folder') {
+            folderPreview.style.display = 'block';
+            document.getElementById('preview-title').textContent = data.name;
+            document.getElementById('preview-subtitle').textContent = data.items ? `${data.items} items` : 'Empty folder';
+        } else {
+            filePreview.style.display = 'block';
+            document.getElementById('file-name-display').textContent = data.name;
+            document.getElementById('file-size-display').textContent = data.size || '—';
+
+            let badgeText = 'File';
+            let iconClass = 'ph-file';
+
+            if (data.mime) {
+                if (data.mime.includes('pdf')) { badgeText = 'PDF'; iconClass = 'ph-file-pdf'; }
+                else if (data.mime.includes('image/')) { badgeText = 'Image'; iconClass = 'ph-file-image'; }
+                else if (data.mime.includes('word')) { badgeText = 'DOC'; iconClass = 'ph-file-doc'; }
+                else if (data.mime.includes('excel') || data.mime.includes('sheet')) { badgeText = 'XLS'; iconClass = 'ph-file-xls'; }
+            }
+
+            document.querySelector('#file-badge small').textContent = badgeText;
+            document.getElementById('file-small-icon').className = `${iconClass} me-2 text-dark`;
+
+            // Render thumbnail
+            if (data.mime && (data.mime.includes('pdf') || data.mime.includes('image/'))) {
+                this.renderFileThumbnail(data.id, data.mime);
+            } else {
+                wrapper.innerHTML = `<i class="ph ${iconClass} fs-1 text-muted"></i>`;
+            }
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('advancedShareModal'));
+        modal.show();
+    }
+    async renderPDFPreview(pdfUrl, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    try {
+        container.innerHTML = '<div class="spinner-border spinner-border-sm text-primary" role="status"></div>';
+
+        const loadingTask = pdfjsLib.getDocument({
+            url: pdfUrl,
+            httpHeaders: {
+                'Authorization': 'Bearer ' + this.token
+            }
+        });
+
+        const pdf = await loadingTask.promise;
+        const page = await pdf.getPage(1);
+
+        // ✅ FIXED CONTAINER DIMENSIONS
+        const containerWidth = 120; // Lebar maksimal container
+        const containerHeight = 80; // Tinggi maksimal container
+
+        const originalViewport = page.getViewport({ scale: 1 });
+        const scale = Math.min(
+            containerWidth / originalViewport.width,
+            containerHeight / originalViewport.height
+        );
+
+        const viewport = page.getViewport({ scale });
+
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        // ✅ STYLE KONSISTEN DENGAN FIXED CONTAINER
+        canvas.style.width = `${viewport.width}px`;
+        canvas.style.height = `${viewport.height}px`;
+        canvas.style.maxWidth = '100%';
+        canvas.style.objectFit = 'contain';
+        canvas.style.borderRadius = '4px';
+        canvas.style.backgroundColor = '#f8f9fa';
+        canvas.style.display = 'block';
+        canvas.style.margin = '0 auto';
+
+        const renderContext = {
+            canvasContext: context,
+            viewport: viewport
+        };
+
+        await page.render(renderContext).promise;
+        container.innerHTML = '';
+        container.appendChild(canvas);
+
+    } catch (error) {
+        console.error('Error rendering PDF preview:', error);
+        container.innerHTML = '<i class="ph ph-file-pdf fs-1 text-muted"></i>';
+    }
+}
 
     attachEventListeners() {
         this.attachInfoPanelListeners();
@@ -585,6 +918,33 @@ createFileElement(file) {
                 });
             }
         });
+
+        // Ganti yang lama dengan ini
+document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.advanced-share-btn');
+    if (!btn) return;
+    e.preventDefault();
+
+    const isFolder = btn.hasAttribute('data-folder-id');
+    const isFile = btn.hasAttribute('data-file-id');
+
+    if (isFolder) {
+        this.openAdvancedShareModal({
+            type: 'folder',
+            id: btn.dataset.folderId,
+            name: btn.dataset.folderName,
+            items: btn.dataset.folderItems
+        });
+    } else if (isFile) {
+        this.openAdvancedShareModal({
+            type: 'file',
+            id: btn.dataset.fileId,
+            name: btn.dataset.fileName,
+            size: btn.dataset.fileItems,
+            mime: btn.dataset.mime || ''
+        });
+    }
+});
     }
 
     attachFileOperationsListeners() {
@@ -626,7 +986,7 @@ createFileElement(file) {
                             fileContainer.appendChild(emptyTemplate);
                         }
                     }
-                    alert("File berhasil dihapus");
+                    // alert("File berhasil dihapus");
                 } else {
                     let errorMessage = "Gagal menghapus file";
                     if (result.message) {
@@ -1126,12 +1486,230 @@ createFileElement(file) {
     }
 
     showError(folderContainer, fileContainer, message) {
-        folderContainer.innerHTML = `<p class="text-danger">Gagal memuat data: ${message}</p>`;
-        fileContainer.innerHTML = `<p class="text-danger">Gagal memuat data: ${message}</p>`;
+        if (folderContainer) {
+            folderContainer.innerHTML = `<p class="text-danger">Gagal memuat data: ${message}</p>`;
+        }
+        if (fileContainer) {
+            fileContainer.innerHTML = `<p class="text-danger">Gagal memuat data: ${message}</p>`;
+        }
     }
 }
 
 // Inisialisasi ketika DOM siap
 document.addEventListener("DOMContentLoaded", function() {
     window.mySpaceManager = new MySpaceManager();
+});
+
+class ShareManager {
+    constructor() {
+        this.selectedUsers = [];
+        this.token = window.token || '';
+        this.itemId = null;      // ID file/folder yang sedang dishare
+        this.itemType = null;    // 'file' atau 'folder'
+        this.debounceTimer = null;
+
+        this.init();
+    }
+
+    init() {
+        const modalEl = document.getElementById('advancedShareModal');
+        if (!modalEl) return;
+
+        // Ambil data dari trigger button saat modal dibuka
+        modalEl.addEventListener('show.bs.modal', (e) => {
+            const button = e.relatedTarget;
+            this.itemId = button.getAttribute('data-item-id');
+            this.itemType = button.getAttribute('data-item-type') || 'file';
+            this.selectedUsers = []; // reset
+            document.getElementById('selected-emails-container').innerHTML = '';
+        });
+
+        modalEl.addEventListener('shown.bs.modal', () => {
+            this.setupInputEvents();
+        });
+
+        // Tombol Done
+        document.getElementById('share-done-btn')?.addEventListener('click', () => {
+            this.shareItem();
+        });
+    }
+
+    setupInputEvents() {
+        const wrapper = document.getElementById('email-input-wrapper');
+        const input = document.getElementById('add-email-input');
+        const suggestions = document.getElementById('email-suggestions');
+
+        if (!wrapper || !input) return;
+
+        wrapper.addEventListener('click', () => input.focus());
+
+        input.addEventListener('input', () => {
+            clearTimeout(this.debounceTimer);
+            const q = input.value.trim();
+            if (q.length < 2) {
+                suggestions.style.display = 'none';
+                return;
+            }
+            this.debounceTimer = setTimeout(() => this.searchUsers(q), 300);
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const first = suggestions.querySelector('.suggestion-item');
+                if (first) first.click();
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!wrapper.contains(e.target)) {
+                suggestions.style.display = 'none';
+            }
+        });
+    }
+
+    async searchUsers(query) {
+        const list = document.getElementById('suggestions-list');
+        const suggestions = document.getElementById('email-suggestions');
+
+        try {
+            list.innerHTML = '<div class="text-center py-3"><small class="text-muted">Searching...</small></div>';
+            suggestions.style.display = 'block';
+
+            const res = await fetch(`https://pdu-dms.my.id/api/search-users?q=${encodeURIComponent(query)}`, {
+                headers: { 'Authorization': 'Bearer ' + this.token }
+            });
+
+            if (!res.ok) throw new Error('Failed');
+
+            const users = await res.json();
+            list.innerHTML = '';
+
+            users.forEach(user => {
+                if (this.selectedUsers.find(u => u.id === user.id)) return;
+
+                const item = document.createElement('div');
+                item.className = 'suggestion-item d-flex align-items-center gap-3 p-3 rounded-3 hover-bg-light cursor-pointer';
+                item.innerHTML = `
+                    <img src="${user.photo_profile_path 
+                    ? 'https://pdu-dms.my.id/storage/profile_photos/' + user.photo_profile_path 
+                    : '/images/profile-pict.jpg'}" 
+                    class="rounded-circle object-fit-cover flex-shrink-0" width="36" height="36" 
+                    onerror="this.src='/images/profile-pict.jpg'">
+            
+                    <div>
+                        <div class="fw-semibold small">${user.fullname || 'No Name'}</div>
+                        <div class="text-muted small">${user.email}</div>
+                    </div>
+                `;
+
+                item.onclick = () => {
+                    this.addUserPill(user);
+                    document.getElementById('add-email-input').value = '';
+                    suggestions.style.display = 'none';
+                };
+
+                list.appendChild(item);
+            });
+
+            if (users.length === 0) {
+                list.innerHTML = '<div class="text-center py-3 text-muted small">No users found</div>';
+            }
+
+        } catch (err) {
+            list.innerHTML = '<div class="text-center py-3 text-danger small">Error loading users</div>';
+        }
+    }
+
+    addUserPill(user) {
+        if (this.selectedUsers.find(u => u.id === user.id)) return;
+
+        this.selectedUsers.push(user);
+
+        const pill = document.createElement('div');
+        pill.className = 'd-inline-flex align-items-center bg-white border rounded-pill px-3 py-1 gap-2 shadow-sm';
+        pill.innerHTML = `
+            <img src="${user.photo_profile_path 
+            ? 'https://pdu-dms.my.id/storage/profile_photos/' + user.photo_profile_path 
+            : '/images/profile-pict.jpg'}" 
+             class="rounded-circle object-fit-cover flex-shrink-0" width="22" height="22" 
+             onerror="this.src='/images/profile-pict.jpg'">
+            <span class="small fw-medium text-dark">${user.email}</span>
+            <button type="button" class="btn-close btn-close-sm" style="font-size: 0.55rem;"></button>
+        `;
+
+        pill.querySelector('.btn-close').onclick = (e) => {
+            e.stopPropagation();
+            this.selectedUsers = this.selectedUsers.filter(u => u.id !== user.id);
+            pill.remove();
+        };
+
+        document.getElementById('selected-emails-container').appendChild(pill);
+    }
+
+    // INI YANG PALING PENTING: KIRIM SHARE KE API
+    async shareItem() {
+    if (!this.itemId) {
+        alert('Item tidak ditemukan!');
+        return;
+    }
+
+    if (this.selectedUsers.length === 0) {
+        alert('Tambahkan minimal satu orang');
+        return;
+    }
+
+    const btn = document.getElementById('share-done-btn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Sharing...';
+
+    try {
+        const payload = {
+            user_id: this.selectedUsers.map(u => u.id),
+            permission_id: 4, // viewer (ubah sesuai kebutuhan)
+            // Kirim keduanya, backend yang pilih mana yang dipakai
+            file_id: this.itemType === 'file' ? parseInt(this.itemId) : null,
+            folder_id: this.itemType === 'folder' ? parseInt(this.itemId) : null,
+        };
+
+        // PAKAI SATU ENDPOINT SAJA → /api/share-file/{id}
+        const response = await fetch(`https://pdu-dms.my.id/api/share-file/${this.itemId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + this.token,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Gagal membagikan');
+        }
+
+        // Sukses!
+        alert(`Berhasil dibagikan ke ${this.selectedUsers.length} orang!`);
+        
+        const modal = bootstrap.Modal.getInstance(document.getElementById('advancedShareModal'));
+        modal.hide();
+
+        // Optional: reload atau update UI
+        // location.reload();
+
+    } catch (err) {
+        console.error('Share error:', err);
+        alert('Gagal: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+}
+
+// Inisialisasi global
+document.addEventListener('DOMContentLoaded', () => {
+    window.shareManager = new ShareManager();
 });

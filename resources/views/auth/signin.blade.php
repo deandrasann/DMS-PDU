@@ -63,6 +63,7 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
         const form = document.getElementById('loginForm');
         const submitBtn = document.getElementById('submitBtn');
 

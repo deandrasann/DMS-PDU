@@ -258,75 +258,153 @@ class MySpaceController extends Controller
         return $transformed;
     }
 
-    private function buildBreadcrumb($ancestors, $currentFolder, $currentPath)
+    public function recommended()
     {
-        $breadcrumb = [];
+        $token = session('token');
+
+        if (!$token) {
+            Log::warning('No token provided in session, redirecting to login');
+            return redirect()->route('signin')->with('error', 'Please login first');
+        }
+
+        Log::info('Accessing Recommended Files Page');
 
         try {
-            // ✅ Root item - selalu ada
-            $breadcrumb[] = [
+            $url = 'https://pdu-dms.my.id/api/recommended-files';
+
+            $response = Http::withToken($token)
+                ->withOptions([
+                    'verify' => false,
+                    'timeout' => 30,
+                ])
+                ->get($url);
+
+            Log::info('Recommended Files API Response Status', ['status' => $response->status()]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+
+                Log::info('Recommended Files Data', [
+                    'files_count' => count($data['recommended_files'] ?? []),
+                ]);
+
+                return view('recommended', [
+                    'files' => $data['recommended_files'] ?? [],
+                    'token' => $token,
+                    'isRecommendedPage' => true,
+                ]);
+            }
+
+            if ($response->status() === 401) {
+                Log::warning('API returned 401, token invalid');
+                session()->forget('token');
+                return redirect()->route('signin')->with('error', 'Session expired. Please login again.');
+            }
+
+            Log::error('Recommended Files API Error', [
+                'status' => $response->status(),
+                'response' => $response->body(),
+            ]);
+
+            return view('recommended', [
+                'files' => [],
+                'error' => 'Failed to load recommended files.',
+                'token' => $token,
+                'isRecommendedPage' => true,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Recommended Files Error', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            return view('recommended', [
+                'files' => [],
+                'error' => 'Connection error: ' . $e->getMessage(),
+                'token' => $token,
+                'isRecommendedPage' => true,
+            ]);
+        }
+    }
+
+private function buildBreadcrumb($ancestors, $currentFolder, $currentPath)
+{
+    $breadcrumb = [];
+
+    try {
+        // ✅ Root item
+        $breadcrumb[] = [
+            'id' => '',
+            'name' => 'MySpace',
+            'path' => '',
+            'url' => route('myspace'),
+        ];
+
+        // Build accumulated path untuk nested folders
+        $accumulatedPath = '';
+
+        if (is_array($ancestors)) {
+            foreach ($ancestors as $index => $ancestor) {
+                if (!is_array($ancestor) || !isset($ancestor['id'], $ancestor['name'])) {
+                    continue;
+                }
+
+                // ✅ SKIP root folder (email)
+                if ($index === 0 && $this->isEmail($ancestor['name'])) {
+                    continue;
+                }
+
+                // ✅ Build accumulated path untuk nested URL
+                if ($accumulatedPath === '') {
+                    $accumulatedPath = (string) $ancestor['id'];
+                } else {
+                    $accumulatedPath .= '/' . (string) $ancestor['id'];
+                }
+
+                $breadcrumb[] = [
+                    'id' => (string) $ancestor['id'],
+                    'name' => $ancestor['name'],
+                    'path' => $accumulatedPath,
+                    'url' => route('myspace', ['path' => $accumulatedPath]), // ✅ PATH YANG BENAR
+                ];
+            }
+        }
+
+        Log::info('Breadcrumb built', [
+            'items_count' => count($breadcrumb),
+            'breadcrumb_names' => array_column($breadcrumb, 'name'),
+            'current_path' => $currentPath,
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('Breadcrumb build error', [
+            'message' => $e->getMessage(),
+            'current_path' => $currentPath,
+        ]);
+
+        $breadcrumb = [
+            [
                 'id' => '',
                 'name' => 'MySpace',
                 'path' => '',
-                'url' => route('myspace'), // ✅ Tambahkan URL
-            ];
-
-            // ✅ Ancestor folders - dengan validasi lebih ketat
-            if (is_array($ancestors)) {
-                foreach ($ancestors as $ancestor) {
-                    // Validasi data ancestor
-                    if (!is_array($ancestor) || !isset($ancestor['id']) || !isset($ancestor['name'])) {
-                        Log::warning('Invalid ancestor data', ['ancestor' => $ancestor]);
-                        continue;
-                    }
-
-                    $breadcrumb[] = [
-                        'id' => (string) $ancestor['id'],
-                        'name' => $ancestor['name'],
-                        'path' => (string) $ancestor['id'],
-                        'url' => route('myspace', ['path' => $ancestor['id']]),
-                    ];
-                }
-            }
-
-            // ✅ Current folder - hanya tambahkan jika ada currentPath
-            if ($currentPath && $currentFolder && is_array($currentFolder)) {
-                if (isset($currentFolder['id'], $currentFolder['name'])) {
-                    $breadcrumb[] = [
-                        'id' => (string) $currentFolder['id'],
-                        'name' => $currentFolder['name'],
-                        'path' => $currentPath,
-                        'url' => route('myspace', ['path' => $currentPath]),
-                    ];
-                }
-            }
-
-            Log::info('Breadcrumb built', [
-                'items_count' => count($breadcrumb),
-                'current_path' => $currentPath,
-                'has_current_folder' => !empty($currentFolder),
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Breadcrumb build error', [
-                'message' => $e->getMessage(),
-                'ancestors_count' => is_array($ancestors) ? count($ancestors) : 0,
-                'current_path' => $currentPath,
-            ]);
-
-            // Fallback: minimal breadcrumb
-            $breadcrumb = [
-                [
-                    'id' => '',
-                    'name' => 'MySpace',
-                    'path' => '',
-                    'url' => route('myspace'),
-                ],
-            ];
-        }
-
-        return $breadcrumb;
+                'url' => route('myspace'),
+            ],
+        ];
     }
 
+    return $breadcrumb;
+}
+
+/**
+ * Helper method untuk deteksi apakah nama folder adalah email
+ */
+private function isEmail($name)
+{
+    // Cek apakah string mengandung @ (email pattern)
+    return filter_var($name, FILTER_VALIDATE_EMAIL) !== false ||
+           strpos($name, '@') !== false;
+}
     // API routes handler
     public function getFiles(Request $request)
     {
@@ -394,72 +472,60 @@ class MySpaceController extends Controller
         }
     }
 
-    public function viewFile($fileId)
-    {
-        // PERBAIKAN: Ambil token dari session
-        $token = session('token');
+ public function viewFile($fileId)
+{
+    $token = session('token');
 
-        if (!$token) {
-            Log::warning('No token in session for file view', ['file_id' => $fileId]);
-            return redirect()->route('signin')->with('error', 'Please login first');
-        }
-
-        try {
-            // Gunakan endpoint yang sama seperti di MySpace
-            $response = Http::withToken($token)
-                ->withOptions([
-                    'verify' => false,
-                    'timeout' => 30,
-                ])
-                ->get('https://pdu-dms.my.id/api/my-files');
-
-            // $listResponse = Http::connectTimeout(5)
-            // ->withHeaders([
-            //     'Authorization' => 'Bearer ' . $token,
-            // ])->timeout(30)->get("http://127.0.0.1:8000/api/my-files");
-
-            if (!$response->successful()) {
-                Log::error('Failed to fetch files for file view', [
-                    'status' => $response->status(),
-                    'file_id' => $fileId,
-                ]);
-                abort(404, 'Cannot fetch files');
-            }
-
-            $data = $response->json();
-            $files = $data['files'] ?? [];
-
-            // Cari file berdasarkan ID
-            $fileData = collect($files)->firstWhere('id', (int) $fileId);
-
-            if (!$fileData) {
-                Log::warning('File not found', ['file_id' => $fileId]);
-                abort(404, 'File not found');
-            }
-
-            // PERBAIKAN: Pastikan URL file lengkap
-            if (isset($fileData['url']) && !str_starts_with($fileData['url'], 'http')) {
-                $fileData['url'] = 'https://pdu-dms.my.id' . $fileData['url'];
-            }
-
-            Log::info('File view accessed', [
-                'file_id' => $fileId,
-                'file_name' => $fileData['name'] ?? 'Unknown',
-            ]);
-
-            return view('file-view', [
-                'fileId' => $fileId,
-                'file' => $fileData,
-                'token' => $token,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('File view error', [
-                'file_id' => $fileId,
-                'error' => $e->getMessage(),
-            ]);
-            abort(500, 'Failed to load file');
-        }
+    if (!$token) {
+        Log::warning('No token in session for file view', ['file_id' => $fileId]);
+        return redirect()->route('signin')->with('error', 'Please login first');
     }
+
+    try {
+        $listResponse = Http::connectTimeout(5)
+            ->withHeaders([
+                'Authorization' => 'Bearer ' . $token,
+            ])
+            ->timeout(30)
+            ->get("https://pdu-dms.my.id/api/my-files");
+
+        if (!$listResponse->successful()) {
+            Log::error('Failed to fetch files for file view', [
+                'status' => $listResponse->status(),
+                'file_id' => $fileId,
+            ]);
+            abort(404, 'Cannot fetch files');
+        }
+
+        $data = $listResponse->json();
+        $files = $data['files'] ?? [];
+
+        $fileData = collect($files)->firstWhere('id', (int) $fileId);
+
+        if (!$fileData) {
+            Log::warning('File not found', ['file_id' => $fileId]);
+            abort(404, 'File not found');
+        }
+
+        if (isset($fileData['url']) && !str_starts_with($fileData['url'], 'http')) {
+            $fileData['url'] = 'https://pdu-dms.my.id' . $fileData['url'];
+        }
+
+        return view('file-view', [
+            'fileId' => $fileId,
+            'file' => $fileData,
+            'token' => $token,
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('File view error', [
+            'file_id' => $fileId,
+            'error' => $e->getMessage(),
+        ]);
+        abort(500, 'Failed to load file');
+    }
+}
+
 
     public function upload(Request $request)
     {

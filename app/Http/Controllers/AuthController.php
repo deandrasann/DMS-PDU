@@ -38,7 +38,29 @@ class AuthController extends Controller
             }
 
             // Jika gagal (misal validasi)
-            return back()->with('error', 'Registration failed. Please check your input.');
+            $errorMessages = 'Registration failed. Please try again.';
+
+            if ($response->json()) {
+                $apiErrors = $response->json('errors'); // kalau API pakai format { "message": "...", "errors": { ... } }
+                $apiMessage = $response->json('message');
+
+                if ($apiErrors && is_array($apiErrors)) {
+                    // Ubah jadi format yang bisa dipakai withErrors()
+                    $flattened = [];
+                    foreach ($apiErrors as $field => $messages) {
+                        $flattened[$field] = is_array($messages) ? $messages[0] : $messages;
+                    }
+                    return back()->withErrors($flattened)->withInput();
+                }
+
+                // Kalau cuma ada message (misal "Email already exists")
+                if ($apiMessage) {
+                    $errorMessages = $apiMessage;
+                }
+            }
+
+            // Fallback kalau tidak ada detail error
+            return back()->with('error', $errorMessages)->withInput();
         } catch (\Exception $e) {
             return back()->with('error', 'Error connecting to API: ' . $e->getMessage());
         }
@@ -83,7 +105,7 @@ class AuthController extends Controller
             }
 
             // ✅ Redirect langsung tanpa flash data
-            return redirect()->route('dashboard');
+            return redirect()->route('recommended');
         }
 
         return back()->withErrors([
