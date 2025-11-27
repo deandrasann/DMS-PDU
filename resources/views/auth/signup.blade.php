@@ -13,7 +13,19 @@
                     Start managing your documents efficiently and securely.
                 </p>
             </div>
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show mx-4" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
 
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show mx-4" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
             <!-- Form Login -->
             <form method="POST" class="px-4" action="{{ route('register') }}">
                 @csrf
@@ -22,16 +34,36 @@
                         <span class="input-group-text">
                             <i class="ph ph-user icon-gray"></i>
                         </span>
-                        <input type="fullname" name="fullname" class="form-control" placeholder="Fullname" required>
+                        <input 
+                            type="text" 
+                            name="fullname" 
+                            class="form-control @error('fullname') is-invalid @enderror" 
+                            placeholder="Fullname" 
+                            value="{{ old('fullname') }}" 
+                            required
+                        >
                     </div>
+                    @error('fullname')
+                        <div class="invalid-feedback ms-1">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="mb-3">
                     <div class="input-group">
                         <span class="input-group-text">
                             <i class="ph ph-envelope-simple icon-gray"></i>
                         </span>
-                        <input type="email" name="email" class="form-control" placeholder="Email" required>
+                        <input 
+                            type="email" 
+                            name="email" 
+                            class="form-control @error('email') is-invalid @enderror" 
+                            placeholder="Email" 
+                            value="{{ old('email') }}" 
+                            required
+                        >
                     </div>
+                    @error('email')
+                        <div class="invalid-feedback ms-1">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="mb-3">
@@ -39,12 +71,15 @@
                         <span class="input-group-text">
                             <i class="ph ph-lock icon-gray"></i>
                         </span>
-                        <input type="password" id="password" name="password" class="form-control" placeholder="Password"
+                        <input type="password" id="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Password"
                             required>
                         <span class="input-group-text" id="togglePassword" style="cursor: pointer;">
                             <i class="ph ph-eye icon-gray"></i>
                         </span>
                     </div>
+                    @error('password')
+                        <div class="invalid-feedback ms-1">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="mb-4">
                     <div class="input-group">
