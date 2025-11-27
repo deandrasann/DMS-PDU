@@ -472,77 +472,60 @@ private function isEmail($name)
         }
     }
 
-    public function viewFile($fileId)
-    {
-        // PERBAIKAN: Ambil token dari session
-        $token = session('token');
+ public function viewFile($fileId)
+{
+    $token = session('token');
 
-        if (!$token) {
-            Log::warning('No token in session for file view', ['file_id' => $fileId]);
-            return redirect()->route('signin')->with('error', 'Please login first');
-        }
+    if (!$token) {
+        Log::warning('No token in session for file view', ['file_id' => $fileId]);
+        return redirect()->route('signin')->with('error', 'Please login first');
+    }
 
-        try {
-            // Gunakan endpoint yang sama seperti di MySpace
-            // $response = Http::withToken($token)
-            //     ->withOptions([
-            //         'verify' => false,
-            //         'timeout' => 30,
-            //     ])
-            //     ->get('https://pdu-dms.my.id/api/my-files');
-
-            $listResponse = Http::connectTimeout(5)
+    try {
+        $listResponse = Http::connectTimeout(5)
             ->withHeaders([
                 'Authorization' => 'Bearer ' . $token,
-            ])->timeout(30)->get("https://pdu-dms.my.id/api/my-files");
-            
-            // $listResponse = Http::connectTimeout(5)
-            // ->withHeaders([
-            //     'Authorization' => 'Bearer ' . $token,
-            // ])->timeout(30)->get("http://127.0.0.1:8000/api/my-files");
+            ])
+            ->timeout(30)
+            ->get("https://pdu-dms.my.id/api/my-files");
 
-            if (!$response->successful()) {
-                Log::error('Failed to fetch files for file view', [
-                    'status' => $response->status(),
-                    'file_id' => $fileId,
-                ]);
-                abort(404, 'Cannot fetch files');
-            }
-
-            $data = $response->json();
-            $files = $data['files'] ?? [];
-
-            // Cari file berdasarkan ID
-            $fileData = collect($files)->firstWhere('id', (int) $fileId);
-
-            if (!$fileData) {
-                Log::warning('File not found', ['file_id' => $fileId]);
-                abort(404, 'File not found');
-            }
-
-            // PERBAIKAN: Pastikan URL file lengkap
-            if (isset($fileData['url']) && !str_starts_with($fileData['url'], 'http')) {
-                $fileData['url'] = 'https://pdu-dms.my.id' . $fileData['url'];
-            }
-
-            Log::info('File view accessed', [
+        if (!$listResponse->successful()) {
+            Log::error('Failed to fetch files for file view', [
+                'status' => $listResponse->status(),
                 'file_id' => $fileId,
-                'file_name' => $fileData['name'] ?? 'Unknown',
             ]);
-
-            return view('file-view', [
-                'fileId' => $fileId,
-                'file' => $fileData,
-                'token' => $token,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('File view error', [
-                'file_id' => $fileId,
-                'error' => $e->getMessage(),
-            ]);
-            abort(500, 'Failed to load file');
+            abort(404, 'Cannot fetch files');
         }
+
+        $data = $listResponse->json();
+        $files = $data['files'] ?? [];
+
+        $fileData = collect($files)->firstWhere('id', (int) $fileId);
+
+        if (!$fileData) {
+            Log::warning('File not found', ['file_id' => $fileId]);
+            abort(404, 'File not found');
+        }
+
+        if (isset($fileData['url']) && !str_starts_with($fileData['url'], 'http')) {
+            $fileData['url'] = 'https://pdu-dms.my.id' . $fileData['url'];
+        }
+
+        return view('file-view', [
+            'fileId' => $fileId,
+            'file' => $fileData,
+            'token' => $token,
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('File view error', [
+            'file_id' => $fileId,
+            'error' => $e->getMessage(),
+        ]);
+        abort(500, 'Failed to load file');
     }
+}
+
 
     public function upload(Request $request)
     {
