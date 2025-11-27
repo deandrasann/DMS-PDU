@@ -13,12 +13,6 @@
                     Start managing your documents efficiently and securely.
                 </p>
             </div>
-            @if (session('error'))
-                <div class="alert alert-danger alert-dismissible fade show mx-4" role="alert">
-                    {{ session('error') }}
-                    <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
 
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show mx-4" role="alert">
@@ -43,9 +37,6 @@
                             required
                         >
                     </div>
-                    @error('fullname')
-                        <div class="invalid-feedback ms-1">{{ $message }}</div>
-                    @enderror
                 </div>
                 <div class="mb-3">
                     <div class="input-group">
@@ -61,9 +52,6 @@
                             required
                         >
                     </div>
-                    @error('email')
-                        <div class="invalid-feedback ms-1">{{ $message }}</div>
-                    @enderror
                 </div>
 
                 <div class="mb-3">
@@ -77,9 +65,6 @@
                             <i class="ph ph-eye icon-gray"></i>
                         </span>
                     </div>
-                    @error('password')
-                        <div class="invalid-feedback ms-1">{{ $message }}</div>
-                    @enderror
                 </div>
                 <div class="mb-4">
                     <div class="input-group">
@@ -95,6 +80,13 @@
                 </div>
 
                 <button type="submit" class="btn btn-orange w-100">Sign Up</button>
+                @if ($errors->any() || session('error'))
+                    <div class="text-center mb-3">
+                        <small class="text-danger">
+                            {{ session('error') ?? $errors->first() }}
+                        </small>
+                    </div>
+                @endif
             </form>
 
             <div class="text-center mt-2">
