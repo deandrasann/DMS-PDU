@@ -406,13 +406,18 @@ class MySpaceController extends Controller
 
         try {
             // Gunakan endpoint yang sama seperti di MySpace
-            $response = Http::withToken($token)
-                ->withOptions([
-                    'verify' => false,
-                    'timeout' => 30,
-                ])
-                ->get('https://pdu-dms.my.id/api/my-files');
+            // $response = Http::withToken($token)
+            //     ->withOptions([
+            //         'verify' => false,
+            //         'timeout' => 30,
+            //     ])
+            //     ->get('https://pdu-dms.my.id/api/my-files');
 
+            $listResponse = Http::connectTimeout(5)
+            ->withHeaders([
+                'Authorization' => 'Bearer ' . $token,
+            ])->timeout(30)->get("https://pdu-dms.my.id/api/my-files");
+            
             // $listResponse = Http::connectTimeout(5)
             // ->withHeaders([
             //     'Authorization' => 'Bearer ' . $token,
