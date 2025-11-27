@@ -40,6 +40,14 @@ class ShareController extends Controller
             //     'Authorization' => 'Bearer ' . $userToken,
             //         'Accept' => 'application/json',
             //     ])->get("http://127.0.0.1:8000/api/share/$token");
+            
+            if ($response->status() >= 300 && $response->status() < 400) {
+                $redirectUrl = $response->header('Location');
+                Log::info("Forwarding redirect to: $redirectUrl");
+                return redirect()->away($redirectUrl);
+            }
+            
+            return $response->body();
         } catch (\Illuminate\Http\Client\RequestException $e) {
             // Log ke laravel.log
             Log::error("Share API Error", [
