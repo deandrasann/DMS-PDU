@@ -27,19 +27,29 @@ class ShareController extends Controller
         Log::info("Fetching share link with token: $token for user token: $userToken");
 
         try {
+            Log::info("Making API request to fetch share link");
+
             $response = Http::connectTimeout(5)
                 ->withHeaders([
                 'Authorization' => 'Bearer ' . $userToken,
                     'Accept' => 'application/json',
                 ])->get("https://pdu-dms.my.id/api/share/$token");
 
-            // $response = Http::connectTimeout(5)
-            //     ->withHeaders([
-            //     'Authorization' => 'Bearer ' . $userToken,
-            //         'Accept' => 'application/json',
-            //     ])->get("http://127.0.0.1:8000/api/share/$token");
+            if ($response->successful()) {
+                $data = $response->json();
 
-            $response->throw(); // ini akan memicu exception kalau gagal
+                $fileId = $data['data']['file_id'] ?? null;
+
+                return redirect()->route('file-view', $fileId);
+            } else {
+                Log::error("Failed to fetch share link", [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                return response($response->body(), $response->status());
+            }
+
         } catch (\Illuminate\Http\Client\RequestException $e) {
             // Log ke laravel.log
             Log::error("Share API Error", [
