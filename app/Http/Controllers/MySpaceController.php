@@ -489,6 +489,10 @@ private function isEmail($name)
             ->timeout(30)
             ->get("https://pdu-dms.my.id/api/my-files");
 
+        Log::info('File view data fetched', [
+            'files response' => $listResponse,
+        ]);
+
         if (!$listResponse->successful()) {
             Log::error('Failed to fetch files for file view', [
                 'status' => $listResponse->status(),
@@ -501,6 +505,11 @@ private function isEmail($name)
         $files = $data['files'] ?? [];
 
         $fileData = collect($files)->firstWhere('id', (int) $fileId);
+
+        Log::info('File view data fetched', [
+            'file_id' => $fileId,
+            'file_found' => $fileData !== null,
+        ]);
 
         if (!$fileData) {
             Log::warning('File not found', ['file_id' => $fileId]);
