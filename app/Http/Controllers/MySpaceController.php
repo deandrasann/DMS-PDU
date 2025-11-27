@@ -524,17 +524,9 @@ class MySpaceController extends Controller
         }
 
         try {
-
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/json',
-            ])->timeout(30)->get("https://pdu-dms.my.id/api/folders/{$folderId}");
-
-            // $response = Http::withHeaders([
-            //     'Authorization' => 'Bearer ' . $token,
-            //     'Accept' => 'application/json',
-            // ])->timeout(30)->get("http://127.0.0.1:8000/api/folders/{$folderId}");
-
             ])
                 ->timeout(30)
                 ->get("https://pdu-dms.my.id/api/folders/{$folderId}");
