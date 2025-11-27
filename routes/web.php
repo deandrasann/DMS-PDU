@@ -60,4 +60,4 @@ Route::patch('/profile/update', [HomeController::class, 'update'])->name('profil
 Route::post('/profile/delete-photo', [HomeController::class, 'deletePhoto'])->name('profile.delete.photo');
 Route::post('/change-password', [HomeController::class, 'updatePassword'])->name('password.update');
 
-Route::get('share/{token}', ShareController::class);
+Route::get('/share/{token}', ShareController::class);

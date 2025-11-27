@@ -51,6 +51,11 @@ class AuthController extends Controller
             'password' => $request->password,
         ]);
 
+        // $response = Http::post('http://127.0.0.1:8000/api/login-user', [
+        //     'email' => $request->email,
+        //     'password' => $request->password,
+        // ]);
+
         if ($response->successful()) {
             $data = $response->json();
 

@@ -87,6 +87,11 @@ class MySpaceController extends Controller
                 'Accept' => 'application/json',
             ])->timeout(30)->get('https://pdu-dms.my.id/api/my-files/');
 
+            // $response = Http::withHeaders([
+            //     'Authorization' => 'Bearer ' . $token,
+            //     'Accept' => 'application/json',
+            // ])->timeout(30)->get('http://127.0.0.1:8000/api/my-files/');
+
             if ($response->successful()) {
                 return response()->json($response->json());
             } else {
@@ -119,6 +124,12 @@ class MySpaceController extends Controller
             ])
             ->timeout(30)
             ->get("https://pdu-dms.my.id/api/view-file/{$fileId}");
+
+            // $response = Http::withHeaders([
+            //     'Authorization' => 'Bearer ' . $token,
+            // ])
+            // ->timeout(30)
+            // ->get("http://127.0.0.1:8000/api/view-file/{$fileId}");
 
             if ($response->successful()) {
                 return response($response->body(), 200)
@@ -153,6 +164,11 @@ public function viewFile($fileId)
             $listResponse = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
             ])->timeout(30)->get("https://pdu-dms.my.id/api/my-files");
+
+            // $listResponse = Http::connectTimeout(5)
+            // ->withHeaders([
+            //     'Authorization' => 'Bearer ' . $token,
+            // ])->timeout(30)->get("http://127.0.0.1:8000/api/my-files");
 
             if (!$listResponse->successful()) {
                 abort(404, 'Cannot fetch files list');
@@ -199,6 +215,11 @@ public function viewFile($fileId)
                 'Accept' => 'application/json',
             ])->timeout(30)->get("https://pdu-dms.my.id/api/files/{$fileId}");
 
+            // $response = Http::withHeaders([
+            //     'Authorization' => 'Bearer ' . $token,
+            //     'Accept' => 'application/json',
+            // ])->timeout(30)->get("http://127.0.0.1:8000/api/files/{$fileId}");
+
             if ($response->successful()) {
                 $fileData = $response->json();
 
@@ -243,10 +264,17 @@ public function viewFile($fileId)
         }
 
         try {
+
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/json',
             ])->timeout(30)->get("https://pdu-dms.my.id/api/folders/{$folderId}");
+
+            // $response = Http::withHeaders([
+            //     'Authorization' => 'Bearer ' . $token,
+            //     'Accept' => 'application/json',
+            // ])->timeout(30)->get("http://127.0.0.1:8000/api/folders/{$folderId}");
+
 
             if ($response->successful()) {
                 return response()->json($response->json());
