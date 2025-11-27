@@ -337,7 +337,15 @@ class MySpaceController extends Controller
         }
 
         try {
-            $response = Http::withToken($token)->get('https://pdu-dms.my.id/api/my-files');
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/json',
+            ])->timeout(30)->get('https://pdu-dms.my.id/api/my-files/');
+
+            // $response = Http::withHeaders([
+            //     'Authorization' => 'Bearer ' . $token,
+            //     'Accept' => 'application/json',
+            // ])->timeout(30)->get('http://127.0.0.1:8000/api/my-files/');
 
             if ($response->successful()) {
                 return response()->json($response->json());
@@ -360,11 +368,17 @@ class MySpaceController extends Controller
         }
 
         try {
-            $response = Http::withToken($token)
-                ->withOptions([
-                    'verify' => false,
-                ])
-                ->get("https://pdu-dms.my.id/api/view-file/{$fileId}");
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $token,
+            ])
+            ->timeout(30)
+            ->get("https://pdu-dms.my.id/api/view-file/{$fileId}");
+
+            // $response = Http::withHeaders([
+            //     'Authorization' => 'Bearer ' . $token,
+            // ])
+            // ->timeout(30)
+            // ->get("http://127.0.0.1:8000/api/view-file/{$fileId}");
 
             if ($response->successful()) {
                 // Return file dengan content type yang sesuai
@@ -398,6 +412,11 @@ class MySpaceController extends Controller
                     'timeout' => 30,
                 ])
                 ->get('https://pdu-dms.my.id/api/my-files');
+
+            // $listResponse = Http::connectTimeout(5)
+            // ->withHeaders([
+            //     'Authorization' => 'Bearer ' . $token,
+            // ])->timeout(30)->get("http://127.0.0.1:8000/api/my-files");
 
             if (!$response->successful()) {
                 Log::error('Failed to fetch files for file view', [

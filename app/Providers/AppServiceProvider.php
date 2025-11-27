@@ -36,6 +36,11 @@ class AppServiceProvider extends ServiceProvider
                 $user = $response->json();
             }
 
+            // if ($token) {
+            //     $response = Http::withToken($token)->get('http://127.0.0.1:8000/api/user');
+            //     $user = $response->json();
+            // }
+
             $view->with('user', $user);
         });
 
@@ -94,4 +99,3 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 }
- 
