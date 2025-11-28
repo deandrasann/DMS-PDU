@@ -472,6 +472,12 @@ private function isEmail($name)
 {
     $token = Session::get('token');
 
+    Log::info('Viewing file', [
+        'file_id' => $fileId,
+        'token_present' => !empty($token),
+    ]);
+
+
     if (!$token) {
         Log::warning('No token in session for file view', ['file_id' => $fileId]);
         return redirect()->route('signin')->with('error', 'Please login first');
