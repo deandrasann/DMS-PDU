@@ -63,7 +63,7 @@ Route::prefix('myspace')->group(function () {
 
 // API routes - di luar group myspace
 Route::get('/my-files', [MySpaceController::class, 'getFiles'])->name('my-files');
-// Route::get('/files/{fileId}', [MySpaceController::class, 'proxyPdf'])->name('pdf.view');
+Route::get('/files/{fileId}', [MySpaceController::class, 'proxyPdf'])->name('pdf.view');
 Route::get('/file-view/{fileId}', [MySpaceController::class, 'viewFile'])->name('file.view');
 
 // Di routes/web.php
