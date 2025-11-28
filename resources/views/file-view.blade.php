@@ -29,9 +29,6 @@
                 const excelUrl = @json($url);
                 const token = @json($token ?? session('token'));
 
-                window.token = token;
-                console.log(token);
-
                 fetch(excelUrl, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -86,10 +83,13 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
             <script>
                 const url = @json($url);
-                fetch(url, {
+                const token = @json($token ?? session('token'));
+
+                fetch(excelUrl, {
                     headers: {
-                        'Authorization': `Bearer ${token}`
-                    }                
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/octet-stream'
+                    }
                 })
                 .then(response => {
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
