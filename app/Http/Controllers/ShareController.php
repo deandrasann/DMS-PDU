@@ -41,6 +41,11 @@ class ShareController extends Controller
                 $fileId = $data['data']['file_id'] ?? null;
                 $fileType = $data['data']['type'] ?? null;
 
+                Log::info("Fetched share link data", [
+                    'file_id' => $fileId,
+                    'file_type' => $fileType,
+                ]);
+                
                 // if redirect
                 if ($fileType === 'PDF') {
                     return redirect()->route('pdf.view', $fileId);
