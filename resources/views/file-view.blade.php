@@ -85,7 +85,7 @@
                 const url = @json($url);
                 const token = @json($token ?? session('token'));
 
-                fetch(excelUrl, {
+                fetch(url, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Accept': 'application/octet-stream'
