@@ -484,6 +484,10 @@ private function isEmail($name)
     }
 
     try {
+        Log::info('User Token', [
+            'token_present' => $token,
+        ]);
+        
         $listResponse = Http::connectTimeout(5)
             ->withHeaders([
                 'Authorization' => 'Bearer ' . $token,
