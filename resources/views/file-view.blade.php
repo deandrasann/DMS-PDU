@@ -28,6 +28,8 @@
             <script>
                 const excelUrl = @json($url);
                 const token = @json($token ?? session('token'));
+                window.token = @json($token ?? session('token'));
+
 
                 fetch(excelUrl, {
                     headers: {
