@@ -45,7 +45,7 @@ class ShareController extends Controller
                 if ($fileType === 'pdf') {
                     return redirect()->route('pdf.view', $fileId);
                 } else {
-                return redirect()->route('file-view', $fileId);
+                return redirect()->route('file.view', $fileId);
                 }
 
             } else {
