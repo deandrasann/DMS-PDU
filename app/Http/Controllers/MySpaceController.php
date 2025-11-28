@@ -468,7 +468,7 @@ private function isEmail($name)
 
  public function viewFile($fileId)
 {
-    $token = session('token');
+    $token = Session::get('token');
 
     if (!$token) {
         Log::warning('No token in session for file view', ['file_id' => $fileId]);
