@@ -452,12 +452,6 @@ private function isEmail($name)
             ->timeout(30)
             ->get("https://pdu-dms.my.id/api/view-file/{$fileId}");
 
-            // $response = Http::withHeaders([
-            //     'Authorization' => 'Bearer ' . $token,
-            // ])
-            // ->timeout(30)
-            // ->get("http://127.0.0.1:8000/api/view-file/{$fileId}");
-
             if ($response->successful()) {
                 // Return file dengan content type yang sesuai
                 $contentType = $response->header('Content-Type', 'application/octet-stream');
@@ -487,7 +481,7 @@ private function isEmail($name)
                 'Authorization' => 'Bearer ' . $token,
             ])
             ->timeout(30)
-            ->get("https://pdu-dms.my.id/api/my-files");
+            ->get("https://pdu-dms.my.id/api/file-info/{$fileId}");
 
         Log::info('File view data fetched', [
             'files response' => $listResponse,
@@ -502,27 +496,20 @@ private function isEmail($name)
         }
 
         $data = $listResponse->json();
-        $files = $data['files'] ?? [];
 
-        $fileData = collect($files)->firstWhere('id', (int) $fileId);
-
-        Log::info('File view data fetched', [
-            'file_id' => $fileId,
-            'file_found' => $fileData !== null,
+        Log::info('File view data structure', [
+            'data_keys' => array_keys($data),
         ]);
 
-        if (!$fileData) {
-            Log::warning('File not found', ['file_id' => $fileId]);
-            abort(404, 'File not found');
-        }
+        $files = $data['file_info'];
 
-        if (isset($fileData['url']) && !str_starts_with($fileData['url'], 'http')) {
-            $fileData['url'] = 'https://pdu-dms.my.id' . $fileData['url'];
-        }
+        Log::info('Data fetched:', [
+            'file info' => $files,
+        ]);
 
         return view('file-view', [
             'fileId' => $fileId,
-            'file' => $fileData,
+            'file' => $files,
             'token' => $token,
         ]);
 

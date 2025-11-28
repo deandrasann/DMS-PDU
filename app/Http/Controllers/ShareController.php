@@ -39,8 +39,15 @@ class ShareController extends Controller
                 $data = $response->json();
 
                 $fileId = $data['data']['file_id'] ?? null;
+                $fileType = $data['data']['type'] ?? null;
 
-                return redirect()->route('file.view', $fileId);
+                // if redirect
+                if ($fileType === 'pdf') {
+                    return redirect()->route('pdf.view', $fileId);
+                } else {
+                return redirect()->route('file-view', $fileId);
+                }
+
             } else {
                 Log::error("Failed to fetch share link", [
                     'status' => $response->status(),
@@ -49,6 +56,7 @@ class ShareController extends Controller
 
                 return response($response->body(), $response->status());
             }
+
         } catch (\Illuminate\Http\Client\RequestException $e) {
             // Log ke laravel.log
             Log::error("Share API Error", [
