@@ -474,7 +474,7 @@ private function isEmail($name)
 
     Log::info('Viewing file', [
         'file_id' => $fileId,
-        'token_present' => !empty($token),
+        'token_present' => $token,
     ]);
 
 
