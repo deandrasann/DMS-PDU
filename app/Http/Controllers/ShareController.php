@@ -29,8 +29,6 @@ class ShareController extends Controller
         try {
             Log::info("Making API request to fetch share link");
 
-            Log::info("Making API request to fetch share link");
-
             $response = Http::connectTimeout(5)
                 ->withHeaders([
                 'Authorization' => 'Bearer ' . $userToken,

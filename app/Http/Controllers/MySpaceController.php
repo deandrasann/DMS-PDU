@@ -436,41 +436,35 @@ private function isEmail($name)
         }
     }
 
-    public function proxyPdf($fileId)
-    {
-        // PERBAIKAN: Ambil token dari session
-        $token = session('token');
+    // public function proxyPdf($fileId)
+    // {
+    //     // PERBAIKAN: Ambil token dari session
+    //     $token = session('token');
 
-        if (!$token) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
+    //     if (!$token) {
+    //         return response()->json(['error' => 'Unauthorized'], 401);
+    //     }
 
-        try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $token,
-            ])
-            ->timeout(30)
-            ->get("https://pdu-dms.my.id/api/view-file/{$fileId}");
+    //     try {
+    //         $response = Http::withHeaders([
+    //             'Authorization' => 'Bearer ' . $token,
+    //         ])
+    //         ->timeout(30)
+    //         ->get("https://pdu-dms.my.id/api/view-file/{$fileId}");
 
-            // $response = Http::withHeaders([
-            //     'Authorization' => 'Bearer ' . $token,
-            // ])
-            // ->timeout(30)
-            // ->get("http://127.0.0.1:8000/api/view-file/{$fileId}");
+    //         if ($response->successful()) {
+    //             // Return file dengan content type yang sesuai
+    //             $contentType = $response->header('Content-Type', 'application/octet-stream');
 
-            if ($response->successful()) {
-                // Return file dengan content type yang sesuai
-                $contentType = $response->header('Content-Type', 'application/octet-stream');
+    //             return response($response->body(), 200)->header('Content-Type', $contentType)->header('Access-Control-Allow-Origin', '*');
+    //         }
 
-                return response($response->body(), 200)->header('Content-Type', $contentType)->header('Access-Control-Allow-Origin', '*');
-            }
-
-            return response()->json(['error' => 'File not found'], 404);
-        } catch (\Exception $e) {
-            Log::error('Proxy file error', ['error' => $e->getMessage()]);
-            return response()->json(['error' => 'Service unavailable'], 500);
-        }
-    }
+    //         return response()->json(['error' => 'File not found'], 404);
+    //     } catch (\Exception $e) {
+    //         Log::error('Proxy file error', ['error' => $e->getMessage()]);
+    //         return response()->json(['error' => 'Service unavailable'], 500);
+    //     }
+    // }
 
  public function viewFile($fileId)
 {
@@ -501,6 +495,11 @@ private function isEmail($name)
         $files = $data['files'] ?? [];
 
         $fileData = collect($files)->firstWhere('id', (int) $fileId);
+
+        Log::info('File view data fetched', [
+            'file_id' => $fileId,
+            'file_found' => $fileData !== null,
+        ]);
 
         if (!$fileData) {
             Log::warning('File not found', ['file_id' => $fileId]);
