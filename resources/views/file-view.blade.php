@@ -84,7 +84,9 @@
             <script>
                 const url = @json($url);
                 fetch(url, {
-                    headers: { 'Authorization': 'Bearer {{ $token ?? '' }}' }
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }                
                 })
                 .then(response => {
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
