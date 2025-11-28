@@ -39,7 +39,7 @@ class ShareController extends Controller
                 $data = $response->json();
 
                 $fileId = $data['data']['file_id'] ?? null;
-                $fileType = $data['data']['type'] ?? null;
+                $fileType = $data['data']['file_type'] ?? null;
 
                 Log::info("Fetched share link data", [
                     'file_id' => $fileId,
