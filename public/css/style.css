@@ -804,6 +804,58 @@ body.modal-open .sidebar-collapse-content * {
   color: #6c757d;
   opacity: 0.8;
 }
+
+
+    .filter-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+    }
+
+    .filter-row label {
+        font-weight: 600;
+        font-size: 14px;
+        min-width: 120px; /* panjang label fix, dropdown menyesuaikan */
+    }
+
+    .dropdown-container {
+        flex: 1; /* isi seluruh sisa ruang → fit dengan label */
+        position: relative;
+    }
+
+    .dropdown-toggle-custom {
+        width: 100%;
+        border-radius: 12px;
+        padding: 8px 14px;
+        border: 1px solid #ddd;
+        background: #fff;
+        text-align: left;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .dropdown-menu-custom {
+        position: relative;      /* penting agar mendorong layout */
+        display: none;           /* hide default */
+        width: 100%;
+        margin-top: 8px;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .dropdown-menu-custom .item {
+        padding: 10px 16px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .dropdown-menu-custom .item:hover {
+        background: #f3f3f3;
+    }
+
 @media (max-width: 991.98px) {
   .sidebar-collapse-content {
     margin-left: 0 !important;
@@ -820,7 +872,7 @@ body.modal-open .sidebar-collapse-content * {
     .dropend:hover > .dropdown-menu {
         display: block;
     }
-    
+
     .dropend .dropdown-toggle::after {
         content: "›";
         border: none;

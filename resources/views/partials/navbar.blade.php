@@ -78,7 +78,7 @@
                         <div class="dropdown-menu-custom" id="dd4">
                             <div class="item">Any</div>
                             <div class="item">Lain</div>
-                            
+
                         </div>
                     </div>
                 </div>
@@ -101,7 +101,7 @@
                 Alphabetical
             </a>
             <a class="dropdown-item d-flex align-items-center gap-2 sort-option" href="#"
-                data-sort="reverse-alphabetical">
+                data-sort="reverse_alphabetical">
                 Reverse Alphabetical
             </a>
             <div class="dropdown-divider"></div>

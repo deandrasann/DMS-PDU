@@ -20,7 +20,29 @@ class MySpaceManager {
         console.log('MySpaceManager init called');
         this.loadFilesAndFolders();
         this.attachEventListeners();
+
     }
+
+    showMessage(type, message) {
+        const div = document.createElement('div');
+        div.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+        div.style.cssText = `
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+        `;
+        div.innerHTML = `
+            <i class="ph ph-info me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+
+        document.body.appendChild(div);
+
+        setTimeout(() => div.remove(), 5000);
+    }
+
 
     attachSortListeners() {
         document.querySelectorAll(".sort-option").forEach(option => {
@@ -840,7 +862,7 @@ getMappedTextColor(backgroundColor) {
 
     async duplicateFile(fileId, fileName, buttonElement) {
         if (!this.token) {
-            alert("Token tidak ditemukan. Silakan login ulang.");
+            this.showMessage("danger", "Token tidak ditemukan. Silakan login ulang.")
             return;
         }
 
@@ -1134,7 +1156,7 @@ document.addEventListener('click', (e) => {
 
             const fileId = btn.getAttribute("data-id");
 
-            if (!confirm("Yakin mau menghapus file ini?")) return;
+            // if (!confirm("Yakin mau menghapus file ini?")) return;
 
             try {
                 const response = await fetch(`https://pdu-dms.my.id/api/delete-file/${fileId}`, {
@@ -1163,6 +1185,7 @@ document.addEventListener('click', (e) => {
                         }
                     }
                     // alert("File berhasil dihapus");
+                    this.showMessage("success", "File berhasil dihapus");
                 } else {
                     let errorMessage = "Gagal menghapus file";
                     if (result.message) {
@@ -1172,12 +1195,12 @@ document.addEventListener('click', (e) => {
                     } else if (response.status === 403) {
                         errorMessage = "Anda tidak memiliki izin untuk menghapus file ini";
                     }
-                    alert(errorMessage);
+                    this.showMessage('danger', errorMessage);
                 }
 
             } catch (err) {
                 console.error('Delete file error:', err);
-                alert("Gagal menghapus file: " + err.message);
+                this.showMessage('danger', 'Gagal menghapus file');
             }
         });
 
