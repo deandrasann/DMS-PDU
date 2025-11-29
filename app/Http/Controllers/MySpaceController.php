@@ -415,15 +415,7 @@ private function isEmail($name)
         }
 
         try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $token,
-                'Accept' => 'application/json',
-            ])->timeout(30)->get('https://pdu-dms.my.id/api/my-files/');
-
-            // $response = Http::withHeaders([
-            //     'Authorization' => 'Bearer ' . $token,
-            //     'Accept' => 'application/json',
-            // ])->timeout(30)->get('http://127.0.0.1:8000/api/my-files/');
+            $response = Http::withToken($token)->get('https://pdu-dms.my.id/api/my-files');
 
             if ($response->successful()) {
                 return response()->json($response->json());
@@ -446,17 +438,11 @@ private function isEmail($name)
         }
 
         try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $token,
-            ])
-            ->timeout(30)
-            ->get("https://pdu-dms.my.id/api/view-file/{$fileId}");
-
-            // $response = Http::withHeaders([
-            //     'Authorization' => 'Bearer ' . $token,
-            // ])
-            // ->timeout(30)
-            // ->get("http://127.0.0.1:8000/api/view-file/{$fileId}");
+            $response = Http::withToken($token)
+                ->withOptions([
+                    'verify' => false,
+                ])
+                ->get("https://pdu-dms.my.id/api/view-file/{$fileId}");
 
             if ($response->successful()) {
                 // Return file dengan content type yang sesuai
@@ -472,69 +458,67 @@ private function isEmail($name)
         }
     }
 
- public function viewFile($fileId)
-{
-    $token = session('token');
+    public function viewFile($fileId)
+    {
+        // PERBAIKAN: Ambil token dari session
+        $token = session('token');
 
-    if (!$token) {
-        Log::warning('No token in session for file view', ['file_id' => $fileId]);
-        return redirect()->route('signin')->with('error', 'Please login first');
-    }
+        if (!$token) {
+            Log::warning('No token in session for file view', ['file_id' => $fileId]);
+            return redirect()->route('signin')->with('error', 'Please login first');
+        }
 
-    try {
-        $listResponse = Http::connectTimeout(5)
-            ->withHeaders([
-                'Authorization' => 'Bearer ' . $token,
-            ])
-            ->timeout(30)
-            ->get("https://pdu-dms.my.id/api/my-files");
+        try {
+            // Gunakan endpoint yang sama seperti di MySpace
+            $response = Http::withToken($token)
+                ->withOptions([
+                    'verify' => false,
+                    'timeout' => 30,
+                ])
+                ->get('https://pdu-dms.my.id/api/my-files');
 
-        Log::info('File view data fetched', [
-            'files response' => $listResponse,
-        ]);
+            if (!$response->successful()) {
+                Log::error('Failed to fetch files for file view', [
+                    'status' => $response->status(),
+                    'file_id' => $fileId,
+                ]);
+                abort(404, 'Cannot fetch files');
+            }
 
-        if (!$listResponse->successful()) {
-            Log::error('Failed to fetch files for file view', [
-                'status' => $listResponse->status(),
+            $data = $response->json();
+            $files = $data['files'] ?? [];
+
+            // Cari file berdasarkan ID
+            $fileData = collect($files)->firstWhere('id', (int) $fileId);
+
+            if (!$fileData) {
+                Log::warning('File not found', ['file_id' => $fileId]);
+                abort(404, 'File not found');
+            }
+
+            // PERBAIKAN: Pastikan URL file lengkap
+            if (isset($fileData['url']) && !str_starts_with($fileData['url'], 'http')) {
+                $fileData['url'] = 'https://pdu-dms.my.id' . $fileData['url'];
+            }
+
+            Log::info('File view accessed', [
                 'file_id' => $fileId,
+                'file_name' => $fileData['name'] ?? 'Unknown',
             ]);
-            abort(404, 'Cannot fetch files');
+
+            return view('file-view', [
+                'fileId' => $fileId,
+                'file' => $fileData,
+                'token' => $token,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('File view error', [
+                'file_id' => $fileId,
+                'error' => $e->getMessage(),
+            ]);
+            abort(500, 'Failed to load file');
         }
-
-        $data = $listResponse->json();
-        $files = $data['files'] ?? [];
-
-        $fileData = collect($files)->firstWhere('id', (int) $fileId);
-
-        Log::info('File view data fetched', [
-            'file_id' => $fileId,
-            'file_found' => $fileData !== null,
-        ]);
-
-        if (!$fileData) {
-            Log::warning('File not found', ['file_id' => $fileId]);
-            abort(404, 'File not found');
-        }
-
-        if (isset($fileData['url']) && !str_starts_with($fileData['url'], 'http')) {
-            $fileData['url'] = 'https://pdu-dms.my.id' . $fileData['url'];
-        }
-
-        return view('file-view', [
-            'fileId' => $fileId,
-            'file' => $fileData,
-            'token' => $token,
-        ]);
-
-    } catch (\Exception $e) {
-        Log::error('File view error', [
-            'file_id' => $fileId,
-            'error' => $e->getMessage(),
-        ]);
-        abort(500, 'Failed to load file');
     }
-}
-
 
     public function upload(Request $request)
     {
