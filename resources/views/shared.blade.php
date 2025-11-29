@@ -44,10 +44,10 @@
 class SharedWithMeManager {
     constructor() {
     // Cara ini PASTI berhasil karena sama persis seperti MySpace
-    this.token = window.token || 
-                 (window.Laravel?.apiToken) || 
-                 localStorage.getItem('token') || 
-                 document.querySelector('meta[name="api-token"]')?.getAttribute('content') || 
+    this.token = window.token ||
+                 (window.Laravel?.apiToken) ||
+                 localStorage.getItem('token') ||
+                 document.querySelector('meta[name="api-token"]')?.getAttribute('content') ||
                  '';
 
     if (!this.token) {
@@ -89,8 +89,8 @@ class SharedWithMeManager {
 
             // Normalisasi struktur agar sesuai dengan fungsi render lama kamu
             const normalizedFolders = folders.map(f => ({
-                id: f.folder_id || f.id,
-                name: f.folder_name || f.name,
+                id: f.file_id || f.id,
+                name: f.file_name || f.name,
                 shared_by_name: f.shared_by?.name || f.shared_by_name || 'Someone'
             }));
 
@@ -200,7 +200,11 @@ class SharedWithMeManager {
         card.style.cursor = "pointer";
 
         const { icon } = this.getFileIcon(file.mime);
-        const openUrl = file.mime?.includes('pdf') ? `/files/${file.id}` : `/file-view/${file.id}`;
+        // const openUrl = file.mime?.includes('pdf') ? `/files/${file.id}` : `/file-view/${file.id}`;
+        const openUrl = file.is_folder
+            ? `https://pdu-dms.my.id/api/my-files/${file.id}`
+            : (file.mime?.includes('pdf') ? `/files/${file.id}` : `/file-view/${file.id}`);
+
         const labelsHTML = this.createLabelsHTML(file.labels || []);
 
         card.innerHTML = `
