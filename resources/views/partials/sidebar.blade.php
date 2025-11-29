@@ -148,6 +148,11 @@
                                     id="addLabelBtn">
                                     <i class="ph ph-plus me-2"></i> Add Label
                                 </button>
+                                <button type="button"
+                                    class="btn btn-outline-primary rounded-3 d-flex align-items-center"
+                                    id="addLabelBtn">
+                                    <i class="ph ph-plus me-2"></i> Delete Label
+                                </button>
 
                                 <!-- Input Label Baru (hidden default) -->
                                 <div id="newLabelContainer" class="d-none">
