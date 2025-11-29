@@ -417,15 +417,7 @@ private function isEmail($name)
         }
 
         try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $token,
-                'Accept' => 'application/json',
-            ])->timeout(30)->get('https://pdu-dms.my.id/api/my-files/');
-
-            // $response = Http::withHeaders([
-            //     'Authorization' => 'Bearer ' . $token,
-            //     'Accept' => 'application/json',
-            // ])->timeout(30)->get('http://127.0.0.1:8000/api/my-files/');
+            $response = Http::withToken($token)->get('https://pdu-dms.my.id/api/my-files');
 
             if ($response->successful()) {
                 return response()->json($response->json());
@@ -478,16 +470,16 @@ private function isEmail($name)
     ]);
 
 
-    if (!$token) {
-        Log::warning('No token in session for file view', ['file_id' => $fileId]);
-        return redirect()->route('signin')->with('error', 'Please login first');
-    }
+        if (!$token) {
+            Log::warning('No token in session for file view', ['file_id' => $fileId]);
+            return redirect()->route('signin')->with('error', 'Please login first');
+        }
 
     try {
         Log::info('User Token', [
             'token_present' => $token,
         ]);
-        
+
         $listResponse = Http::connectTimeout(5)
             ->withHeaders([
                 'Authorization' => 'Bearer ' . $token,
@@ -495,17 +487,13 @@ private function isEmail($name)
             ->timeout(30)
             ->get("https://pdu-dms.my.id/api/file-info/{$fileId}");
 
-        Log::info('File view data fetched', [
-            'files response' => $listResponse,
-        ]);
-
-        if (!$listResponse->successful()) {
-            Log::error('Failed to fetch files for file view', [
-                'status' => $listResponse->status(),
-                'file_id' => $fileId,
-            ]);
-            abort(404, 'Cannot fetch files');
-        }
+            if (!$response->successful()) {
+                Log::error('Failed to fetch files for file view', [
+                    'status' => $response->status(),
+                    'file_id' => $fileId,
+                ]);
+                abort(404, 'Cannot fetch files');
+            }
 
         $data = $listResponse->json();
 

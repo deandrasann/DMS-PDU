@@ -22,7 +22,22 @@ class MySpaceManager {
         this.attachEventListeners();
     }
 
-    async loadFilesAndFolders() {
+    attachSortListeners() {
+        document.querySelectorAll(".sort-option").forEach(option => {
+            option.addEventListener("click", (e) => {
+                e.preventDefault();
+
+                const sortType = option.dataset.sort;
+                console.log("Sorting:", sortType);
+
+                // Panggil ulang loader dgn sort
+                this.loadFilesAndFolders(sortType);
+            });
+        });
+    }
+
+
+    async loadFilesAndFolders(sortType = null) {
         const folderContainer = document.getElementById("folderContainer");
         const fileContainer = document.getElementById("fileContainer");
         const emptyTemplate = document.getElementById("empty-template");
@@ -35,20 +50,30 @@ class MySpaceManager {
         try {
             let url;
             let transformData = false;
+            let folderData = null;
 
             // ✅ DETECT RECOMMENDED PAGE
             if (this.isRecommendedPage) {
                 url = "https://pdu-dms.my.id/api/recommended-files";
                 transformData = true;
+                if (sortType) {
+                    url += `?sort=${sortType}`;
+                }
             }
             // DETECT LAST OPENED PAGE
             else if (this.isLastOpenedPage) {
                 url = "https://pdu-dms.my.id/api/last-opened-files";
                 transformData = true;
+                if (sortType) {
+                    url += `?sort=${sortType}`;
+                }
             } else {
                 const baseUrl = "https://pdu-dms.my.id/api/my-files";
                 url = this.currentPath ? `${baseUrl}/${this.currentPath}` : baseUrl;
                 transformData = false;
+                if (sortType) {
+                    url += `?sort=${sortType}`;
+                }
             }
 
             console.log('Fetching from:', url);
@@ -92,6 +117,7 @@ class MySpaceManager {
                 // DATA DARI MY-FILES ENDPOINT (ORIGINAL)
                 folders = data.files?.filter(f => f.is_folder) || [];
                 files = data.files?.filter(f => !f.is_folder) || [];
+                folderData = data;
             }
 
             // ✅ UNTUK RECOMMENDED PAGE: Hanya render files, hide folder container
@@ -103,7 +129,7 @@ class MySpaceManager {
             } else {
                 // Untuk halaman lain: render normal
                 if (folderContainer) {
-                    this.renderFolders(folders, folderContainer, emptyTemplate.content.cloneNode(true));
+                    await this.renderFolders(folders, folderContainer, emptyTemplate.content.cloneNode(true), folderData);
                 }
                 this.renderFiles(files, fileContainer, emptyTemplate.content.cloneNode(true));
             }
@@ -114,29 +140,57 @@ class MySpaceManager {
         }
     }
 
-    renderFolders(folders, container, emptyTemplate) {
-        if (!container) return;
+    async renderFolders(folders, container, emptyTemplate, folderData = null) {
+    if (!container) return;
 
-        container.innerHTML = '';
+    container.innerHTML = '';
 
-        if (folders.length === 0) {
-            const empty = emptyTemplate.cloneNode(true);
-            if (this.isLastOpenedPage) {
-                empty.querySelector("i").className = "ph ph-folder-open";
-                empty.querySelector("p").textContent = "No recently opened folders";
-            } else {
-                empty.querySelector("i").className = "ph ph-folder-open";
-                empty.querySelector("p").textContent = "Create a folder to get organized";
-            }
-            container.appendChild(empty);
+    if (folders.length === 0) {
+        const empty = emptyTemplate.cloneNode(true);
+        if (this.isLastOpenedPage) {
+            empty.querySelector("i").className = "ph ph-folder-open";
+            empty.querySelector("p").textContent = "No recently opened folders";
         } else {
-            folders.forEach(folder => {
-                const col = this.createFolderElement(folder);
-                container.appendChild(col);
-            });
+            empty.querySelector("i").className = "ph ph-folder-open";
+            empty.querySelector("p").textContent = "Create a folder to get organized";
         }
-    }
+        container.appendChild(empty);
+    } else {
+        // ✅ GUNAKAN Promise.all UNTUK LOAD SEMUA FOLDER ITEM COUNT SECARA PARALEL
+        const folderPromises = folders.map(async (folder) => {
+            try {
+                // Fetch data untuk setiap folder secara individual
+                const response = await fetch(`https://pdu-dms.my.id/api/my-files/${folder.id}`, {
+                    headers: {
+                        "Authorization": "Bearer " + this.token,
+                        "Accept": "application/json"
+                    }
+                });
 
+                if (response.ok) {
+                    const data = await response.json();
+                    const totalItems = data.files?.length || 0;
+                    return { folder, totalItems };
+                } else {
+                    // Jika gagal, fallback ke size
+                    return { folder, totalItems: 0 };
+                }
+            } catch (error) {
+                console.error(`Error loading folder ${folder.id}:`, error);
+                return { folder, totalItems: 0 };
+            }
+        });
+
+        // Tunggu semua request selesai
+        const foldersWithItems = await Promise.all(folderPromises);
+
+        // Render semua folder dengan data yang sudah diload
+        foldersWithItems.forEach(({ folder, totalItems }) => {
+            const col = this.createFolderElement(folder, totalItems);
+            container.appendChild(col);
+        });
+    }
+}
     renderFiles(files, container, emptyTemplate) {
         if (!container) return;
 
@@ -170,10 +224,15 @@ class MySpaceManager {
         }
     }
 
-    createFolderElement(folder) {
+    createFolderElement(folder, totalItems = 0) {
         const col = document.createElement("div");
         col.className = "col-6 col-sm-4 col-md-3 col-lg-2 folder-item";
         const folderPath = folder.id;
+
+        // ✅ PERBAIKAN: GUNAKAN !== undefined ATAU null UNTUK totalItems
+        const itemCountText = totalItems !== undefined && totalItems !== null ?
+            `${totalItems} ${totalItems === 1 ? 'item' : 'items'}` :
+            folder.size;
 
         col.innerHTML = `
             <div class="position-relative">
@@ -182,7 +241,7 @@ class MySpaceManager {
                     <div class="position-absolute top-0 start-0 p-2 p-sm-3 w-100 h-100 d-flex flex-column justify-content-between">
                         <div>
                             <p class="fw-normal mt-2 mb-0 text-truncate" title="${folder.name}">${folder.name}</p>
-                            <small class="fw-light">${folder.size}</small>
+                            <small class="fw-light">${itemCountText}</small>
                         </div>
                         <div class="d-flex justify-content-end">
                             <div class="dropdown">
@@ -219,6 +278,14 @@ class MySpaceManager {
                                             data-folder-name="${folder.name}"
                                             data-folder-items="${folder.size}">
                                              <i class="ph ph-share-network fs-5"></i> Share
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#"
+                                        class="dropdown-item d-flex align-items-center gap-2 duplicate-btn"
+                                        data-id="${folder.id}"
+                                        data-name="${folder.name}">
+                                        <i class="ph ph-copy fs-5"></i> Duplicate
                                         </a>
                                     </li>
                                     <li>
@@ -308,6 +375,32 @@ createFileElement(file) {
                                 <i class="ph ph-arrow-up-right fs-5"></i> Open
                             </a>
                         </li>
+
+
+                        <li class="dropdown-submenu position-relative">
+                            <a class="dropdown-item d-flex align-items-center gap-2 info-btn"
+                            href="#"
+                            data-file-id="${file.id}">
+                                <i class="ph ph-info fs-5"></i> Get Info
+                            </a>
+                            <div class="file-info-panel" style="display: none; position: absolute; left: 100%; top: 0; width: 320px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #e9ecef;">
+                                ${this.getFileInfoPanelHTML(file, fileInfo)}
+                            </div>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-2 edit-file-btn" href="#"
+                            data-id="${file.id}" data-name="${file.name}" data-labels='${JSON.stringify(file.labels || [])}'>
+                                <i class="ph ph-pencil-simple fs-5"></i> Edit File
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#"
+                            class="dropdown-item d-flex align-items-center gap-2 duplicate-btn"
+                            data-id="${file.id}"
+                            data-name="${file.name}">
+                            <i class="ph ph-copy fs-5"></i> Duplicate
+                            </a>
+                        </li>
                         <li>
                             <a class="dropdown-item d-flex align-items-center gap-2 advanced-share-btn"
                             href="#"
@@ -328,22 +421,6 @@ createFileElement(file) {
                             data-id="${file.id}"
                             data-name="${file.name}">
                             <i class="ph ph-download fs-5"></i> Download
-                            </a>
-                        </li>
-                        <li class="dropdown-submenu position-relative">
-                            <a class="dropdown-item d-flex align-items-center gap-2 info-btn"
-                            href="#"
-                            data-file-id="${file.id}">
-                                <i class="ph ph-info fs-5"></i> Get Info
-                            </a>
-                            <div class="file-info-panel" style="display: none; position: absolute; left: 100%; top: 0; width: 320px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 1px solid #e9ecef;">
-                                ${this.getFileInfoPanelHTML(file, fileInfo)}
-                            </div>
-                        </li>
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center gap-2 edit-file-btn" href="#"
-                            data-id="${file.id}" data-name="${file.name}" data-labels='${JSON.stringify(file.labels || [])}'>
-                                <i class="ph ph-pencil-simple fs-5"></i> Edit File
                             </a>
                         </li>
                         <li>
@@ -438,7 +515,7 @@ getMappedTextColor(backgroundColor) {
         } else if (mime.includes("docs") || mime.includes("document")) {
             return { icon: "ph-file-doc", type: "DOC" };
         } else if (mime.includes("xlsx") || mime.includes("spreadsheet")) {
-            return { icon: "ph-file-xls", type: "XLS" };
+            return { icon: "ph-file-xls", type: "XLSX" };
         } else if (mime.includes("ppt")) {
             return { icon: "ph-file-image", type: "Image" };
         }
@@ -530,7 +607,7 @@ getMappedTextColor(backgroundColor) {
                         <i class="ph ${fileInfo.icon} fs-1 text-muted"></i>
                     </div>
                     <h6 class="fw-semibold mb-1 text-truncate">${file.name}</h6>
-                    <small class="text-muted">${fileInfo.type} • ${file.size}</small>
+                    <small class="text-muted">${file.type} • ${file.size}</small>
                 </div>
 
                 <div class="file-details">
@@ -543,7 +620,7 @@ getMappedTextColor(backgroundColor) {
                         <div class="col-6">
                             <div class="detail-item mb-2">
                                 <label class="text-muted small fw-semibold mb-1">Type</label>
-                                <p class="mb-0 fw-medium">${fileInfo.type}</p>
+                                <p class="mb-0 fw-medium">${file.type}</p>
                             </div>
                         </div>
                         <div class="col-6">
@@ -760,6 +837,91 @@ getMappedTextColor(backgroundColor) {
         const modal = new bootstrap.Modal(document.getElementById('advancedShareModal'));
         modal.show();
     }
+
+    async duplicateFile(fileId, fileName, buttonElement) {
+        if (!this.token) {
+            alert("Token tidak ditemukan. Silakan login ulang.");
+            return;
+        }
+
+        try {
+            // Show loading state on button
+            const originalText = buttonElement.innerHTML;
+            buttonElement.innerHTML = '<i class="ph ph-spinner ph-spin fs-5"></i> Duplicating...';
+            buttonElement.disabled = true;
+
+            const response = await fetch("https://pdu-dms.my.id/api/duplicate-file", {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + this.token,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    file_id: parseInt(fileId)
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                // Success - reload files to show the duplicated file
+                this.loadFilesAndFolders();
+
+                // Show success message
+                this.showDuplicateSuccessMessage(fileName);
+
+            } else {
+                let errorMessage = "Gagal menduplikat file";
+                if (result.message) {
+                    errorMessage += ": " + result.message;
+                } else if (response.status === 404) {
+                    errorMessage = "File tidak ditemukan";
+                } else if (response.status === 403) {
+                    errorMessage = "Anda tidak memiliki izin untuk menduplikat file ini";
+                } else if (response.status === 422) {
+                    errorMessage = "Data tidak valid";
+                }
+                throw new Error(errorMessage);
+            }
+
+        } catch (err) {
+            console.error('Duplicate file error:', err);
+            alert("Gagal menduplikat file: " + err.message);
+        } finally {
+            // Reset button state
+            if (buttonElement) {
+                buttonElement.innerHTML = originalText;
+                buttonElement.disabled = false;
+            }
+        }
+    }
+
+    showDuplicateSuccessMessage(fileName) {
+        // Create a custom success notification
+        const successDiv = document.createElement('div');
+        successDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+        successDiv.style.cssText = `
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+        `;
+        successDiv.innerHTML = `
+            <i class="ph ph-check-circle me-2"></i>
+            <strong>Success!</strong> File "${fileName}" berhasil diduplikat.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+
+        document.body.appendChild(successDiv);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (successDiv.parentNode) {
+                successDiv.remove();
+            }
+        }, 5000);
+    }
     async renderPDFPreview(pdfUrl, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -824,6 +986,7 @@ getMappedTextColor(backgroundColor) {
         this.attachFileOperationsListeners();
         this.attachFolderOperationsListeners();
         this.attachRenameFolderListeners();
+        this.attachSortListeners();
     }
 
     attachInfoPanelListeners() {
@@ -948,6 +1111,19 @@ document.addEventListener('click', (e) => {
     }
 
     attachFileOperationsListeners() {
+    // Event listener untuk duplicate file
+        document.addEventListener("click", async (e) => {
+            const btn = e.target.closest(".duplicate-btn");
+            if (!btn) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const fileId = btn.getAttribute("data-id");
+            const fileName = btn.getAttribute("data-name");
+
+            await this.duplicateFile(fileId, fileName, btn);
+        });
         // Event listener untuk delete file
         document.addEventListener("click", async (e) => {
             const btn = e.target.closest(".delete-btn");
@@ -1591,12 +1767,12 @@ class ShareManager {
                 const item = document.createElement('div');
                 item.className = 'suggestion-item d-flex align-items-center gap-3 p-3 rounded-3 hover-bg-light cursor-pointer';
                 item.innerHTML = `
-                    <img src="${user.photo_profile_path 
-                    ? 'https://pdu-dms.my.id/storage/profile_photos/' + user.photo_profile_path 
-                    : '/images/profile-pict.jpg'}" 
-                    class="rounded-circle object-fit-cover flex-shrink-0" width="36" height="36" 
+                    <img src="${user.photo_profile_path
+                    ? 'https://pdu-dms.my.id/storage/profile_photos/' + user.photo_profile_path
+                    : '/images/profile-pict.jpg'}"
+                    class="rounded-circle object-fit-cover flex-shrink-0" width="36" height="36"
                     onerror="this.src='/images/profile-pict.jpg'">
-            
+
                     <div>
                         <div class="fw-semibold small">${user.fullname || 'No Name'}</div>
                         <div class="text-muted small">${user.email}</div>
@@ -1629,10 +1805,10 @@ class ShareManager {
         const pill = document.createElement('div');
         pill.className = 'd-inline-flex align-items-center bg-white border rounded-pill px-3 py-1 gap-2 shadow-sm';
         pill.innerHTML = `
-            <img src="${user.photo_profile_path 
-            ? 'https://pdu-dms.my.id/storage/profile_photos/' + user.photo_profile_path 
-            : '/images/profile-pict.jpg'}" 
-             class="rounded-circle object-fit-cover flex-shrink-0" width="22" height="22" 
+            <img src="${user.photo_profile_path
+            ? 'https://pdu-dms.my.id/storage/profile_photos/' + user.photo_profile_path
+            : '/images/profile-pict.jpg'}"
+             class="rounded-circle object-fit-cover flex-shrink-0" width="22" height="22"
              onerror="this.src='/images/profile-pict.jpg'">
             <span class="small fw-medium text-dark">${user.email}</span>
             <button type="button" class="btn-close btn-close-sm" style="font-size: 0.55rem;"></button>
@@ -1692,7 +1868,7 @@ class ShareManager {
 
         // Sukses!
         alert(`Berhasil dibagikan ke ${this.selectedUsers.length} orang!`);
-        
+
         const modal = bootstrap.Modal.getInstance(document.getElementById('advancedShareModal'));
         modal.hide();
 
