@@ -130,7 +130,7 @@
     </div>
 
     <!-- Profile -->
-    <div class="profile-box mx-2">
+    <div class="profile-box desktop-only mx-2">
         <button id="profileBtn"
             class="btn btn-light rounded-circle shadow d-flex align-items-center justify-content-center p-0"
             style="width: 45px; height: 45px;">
@@ -160,7 +160,7 @@
             </button>
 
             <!-- Account Settings Modal -->
-            <div class="modal fade" id="accountSettingsModal" tabindex="-1" aria-labelledby="accountSettingsLabel"
+            <div class="modal fade desktop-only" id="accountSettingsModal" tabindex="-1" aria-labelledby="accountSettingsLabel"
                 aria-hidden="true" data-bs-backdrop="false">
                 <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content border-0 shadow-lg rounded-4">
@@ -286,7 +286,7 @@
                 </div>
             </div>
             <!-- Change Password Modal -->
-            <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordLabel"
+            <div class="modal fade desktop-only" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordLabel"
                 aria-hidden="true" data-bs-backdrop="false">
                 <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content border-0 shadow-lg rounded-4">
@@ -367,7 +367,7 @@
     </div>
 </div>
 
-<script>
+{{-- <script>
 // Toggle dropdown
 document.querySelectorAll('.dropdown-toggle-custom').forEach(btn => {
     btn.addEventListener('click', function(e) {
@@ -700,4 +700,4 @@ function closeAll() {
                 window.location.href = "/signin";
             });
     }
-</script>
+</script> --}}

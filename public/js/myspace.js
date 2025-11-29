@@ -1825,13 +1825,8 @@ class ShareManager {
 
     // INI YANG PALING PENTING: KIRIM SHARE KE API
     async shareItem() {
-    if (!this.itemId) {
-        alert('Item tidak ditemukan!');
-        return;
-    }
-
-    if (this.selectedUsers.length === 0) {
-        alert('Tambahkan minimal satu orang');
+    if (!this.itemId || this.selectedUsers.length === 0) {
+        alert('Pilih item dan minimal satu penerima!');
         return;
     }
 
@@ -1841,15 +1836,13 @@ class ShareManager {
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Sharing...';
 
     try {
+        // PAKAI FORMAT EXACTLY SAMA DENGAN POSTMAN
         const payload = {
-            user_id: this.selectedUsers.map(u => u.id),
-            permission_id: 4, // viewer (ubah sesuai kebutuhan)
-            // Kirim keduanya, backend yang pilih mana yang dipakai
-            file_id: this.itemType === 'file' ? parseInt(this.itemId) : null,
-            folder_id: this.itemType === 'folder' ? parseInt(this.itemId) : null,
+            emails: this.selectedUsers.map(u => u.email),  // KIRIM EMAIL, BUKAN ID!
+            permission_id: 4  // viewer
+            // TIDAK USAH KIRIM file_id / folder_id → sudah ada di URL: /share-file/{id}
         };
 
-        // PAKAI SATU ENDPOINT SAJA → /api/share-file/{id}
         const response = await fetch(`https://pdu-dms.my.id/api/share-file/${this.itemId}`, {
             method: 'POST',
             headers: {
@@ -1866,18 +1859,12 @@ class ShareManager {
             throw new Error(result.message || 'Gagal membagikan');
         }
 
-        // Sukses!
         alert(`Berhasil dibagikan ke ${this.selectedUsers.length} orang!`);
-
-        const modal = bootstrap.Modal.getInstance(document.getElementById('advancedShareModal'));
-        modal.hide();
-
-        // Optional: reload atau update UI
-        // location.reload();
+        bootstrap.Modal.getInstance(document.getElementById('advancedShareModal')).hide();
 
     } catch (err) {
         console.error('Share error:', err);
-        alert('Gagal: ' + err.message);
+        alert('Gagal: ' + (err.message || 'Server error'));
     } finally {
         btn.disabled = false;
         btn.innerHTML = originalText;

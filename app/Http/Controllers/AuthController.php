@@ -252,8 +252,7 @@ class AuthController extends Controller
                 return redirect('/signin')->with('success', 'Logged out successfully.');
             }
 
-            // Jika API gagal tapi tetap hapus session
-            return redirect('/signin')->with('warning', 'Logout locally, but API failed.');
+            return redirect()->back()->with('warning', 'Logged out locally. Server unreachable.');
         } catch (\Exception $e) {
             session()->forget('token');
             return redirect('/signin')->with('error', 'Error during logout: ' . $e->getMessage());
