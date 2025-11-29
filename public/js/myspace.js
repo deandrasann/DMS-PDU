@@ -1216,7 +1216,7 @@ document.addEventListener('click', (e) => {
             const fileName = btn.getAttribute("data-name");
 
             if (!this.token) {
-                alert("Token tidak ditemukan. Silakan login ulang.");
+                this.showMessage("danger", "Token tidak ditemukan. Silakan login ulang.");
                 return;
             }
 
