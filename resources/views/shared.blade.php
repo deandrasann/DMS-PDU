@@ -1,4 +1,3 @@
-{{-- resources/views/shared-with-me.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Shared with Me')
@@ -7,7 +6,31 @@
     <div>
         <h4 class="fw-semibold mb-4">Shared with Me</h4>
     </div>
-
+    {{-- Breadcrumb untuk navigasi folder --}}
+    @if (!empty($breadcrumb) && count($breadcrumb) > 1)
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ route('shared') }}" class="text-decoration-none text-dark">Shared with Me</a>
+        </li>
+        @if(isset($breadcrumb) && count($breadcrumb) > 1)
+            @foreach(array_slice($breadcrumb, 1) as $crumb)
+                @if($loop->last)
+                    <li class="breadcrumb-item active text-dark" aria-current="page">
+                        {{ $crumb['name'] }}
+                    </li>
+                @else
+                    <li class="breadcrumb-item">
+                        <a href="{{ $crumb['url'] }}" class="text-decoration-none text-dark">
+                            {{ $crumb['name'] }}
+                        </a>
+                    </li>
+                @endif
+            @endforeach
+        @endif
+    </ol>
+        </nav>
+    @endif
     <div class="container py-2">
         <!-- Shared Folders -->
         <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4">
@@ -42,10 +65,15 @@
         <meta name="api-token" content="{{ auth()->user()->api_token }}">
     @endauth
 
+    {{-- Load PDF.js --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+    </script>
+
     <script>
         class SharedWithMeManager {
             constructor() {
-                // Cara ini PASTI berhasil karena sama persis seperti MySpace
                 this.token = window.token ||
                     (window.Laravel?.apiToken) ||
                     localStorage.getItem('token') ||
@@ -57,66 +85,120 @@
                     window.location.href = "/signin";
                     return;
                 }
+
+                // Ambil currentPath dari PHP
+                this.currentPath = "{{ $currentPath }}";
+                this.baseUrl = '/shared-with-me';
                 this.init();
             }
 
             init() {
-                this.loadSharedItems();
+                this.loadItems();
                 this.attachGlobalListeners();
             }
 
-            async loadSharedItems() {
+            async loadItems() {
                 const folderContainer = document.getElementById("folderContainer");
                 const fileContainer = document.getElementById("fileContainer");
                 const emptyTemplate = document.getElementById("empty-template");
 
                 try {
-                    const res = await fetch("https://pdu-dms.my.id/api/shared-with-me", {
-                        headers: {
-                            "Authorization": "Bearer " + this.token,
-                            "Accept": "application/json"
-                        }
-                    });
+                    let normalizedFolders = [];
+                    let normalizedFiles = [];
 
-                    if (!res.ok) {
-                        if (res.status === 401) return this.handleUnauthorized();
-                        throw new Error("Gagal memuat data");
+                    if (!this.currentPath) {
+                        // MODE ROOT: /api/shared-with-me
+                        const res = await fetch("https://pdu-dms.my.id/api/shared-with-me", {
+                            headers: {
+                                "Authorization": "Bearer " + this.token,
+                                "Accept": "application/json"
+                            }
+                        });
+
+                        if (!res.ok) throw new Error("Gagal memuat shared items");
+
+                        const response = await res.json();
+                        const items = response.data || response.items || response || [];
+
+                        normalizedFolders = items.filter(i => i.is_folder === true || i.is_folder === 1);
+                        normalizedFiles = items.filter(i => !i.is_folder && i.is_folder !== 1);
+
+                    } else {
+                        // MODE SUBFOLDER: /api/my-files/{id}
+                        const folderId = this.getLastSegmentFromPath();
+                        const res = await fetch(`https://pdu-dms.my.id/api/my-files/${folderId}`, {
+                            headers: {
+                                "Authorization": "Bearer " + this.token,
+                                "Accept": "application/json"
+                            }
+                        });
+
+                        if (!res.ok) throw new Error("Gagal membuka folder");
+
+                        const data = await res.json();
+
+                        // Struktur standar dari /api/my-files
+                        normalizedFolders = data.folders || [];
+                        normalizedFiles = data.files || [];
+
+                        // // Update breadcrumb dengan nama folder saat ini
+                        // this.updateBreadcrumb(data.name || this.getLastSegmentFromPath());
                     }
 
-                    const {
-                        data = []
-                    } = await res.json();
-
-                    // Pisahkan folder & file berdasarkan is_folder
-                    const folders = data.filter(item => item.is_folder === true || item.is_folder === 1);
-                    const files = data.filter(item => !item.is_folder && item.is_folder !== 1);
-
-                    // Normalisasi struktur agar sesuai dengan fungsi render lama kamu
-                    const normalizedFolders = folders.map(f => ({
-                        id: f.file_id || f.id,
-                        name: f.file_name || f.name,
-                        shared_by_name: f.shared_by?.name || f.shared_by_name || 'Someone'
+                    // Normalisasi data biar sama formatnya
+                    const folders = normalizedFolders.map(f => ({
+                        id: f.id || f.file_id,
+                        name: f.name || f.file_name,
+                        shared_by_name: f.shared_by?.name || f.shared_by_name || f.owner?.name || 'Someone',
+                        size: f.size || '—',
+                        created_at: f.created_at || 'Unknown',
+                        updated_at: f.updated_at || 'Unknown'
                     }));
 
-                    const normalizedFiles = files.map(f => ({
-                        id: f.file_id || f.id,
-                        name: f.file_name || f.name,
-                        mime: this.guessMime(f.file_name || f.name),
+                    const files = normalizedFiles.map(f => ({
+                        id: f.id || f.file_id,
+                        name: f.name || f.file_name,
+                        mime: f.mime_type || f.mime || this.guessMime(f.name || f.file_name),
                         labels: f.labels || [],
-                        url: f.file_path ? `https://pdu-dms.my.id/storage/${f.file_path}` : null
+                        size: f.size || '—',
+                        created_at: f.created_at || 'Unknown',
+                        updated_at: f.updated_at || 'Unknown',
+                        url: f.file_path ? `https://pdu-dms.my.id/storage/${f.file_path}` : null,
+                        shared_by_name: f.shared_by?.name || f.shared_by_name || f.owner?.name || 'Someone'
                     }));
 
-                    // GUNAKAN FUNGSI ASLI KAMU 100% (tidak diubah sama sekali)
-                    this.renderFolders(normalizedFolders, folderContainer, emptyTemplate);
-                    this.renderFiles(normalizedFiles, fileContainer, emptyTemplate);
+                    this.renderFolders(folders, folderContainer, emptyTemplate);
+                    this.renderFiles(files, fileContainer, emptyTemplate);
 
                 } catch (err) {
                     console.error(err);
-                    const msg = `<p class="text-danger text-center">Error: ${err.message}</p>`;
-                    folderContainer.innerHTML = msg;
-                    fileContainer.innerHTML = msg;
+                    folderContainer.innerHTML = `<p class="text-danger text-center">${err.message}</p>`;
+                    fileContainer.innerHTML = `<p class="text-danger text-center">${err.message}</p>`;
                 }
             }
+
+            getLastSegmentFromPath() {
+                const segments = this.currentPath.split('/').filter(seg => seg);
+                return segments.length > 0 ? segments[segments.length - 1] : null;
+            }
+
+            // updateBreadcrumb(folderName) {
+            //     const breadcrumb = document.querySelector('.breadcrumb');
+            //     if (!breadcrumb) return;
+
+            //     // Hapus semua item setelah "Shared with Me"
+            //     const items = breadcrumb.querySelectorAll('.breadcrumb-item');
+            //     items.forEach((item, index) => {
+            //         if (index > 0) item.remove();
+            //     });
+
+            //     // Tambahkan nama folder saat ini sebagai item terakhir
+            //     const lastItem = document.createElement('li');
+            //     lastItem.className = 'breadcrumb-item active text-dark';
+            //     lastItem.setAttribute('aria-current', 'page');
+            //     lastItem.textContent = folderName || 'Folder';
+            //     breadcrumb.appendChild(lastItem);
+            // }
 
             // Helper tambahan (hanya ini yang ditambah)
             guessMime(name) {
@@ -150,9 +232,13 @@
             }
 
             createFolderHTML(folder) {
+                // Tentukan path baru: currentPath + folder.id
+                const newPath = this.currentPath ? `${this.currentPath}/${folder.id}` : folder.id;
+                const url = `${this.baseUrl}/${newPath}`;
+
                 return `
         <div class="position-relative folder-item-wrapper">
-            <div class="folder-card" style="cursor:pointer; position:relative; overflow:visible !important;">
+            <div class="folder-card" style="cursor:pointer; position:relative; overflow:visible !important;" data-folder-id="${folder.id}">
                 <img src="/img/folder.svg" alt="Folder" class="img-fluid w-100 h-100 object-fit-contain" style="min-height:100px;">
                 
                 <div class="position-absolute top-0 start-0 p-2 p-sm-3 w-100 h-100 d-flex flex-column justify-content-between pointer-events-none">
@@ -205,10 +291,7 @@
                 const {
                     icon
                 } = this.getFileIcon(file.mime);
-                // const openUrl = file.mime?.includes('pdf') ? `/files/${file.id}` : `/file-view/${file.id}`;
-                const openUrl = file.is_folder ?
-                    `https://pdu-dms.my.id/api/my-files/${file.id}` :
-                    (file.mime?.includes('pdf') ? `/files/${file.id}` : `/file-view/${file.id}`);
+                const openUrl = file.mime?.includes('pdf') ? `/files/${file.id}` : `/file-view/${file.id}`;
 
                 const labelsHTML = this.createLabelsHTML(file.labels || []);
 
@@ -236,7 +319,7 @@
                             <li><a class="dropdown-item d-flex align-items-center gap-2 download-btn" href="#" data-id="${file.id}" data-name="${file.name}">
                                 <i class="ph ph-download fs-5"></i> Download
                             </a></li>
-                            <li><a class="dropdown-item d-flex align-items-center gap-2 info-btn" href="#" data-file='${JSON.stringify(file)}' data-shared-by="${file.shared_by_name || (file.shared_by ? file.shared_by.name : 'Someone')}">
+                            <li><a class="dropdown-item d-flex align-items-center gap-2 info-btn" href="#" data-file='${JSON.stringify(file)}' data-shared-by="${file.shared_by_name || 'Someone'}">
                                 <i class="ph ph-info fs-5"></i> Get Info
                             </a></li>
                         </ul>
@@ -337,6 +420,17 @@
             }
 
             attachGlobalListeners() {
+                // Klik pada folder card (untuk membuka folder di shared-with-me)
+                document.addEventListener('click', (e) => {
+                    const folderCard = e.target.closest('.folder-card');
+                    if (folderCard) {
+                        e.preventDefault();
+                        const folderId = folderCard.dataset.folderId;
+                        const newPath = this.currentPath ? `${this.currentPath}/${folderId}` : folderId;
+                        window.location.href = `${this.baseUrl}/${newPath}`;
+                    }
+                });
+
                 document.addEventListener("click", async e => {
                     const btn = e.target.closest(".download-btn");
                     if (!btn) return;
@@ -362,7 +456,7 @@
                     }
                 });
 
-                // === PORTAL DROPDOWN FOLDER — SOLUSI ANTI-TIMBUN 100% ===
+                // === PORTAL DROPDOWN FOLDER
                 let activePortal = null;
 
                 document.addEventListener("click", e => {
@@ -395,9 +489,14 @@
                     portal.style.backdropFilter = "blur(12px)";
                     portal.style.minWidth = "150px";
                     portal.style.overflow = "hidden";
+                    // Link Open mengarah ke shared-with-me
+                    const newPath = this.currentPath ?
+                        `${this.currentPath}/${btn.dataset.folderId}` :
+                        btn.dataset.folderId;
+
                     portal.innerHTML = `
             <ul class="dropdown-menu shadow show p-2 m-0" style="position:relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: none;">
-                <li><a class="dropdown-item d-flex align-items-center gap-2 rounded-2" href="/myspace/${btn.dataset.folderId}">
+                <li><a class="dropdown-item d-flex align-items-center gap-2 rounded-2" href="${this.baseUrl}/${newPath}">
                     <i class="ph ph-arrow-up-right fs-5"></i> Open
                 </a></li>
                 <li><a class="dropdown-item d-flex align-items-center gap-2 rounded-2 folder-portal-info" href="#">
@@ -489,6 +588,7 @@
                         info.querySelector(".btn-close-portal").onclick = () => info.remove();
                     });
                 });
+
                 document.addEventListener("click", e => {
                     const btn = e.target.closest(".info-btn");
                     if (!btn) return;
@@ -504,7 +604,8 @@
                         file = btn.dataset.file || {};
                     }
 
-                    const sharedBy = btn.dataset.sharedBy || file.shared_by?.name || file.shared_by_name || 'Someone';
+                    const sharedBy = btn.dataset.sharedBy || file.shared_by?.name || file.shared_by_name ||
+                        'Someone';
                     const fileType = file.mime?.includes('pdf') ? 'PDF' :
                         file.mime?.includes('doc') ? 'DOC' :
                         file.mime?.includes('xls') ? 'XLSX' :
@@ -595,62 +696,62 @@
                 window.location.href = "/signin";
             }
         }
-        // === FUNGSI GLOBAL: BUKA FOLDER SHARED (PAKAI API YANG SUDAH ADA) ===
-        function openSharedFolder(folderId) {
-            // Simpan ID folder yang mau dibuka
-            sessionStorage.setItem('open_shared_folder_id', folderId);
-            // Redirect ke MySpace
-            window.location.href = '/myspace';
-        }
+        // // === FUNGSI GLOBAL: BUKA FOLDER SHARED (PAKAI API YANG SUDAH ADA) ===
+        // function openSharedFolder(folderId) {
+        //     // Simpan ID folder yang mau dibuka
+        //     sessionStorage.setItem('open_shared_folder_id', folderId);
+        //     // Redirect ke MySpace
+        //     window.location.href = '/myspace';
+        // }
 
-        // === DI MYSPACE: OTOMATIS BUKA FOLDER SHARED PAKAI API /api/my-files/{id} ===
-        document.addEventListener('DOMContentLoaded', function() {
-            // Hanya jalankan di halaman MySpace
-            if (window.location.pathname !== '/myspace' && !window.location.pathname.startsWith('/myspace/'))
-                return;
+        // // === DI MYSPACE: OTOMATIS BUKA FOLDER SHARED PAKAI API /api/my-files/{id} ===
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     // Hanya jalankan di halaman MySpace
+        //     if (window.location.pathname !== '/myspace' && !window.location.pathname.startsWith('/myspace/'))
+        //         return;
 
-            const sharedFolderId = sessionStorage.getItem('open_shared_folder_id');
-            if (!sharedFolderId) return;
+        //     const sharedFolderId = sessionStorage.getItem('open_shared_folder_id');
+        //     if (!sharedFolderId) return;
 
-            // Hapus biar tidak keulang
-            sessionStorage.removeItem('open_shared_folder_id');
+        //     // Hapus biar tidak keulang
+        //     sessionStorage.removeItem('open_shared_folder_id');
 
-            // Pastikan MySpaceManager sudah siap
-            const waitForManager = setInterval(() => {
-                if (window.mySpaceManager && typeof window.mySpaceManager.loadFilesAndFolders ===
-                    'function') {
-                    clearInterval(waitForManager);
+        //     // Pastikan MySpaceManager sudah siap
+        //     const waitForManager = setInterval(() => {
+        //         if (window.mySpaceManager && typeof window.mySpaceManager.loadFilesAndFolders ===
+        //             'function') {
+        //             clearInterval(waitForManager);
 
-                    // Ganti currentPath langsung ke folder yang dishare
-                    window.mySpaceManager.currentPath = sharedFolderId;
+        //             // Ganti currentPath langsung ke folder yang dishare
+        //             window.mySpaceManager.currentPath = sharedFolderId;
 
-                    // Reset URL biar breadcrumb benar
-                    const newUrl = `/myspace/${sharedFolderId}`;
-                    history.replaceState({}, '', newUrl);
+        //             // Reset URL biar breadcrumb benar
+        //             const newUrl = `/myspace/${sharedFolderId}`;
+        //             history.replaceState({}, '', newUrl);
 
-                    // Load isi folder pakai API yang sudah ada: /api/my-files/{id}
-                    window.mySpaceManager.loadFilesAndFolders();
+        //             // Load isi folder pakai API yang sudah ada: /api/my-files/{id}
+        //             window.mySpaceManager.loadFilesAndFolders();
 
-                    // Optional: kasih tahu user
-                    setTimeout(() => {
-                        const toast = document.createElement('div');
-                        toast.className = 'position-fixed top-0 start-50 translate-middle-x p-3';
-                        toast.style.zIndex = '9999';
-                        toast.innerHTML = `
-                    <div class="alert alert-success alert-dismissible fade show shadow">
-                        Berhasil membuka folder yang dishare!
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                `;
-                        document.body.appendChild(toast);
-                        setTimeout(() => toast.remove(), 4000);
-                    }, 1500);
-                }
-            }, 100);
+        //             // Optional: kasih tahu user
+        //             setTimeout(() => {
+        //                 const toast = document.createElement('div');
+        //                 toast.className = 'position-fixed top-0 start-50 translate-middle-x p-3';
+        //                 toast.style.zIndex = '9999';
+        //                 toast.innerHTML = `
+    //             <div class="alert alert-success alert-dismissible fade show shadow">
+    //                 Berhasil membuka folder yang dishare!
+    //                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    //             </div>
+    //         `;
+        //                 document.body.appendChild(toast);
+        //                 setTimeout(() => toast.remove(), 4000);
+        //             }, 1500);
+        //         }
+        //     }, 100);
 
-            // Kalau setelah 5 detik masih belum ada manager → fallback
-            setTimeout(() => clearInterval(waitForManager), 5000);
-        });
+        //     // Kalau setelah 5 detik masih belum ada manager → fallback
+        //     setTimeout(() => clearInterval(waitForManager), 5000);
+        // });
         document.addEventListener("DOMContentLoaded", () => {
             new SharedWithMeManager();
         });
