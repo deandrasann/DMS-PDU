@@ -2076,12 +2076,12 @@ class ShareManager {
     // INI YANG PALING PENTING: KIRIM SHARE KE API
     async shareItem() {
     if (!this.itemId) {
-        this.showMessage('danger', 'Item tidak ditemukan!');
+        alert('Item tidak ditemukan!');
         return;
     }
 
     if (this.selectedUsers.length === 0) {
-        this.showMessage('danger', 'Tambahkan minimal satu orang');
+        alert('Tambahkan minimal satu orang');
         return;
     }
 
@@ -2115,7 +2115,7 @@ class ShareManager {
         }
 
         // Sukses!
-        this.showMessage('success', `Berhasil dibagikan ke ${this.selectedUsers.length} orang!`);
+        alert(`Berhasil dibagikan ke ${this.selectedUsers.length} orang!`);
 
         const modal = bootstrap.Modal.getInstance(document.getElementById('advancedShareModal'));
         modal.hide();

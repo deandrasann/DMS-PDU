@@ -706,4 +706,4 @@ function closeAll() {
                 window.location.href = "/signin";
             });
     }
-</script> --}}
+</script>
