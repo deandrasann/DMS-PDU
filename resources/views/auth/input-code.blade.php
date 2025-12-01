@@ -18,7 +18,7 @@
                 </p>
             </div>
 
-            <form method="POST" class="px-4" action="{{ route('verify.code') }}">
+            <form method="POST" class="px-4" action="{{ route('verify.code') }}" id="verifyForm">
                 @csrf
                 <div class="mb-4">
                     <div class="input-group">
@@ -29,7 +29,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-orange w-100">Reset Password</button>
+                <button type="submit" class="btn btn-orange w-100" id="submitBtn">Reset Password</button>
                 <div class="text-center mt-2">
                     <small class="text-muted">
                         <span id="resendText">
@@ -46,16 +46,36 @@
 @endsection
 @push('scripts')
     <script>
-        let duration = 59; // detik
+        document.addEventListener('DOMContentLoaded', function () {
+
+        // === EFEK LOADING SAAT KLIK "Reset Password" ===
+        const form = document.getElementById('verifyForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (form && submitBtn) {
+            form.addEventListener('submit', function (e) {
+                if (submitBtn.disabled) return;
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Verifying Code...
+                `;
+                submitBtn.classList.add('disabled');
+            });
+        }
+
+        // === TIMER RESEND CODE (tetap sama, cuma sedikit dipercantik) ===
+        let duration = 59;
         const timerEl = document.getElementById('timer');
         const resendText = document.getElementById('resendText');
         const resendLink = document.getElementById('resendLink');
 
         function startTimer() {
             let timer = duration;
-            let interval = setInterval(() => {
-                let minutes = String(Math.floor(timer / 60)).padStart(2, '0');
-                let seconds = String(timer % 60).padStart(2, '0');
+            const interval = setInterval(() => {
+                const minutes = String(Math.floor(timer / 60)).padStart(2, '0');
+                const seconds = String(timer % 60).padStart(2, '0');
                 timerEl.textContent = `${minutes}:${seconds}`;
 
                 if (--timer < 0) {
@@ -66,6 +86,7 @@
             }, 1000);
         }
 
-        document.addEventListener("DOMContentLoaded", startTimer);
+        startTimer();
+    });
     </script>
 @endpush

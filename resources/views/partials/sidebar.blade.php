@@ -264,13 +264,27 @@
                         Cancel
                     </button>
                     <button type="button" id="confirmLogoutBtn"
-                        class="btn btn-danger rounded-4 px-4 py-2 text-white"
+                        class="btn btn-danger rounded-4 px-4 py-2 text-white position-relative"
                         style="min-width: 100px; font-size:14px; background-color: #dc3545; border: none;">
-                        Log out
+                        <span class="btn-text">Log out</span>
+                        <span class="btn-loading d-none">
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            Logging out...
+                        </span>
                     </button>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+<div id="globalLogoutLoader" class="position-fixed top-0 start-0 w-100 h-100 d-none"
+     style="background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 99999;">
+    <div class="d-flex flex-column justify-content-center align-items-center h-100 text-orange">
+        <div class="spinner-border mb-4" style="width: 3.5rem; height: 3.5rem;" role="status">
+            <span class="visually-hidden">Logging out...</span>
+        </div>
+        <h5 class="fw-semibold">Signing you out...</h5>
+        <small class="text-muted">Please wait a moment</small>
     </div>
 </div>
 
@@ -669,7 +683,10 @@
     document.addEventListener("DOMContentLoaded", function() {
         const logoutLink = document.getElementById('logoutLink');
         const logoutForm = document.getElementById('logout-form');
-        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+        const logoutBtn = document.getElementById('confirmLogoutBtn');
+        const loader = document.getElementById('globalLogoutLoader');
+        const btnText = logoutBtn.querySelector('.btn-text');
+        const btnLoading = logoutBtn.querySelector('.btn-loading');
 
         // Buka modal saat klik "Log Out"
         logoutLink.addEventListener('click', function(e) {
@@ -678,16 +695,29 @@
             modal.show();
         });
 
-        // Konfirmasi logout → submit form
-        confirmLogoutBtn.addEventListener('click', function() {
-            logoutForm.submit();
-        });
+        if (logoutBtn && loader) {
+            logoutBtn.addEventListener('click', function () {
+                // Disable tombol
+                logoutBtn.disabled = true;
+                btnText.classList.add('d-none');
+                btnLoading.classList.remove('d-none');
 
-        document.getElementById('logoutConfirmationModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                bootstrap.Modal.getInstance(this).hide();
-            }
-        });
+                // Tampilkan full screen loading + blur
+                loader.classList.remove('d-none');
+
+                // Submit form logout (pastikan ada form logout dengan id atau name "logout-form")
+                // Biasanya Laravel punya form logout seperti ini:
+                const logoutForm = document.querySelector('form[action*="logout"]') || 
+                                  document.getElementById('logout-form');
+                
+                if (logoutForm) {
+                    logoutForm.submit();
+                } else {
+                    // Fallback: langsung redirect ke route logout
+                    window.location.href = "{{ route('logout') }}";
+                }
+            });
+        }
     });
 
     // ==================== LABEL MANAGEMENT FUNCTIONALITY ====================
