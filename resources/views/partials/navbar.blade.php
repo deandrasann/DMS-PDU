@@ -29,11 +29,11 @@
                             <i class="bi bi-chevron-down"></i>
                         </button>
                         <div class="dropdown-menu-custom" id="dd1">
-                            <div class="item">Any Time</div>
-                            <div class="item">Today</div>
-                            <div class="item">Last Week</div>
-                            <div class="item">Last Month</div>
-                            <div class="item">Last Year</div>
+                            <div class="item" data-date="any_time">Any Time</div>
+                            <div class="item" data-date="today">Today</div>
+                            <div class="item" data-date="last_week">Last Week</div>
+                            <div class="item" data-date="last_month">Last Month</div>
+                            <div class="item" data-date="last_year">Last Year</div>
                         </div>
                     </div>
                 </div>
@@ -46,9 +46,9 @@
                         <button class="dropdown-toggle-custom" data-target="#dd2">Anyone</button>
 
                         <div class="dropdown-menu-custom" id="dd2">
-                            <div class="item">Anyone</div>
-                            <div class="item">Owned by Me</div>
-                            <div class="item">Not Owned by Me</div>
+                            <div class="item" data-owner="anyone">Anyone</div>
+                            <div class="item" data-owner="owned_by_me">Owned by Me</div>
+                            <div class="item" data-owner="not_owned_by_me">Not Owned by Me</div>
                         </div>
                     </div>
                 </div>
@@ -61,24 +61,31 @@
                         <button class="dropdown-toggle-custom" data-target="#dd3">Any Type</button>
 
                         <div class="dropdown-menu-custom" id="dd3">
-                            <div class="item">Document</div>
-                            <div class="item">Spreadsheet</div>
-                            <div class="item">PDF</div>
+                            <div class="item" data-type="ANYTYPE">Any Type</div>
+                            <div class="item" data-type="DOCUMENT">Document</div>
+                            <div class="item" data-type="SPREADSHEET">Spreadsheet</div>
+                            <div class="item" data-type="PDF">PDF</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- LABEL -->
+                <!-- LABEL -->
+                <!-- Di dalam navbar, bagian LABEL harus seperti ini: -->
                 <div class="filter-row">
                     <label>Label</label>
 
                     <div class="dropdown-container">
-                        <button class="dropdown-toggle-custom" data-target="#dd4">Any</button>
-
+                        <button class="dropdown-toggle-custom d-flex justify-content-between align-items-center" data-target="#dd4">
+                            <span>Any</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
                         <div class="dropdown-menu-custom" id="dd4">
-                            <div class="item">Any</div>
-                            <div class="item">Lain</div>
-                            
+                            <div class="item" data-label="any">Any</div>
+                            <!-- Container untuk semua label -->
+                            <div id="existingLabels" class="p-2 d-flex flex-wrap gap-2"></div>
+                            <div id="existingLabels" class="p-2 d-flex flex-wrap gap-2">asw</div>
+
                         </div>
                     </div>
                 </div>
@@ -101,7 +108,7 @@
                 Alphabetical
             </a>
             <a class="dropdown-item d-flex align-items-center gap-2 sort-option" href="#"
-                data-sort="reverse-alphabetical">
+                data-sort="reverse_alphabetical">
                 Reverse Alphabetical
             </a>
             <div class="dropdown-divider"></div>
@@ -366,8 +373,7 @@
         </div>
     </div>
 </div>
-
-{{-- <script>
+<script>
 // Toggle dropdown
 document.querySelectorAll('.dropdown-toggle-custom').forEach(btn => {
     btn.addEventListener('click', function(e) {

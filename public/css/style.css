@@ -804,6 +804,58 @@ body.modal-open .sidebar-collapse-content * {
   color: #6c757d;
   opacity: 0.8;
 }
+
+
+    .filter-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+    }
+
+    .filter-row label {
+        font-weight: 600;
+        font-size: 14px;
+        min-width: 120px; /* panjang label fix, dropdown menyesuaikan */
+    }
+
+    .dropdown-container {
+        flex: 1; /* isi seluruh sisa ruang → fit dengan label */
+        position: relative;
+    }
+
+    .dropdown-toggle-custom {
+        width: 100%;
+        border-radius: 12px;
+        padding: 8px 14px;
+        border: 1px solid #ddd;
+        background: #fff;
+        text-align: left;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .dropdown-menu-custom {
+        position: relative;      /* penting agar mendorong layout */
+        display: none;           /* hide default */
+        width: 100%;
+        margin-top: 8px;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .dropdown-menu-custom .item {
+        padding: 10px 16px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .dropdown-menu-custom .item:hover {
+        background: #f3f3f3;
+    }
+
 @media (max-width: 991.98px) {
   .sidebar-collapse-content {
     margin-left: 0 !important;
@@ -820,7 +872,7 @@ body.modal-open .sidebar-collapse-content * {
     .dropend:hover > .dropdown-menu {
         display: block;
     }
-    
+
     .dropend .dropdown-toggle::after {
         content: "›";
         border: none;
@@ -834,11 +886,11 @@ body.modal-open .sidebar-collapse-content * {
     .modal-backdrop {
       background-color: transparent !important;
     }
-  
+
         #mobileAccountSettingsModal .modal-fullscreen-sm-down {
           margin: 0;
         }
-    
+
         #mobileAccountSettingsModal .modal-content {
           border-radius: 1.5rem 1.5rem 0 0 !important;
           min-height: 90vh;
@@ -847,7 +899,7 @@ body.modal-open .sidebar-collapse-content * {
         #mobileAccountSettingsModal .modal-content { height: 100dvh; border-radius: 0; }
         #mobileAccountSettingsModal .modal-body { padding-left: 16px !important;   /* kiri */
             padding-right: 16px !important; padding-bottom: 100px; }
-  
+
     /* Header fix */
     #mobileAccountSettingsModal .modal-header {
       height: 60px;
@@ -859,7 +911,7 @@ body.modal-open .sidebar-collapse-content * {
       position: relative;
       padding: 0 20px;
     }
-  
+
     /* Close button — kiri & selalu center vertikal */
     #mobileAccountSettingsModal .btn-close {
       position: absolute;
@@ -873,11 +925,11 @@ body.modal-open .sidebar-collapse-content * {
       margin: 0 -8px;
       /* kompensasi gap agar mentok */
     }
-  
+
     #mobileChangePasswordModal .d-flex.gap-3>button {
       margin: 0 8px;
     }
-  
+
     /* Padding body dikurangi di kanan agar simetris */
     #mobileChangePasswordModal .modal-body {
       padding-right: 12px !important;
@@ -886,14 +938,14 @@ body.modal-open .sidebar-collapse-content * {
     #mobileAccountSettingsModal .modal-body {
       padding: 0 25px 40px;
     }
-  
+
     /* Input style */
     #mobileAccountSettingsModal .form-control {
       border-radius: 12px;
       height: 46px;
       font-size: 0.95rem;
     }
-  
+
     /* Change Password button style */
     #mobileAccountSettingsModal .btn-outline-secondary {
       width: 100%;
@@ -901,13 +953,13 @@ body.modal-open .sidebar-collapse-content * {
       border-radius: 12px;
       font-size: 0.9rem;
     }
-  
+
     /* Upload/Delete circle buttons */
     #mobileAccountSettingsModal .btn-outline-danger,
     #mobileAccountSettingsModal .btn-outline-secondary.btn-sm {
       border-radius: 50px !important;
     }
-  
+
     /* Save (blue) button */
     .btn-blue {
       background: #2563eb;
@@ -915,13 +967,13 @@ body.modal-open .sidebar-collapse-content * {
       border-radius: 12px;
       padding: 10px 24px;
     }
-  
+
     /* Log Out button */
     .btn-danger {
       border-radius: 12px;
       padding: 10px 24px;
     }
-  
+
     /* Tombol kiri-kanan rapi */
     #mobileAccountSettingsModal .d-flex.gap-3 {
       display: flex;

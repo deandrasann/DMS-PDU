@@ -31,13 +31,13 @@
     <div class="container py-4">
         {{-- SECTION: MY FOLDERS --}}
         <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4">
-            <h4 class="fw-semibold mb-4">My Folders</h4>
+            <h5 class="mb-4">My Folders</h5>
             <div id="folderContainer" class="row g-3"></div>
         </div>
 
         {{-- SECTION: MY FILES --}}
         <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4">
-            <h4 class="fw-semibold mb-4">My Files</h4>
+            <h5 class="mb-4">My Files</h5>
             <div id="fileContainer" class="row g-3 ms-1 me-2"></div>
         </div>
     </div>

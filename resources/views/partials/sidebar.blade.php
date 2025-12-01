@@ -141,17 +141,12 @@
                                 <!-- Label akan diisi via JavaScript -->
                             </div>
 
-                            <!-- Tombol Add Label (akan berubah jadi input) -->
+                            <!-- Tombol Add Label (dipindahkan ke samping existing labels) -->
                             <div id="addLabelContainer">
                                 <button type="button"
-                                    class="btn btn-outline-primary rounded-3 d-flex align-items-center"
+                                    class="btn btn-outline-primary rounded-3 d-flex align-items-center text-dark"
                                     id="addLabelBtn">
-                                    <i class="ph ph-plus me-2"></i> Add Label
-                                </button>
-                                <button type="button"
-                                    class="btn btn-outline-primary rounded-3 d-flex align-items-center"
-                                    id="addLabelBtn">
-                                    <i class="ph ph-plus me-2"></i> Delete Label
+                                    <i class="ph ph-plus "></i>
                                 </button>
 
                                 <!-- Input Label Baru (hidden default) -->
@@ -373,35 +368,7 @@
     </div>
 </div>
 
-{{-- MODAL RENAME FOLDER --}}
-<div class="modal fade" id="renameFolderModal" tabindex="-1" aria-labelledby="renameFolderModalLabel" aria-hidden="true" data-bs-backdrop="false">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-semibold" id="renameFolderModalLabel">Rename Folder</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body pt-0">
-                <form id="renameFolderForm">
-                    <input type="hidden" id="renameFolderId" name="folder_id">
-                    <div class="mb-3">
-                        <label for="newFolderName" class="form-label fw-medium">New Folder Name</label>
-                        <input type="text" class="form-control rounded-3 border-dark-subtle"
-                               id="newFolderName" name="new_name" required
-                               placeholder="Enter new folder name">
-                        <div class="form-text text-muted">
-                            Folder name cannot contain special characters.
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-blue rounded-3 px-4" id="confirmRenameFolder">Rename</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <script>
     // ==================== GLOBAL VARIABLES ====================
@@ -477,7 +444,10 @@
         }
 
         // Scroll ke pesan
-        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        messageDiv.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
     }
 
     // 🟢 Ambil semua label dari API
@@ -523,48 +493,89 @@
     }
 
     // Render daftar label yang tersedia (UPLOAD MODAL)
-    function renderExistingLabels() {
-        const existingLabelsContainer = document.getElementById("existingLabels");
-        if (!existingLabelsContainer) return;
+    // Render daftar label yang tersedia (UPLOAD MODAL) dengan delete button
+// Render daftar label yang tersedia (UPLOAD MODAL) dengan delete button di dalam badge
+function renderExistingLabels() {
+    const existingLabelsContainer = document.getElementById("existingLabels");
+    if (!existingLabelsContainer) return;
 
-        existingLabelsContainer.innerHTML = "";
+    existingLabelsContainer.innerHTML = "";
 
-        allLabels.forEach(label => {
-            const bgColor = label.color ? `#${label.color}` : "#E6E5E3";
-            const textColor = colorMap[label.color] || "#333";
+    allLabels.forEach(label => {
+        const bgColor = label.color ? `#${label.color}` : "#E6E5E3";
+        const textColor = colorMap[label.color] || "#333";
 
-            const labelElement = document.createElement("button");
-            labelElement.type = "button";
-            labelElement.classList.add("btn", "rounded-pill", "px-3", "py-2", "small", "border-0", "me-2", "mb-2");
-            labelElement.textContent = label.name;
+        // Buat container untuk label + delete button dalam satu badge
+        const labelContainer = document.createElement("div");
+        labelContainer.classList.add("d-inline-flex", "align-items-center", "rounded-pill", "px-3", "py-2", "small", "me-2", "mb-2");
+        labelContainer.style.backgroundColor = bgColor;
+        labelContainer.style.color = textColor;
+        labelContainer.style.border = `1px solid ${textColor}22`;
+        labelContainer.style.cursor = "pointer";
+        labelContainer.style.transition = "all 0.2s ease";
 
-            labelElement.style.backgroundColor = bgColor;
-            labelElement.style.color = textColor;
-            labelElement.style.border = `1px solid ${textColor}22`;
-            labelElement.style.cursor = "pointer";
-            labelElement.style.transition = "all 0.2s ease";
+        // Hover effects untuk seluruh container
+        labelContainer.addEventListener("mouseenter", () => {
+            labelContainer.style.opacity = "0.9";
+            labelContainer.style.transform = "scale(1.02)";
+        });
+        labelContainer.addEventListener("mouseleave", () => {
+            labelContainer.style.opacity = "1";
+            labelContainer.style.transform = "scale(1)";
+        });
 
-            // Hover effects
-            labelElement.addEventListener("mouseenter", () => {
-                labelElement.style.opacity = "0.8";
-                labelElement.style.transform = "scale(1.05)";
-            });
-            labelElement.addEventListener("mouseleave", () => {
-                labelElement.style.opacity = "1";
-                labelElement.style.transform = "scale(1)";
-            });
+        // Text label
+        const labelText = document.createElement("span");
+        labelText.textContent = label.name;
+        labelText.classList.add("me-1");
 
-            // Click handler untuk memilih label
-            labelElement.addEventListener("click", () => {
+        // Delete button (dropdown) - lebih kecil dan compact
+        const deleteDropdown = document.createElement("div");
+        deleteDropdown.classList.add("dropdown");
+
+        deleteDropdown.innerHTML = `
+            <button class="btn btn-link p-0 shadow-none"
+                    data-bs-toggle="dropdown"
+                    data-bs-display="static"
+                    style="font-size: 0.6rem; color: ${textColor}; line-height: 1;">
+                <i class="ph ph-dots-three-vertical"></i>
+            </button>
+            <ul class="dropdown-menu shadow rounded-3 border-0 p-2">
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2 text-danger delete-existing-label-btn"
+                       href="#"
+                       data-label-id="${label.id}"
+                       data-label-name="${label.name}">
+                        <i class="ph ph-trash fs-5"></i> Delete Label
+                    </a>
+                </li>
+            </ul>
+        `;
+
+        // Click handler untuk memilih label (klik area text)
+        labelText.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (!selectedLabelIds.includes(label.id)) {
+                selectedLabelIds.push(label.id);
+                renderSelectedLabels();
+            }
+        });
+
+        // Click handler untuk container (fallback)
+        labelContainer.addEventListener("click", (e) => {
+            if (!e.target.closest('.dropdown')) {
                 if (!selectedLabelIds.includes(label.id)) {
                     selectedLabelIds.push(label.id);
                     renderSelectedLabels();
                 }
-            });
-
-            existingLabelsContainer.appendChild(labelElement);
+            }
         });
-    }
+
+        labelContainer.appendChild(labelText);
+        labelContainer.appendChild(deleteDropdown);
+        existingLabelsContainer.appendChild(labelContainer);
+    });
+}
 
     // Render label yang sudah dipilih (UPLOAD MODAL)
     function renderSelectedLabels() {
@@ -580,7 +591,8 @@
                 const textColor = colorMap[label.color] || "#333";
 
                 const labelElement = document.createElement("div");
-                labelElement.classList.add("d-flex", "align-items-center", "gap-2", "rounded-pill", "px-3", "py-2", "small", "me-2", "mb-2");
+                labelElement.classList.add("d-flex", "align-items-center", "gap-2", "rounded-pill", "px-3",
+                    "py-2", "small", "me-2", "mb-2");
                 labelElement.style.backgroundColor = bgColor;
                 labelElement.style.color = textColor;
                 labelElement.style.border = `1px solid ${textColor}22`;
@@ -765,7 +777,8 @@
                 showMessage("Label created successfully!", "success", "uploadMessage");
 
             } catch (err) {
-                showMessage("Failed to create label: " + err.message, "danger", "uploadMessage");
+                showMessage("Failed to create label: " + err.message, "danger",
+                "uploadMessage");
             }
         });
 
@@ -1006,7 +1019,8 @@
 
                 setTimeout(() => {
                     document.getElementById("createFolderForm").reset();
-                    bootstrap.Modal.getInstance(document.getElementById("uploadFolderModal")).hide();
+                    bootstrap.Modal.getInstance(document.getElementById("uploadFolderModal"))
+                .hide();
                     location.reload();
                 }, 1500);
             } else {
@@ -1085,71 +1099,117 @@
         const editCancelNewLabelBtn = document.getElementById("editCancelNewLabelBtn");
 
         // Render daftar label yang tersedia untuk edit
-        function renderEditExistingLabels() {
-            if (!editExistingLabelsContainer) return;
+        // Render daftar label yang tersedia untuk edit dengan delete button
+// Render daftar label yang tersedia untuk edit dengan delete button di dalam badge
+function renderEditExistingLabels() {
+    const editExistingLabelsContainer = document.getElementById("editExistingLabels");
+    if (!editExistingLabelsContainer) return;
 
-            editExistingLabelsContainer.innerHTML = "";
+    editExistingLabelsContainer.innerHTML = "";
 
-            if (!allLabels || allLabels.length === 0) {
-                editExistingLabelsContainer.innerHTML = `
-                    <div class="text-muted small">No labels available. Create one first.</div>
-                `;
-                return;
-            }
+    if (!allLabels || allLabels.length === 0) {
+        editExistingLabelsContainer.innerHTML = `
+            <div class="text-muted small">No labels available. Create one first.</div>
+        `;
+        return;
+    }
 
-            allLabels.forEach(label => {
-                const bgColor = label.color ? `#${label.color}` : "#E6E5E3";
-                const textColor = colorMap[label.color] || "#333";
+    allLabels.forEach(label => {
+        const bgColor = label.color ? `#${label.color}` : "#E6E5E3";
+        const textColor = colorMap[label.color] || "#333";
 
-                const labelElement = document.createElement("button");
-                labelElement.type = "button";
-                labelElement.classList.add("btn", "rounded-pill", "px-3", "py-2", "small", "border-0", "me-2", "mb-2");
-                labelElement.textContent = label.name;
+        // Buat container untuk label + delete button dalam satu badge
+        const labelContainer = document.createElement("div");
+        labelContainer.classList.add("d-inline-flex", "align-items-center", "rounded-pill", "px-3", "py-2", "small", "me-2", "mb-2");
+        labelContainer.style.backgroundColor = bgColor;
+        labelContainer.style.color = textColor;
+        labelContainer.style.border = `1px solid ${textColor}22`;
+        labelContainer.style.cursor = "pointer";
+        labelContainer.style.transition = "all 0.2s ease";
 
-                labelElement.style.backgroundColor = bgColor;
-                labelElement.style.color = textColor;
-                labelElement.style.border = `1px solid ${textColor}22`;
-                labelElement.style.cursor = "pointer";
-                labelElement.style.transition = "all 0.2s ease";
-
-                // Jika label sudah dipilih, beri style berbeda
-                if (editSelectedLabelIds.includes(label.id)) {
-                    labelElement.style.opacity = "0.6";
-                    labelElement.style.transform = "scale(0.95)";
-                    labelElement.style.border = `2px solid ${textColor}`;
-                }
-
-                // Hover effects
-                labelElement.addEventListener("mouseenter", () => {
-                    labelElement.style.opacity = "0.8";
-                    labelElement.style.transform = "scale(1.05)";
-                });
-                labelElement.addEventListener("mouseleave", () => {
-                    if (!editSelectedLabelIds.includes(label.id)) {
-                        labelElement.style.opacity = "1";
-                        labelElement.style.transform = "scale(1)";
-                    } else {
-                        labelElement.style.opacity = "0.6";
-                        labelElement.style.transform = "scale(0.95)";
-                    }
-                });
-
-                // Click handler untuk memilih label
-                labelElement.addEventListener("click", () => {
-                    if (!editSelectedLabelIds.includes(label.id)) {
-                        editSelectedLabelIds.push(label.id);
-                        renderEditSelectedLabels();
-                        renderEditExistingLabels();
-                    } else {
-                        editSelectedLabelIds = editSelectedLabelIds.filter(id => id !== label.id);
-                        renderEditSelectedLabels();
-                        renderEditExistingLabels();
-                    }
-                });
-
-                editExistingLabelsContainer.appendChild(labelElement);
-            });
+        // Jika label sudah dipilih, beri style berbeda
+        if (editSelectedLabelIds.includes(label.id)) {
+            labelContainer.style.opacity = "0.7";
+            labelContainer.style.border = `2px solid ${textColor}`;
         }
+
+        // Hover effects untuk seluruh container
+        labelContainer.addEventListener("mouseenter", () => {
+            labelContainer.style.opacity = "0.9";
+            labelContainer.style.transform = "scale(1.02)";
+        });
+        labelContainer.addEventListener("mouseleave", () => {
+            if (!editSelectedLabelIds.includes(label.id)) {
+                labelContainer.style.opacity = "1";
+                labelContainer.style.transform = "scale(1)";
+            } else {
+                labelContainer.style.opacity = "0.7";
+                labelContainer.style.transform = "scale(1)";
+            }
+        });
+
+        // Text label
+        const labelText = document.createElement("span");
+        labelText.textContent = label.name;
+        labelText.classList.add("me-1");
+
+        // Delete button (dropdown) - lebih kecil dan compact
+        const deleteDropdown = document.createElement("div");
+        deleteDropdown.classList.add("dropdown");
+
+        deleteDropdown.innerHTML = `
+            <button class="btn btn-link p-0 shadow-none"
+                    data-bs-toggle="dropdown"
+                    data-bs-display="static"
+                    style="font-size: 0.6rem; color: ${textColor}; line-height: 1;">
+                <i class="ph ph-dots-three-vertical"></i>
+            </button>
+            <ul class="dropdown-menu shadow rounded-3 border-0 p-2">
+                <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2 text-danger delete-existing-label-btn"
+                       href="#"
+                       data-label-id="${label.id}"
+                       data-label-name="${label.name}">
+                        <i class="ph ph-trash fs-5"></i> Delete Label
+                    </a>
+                </li>
+            </ul>
+        `;
+
+        // Click handler untuk memilih label (klik area text)
+        labelText.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (!editSelectedLabelIds.includes(label.id)) {
+                editSelectedLabelIds.push(label.id);
+                renderEditSelectedLabels();
+                renderEditExistingLabels();
+            } else {
+                editSelectedLabelIds = editSelectedLabelIds.filter(id => id !== label.id);
+                renderEditSelectedLabels();
+                renderEditExistingLabels();
+            }
+        });
+
+        // Click handler untuk container (fallback)
+        labelContainer.addEventListener("click", (e) => {
+            if (!e.target.closest('.dropdown')) {
+                if (!editSelectedLabelIds.includes(label.id)) {
+                    editSelectedLabelIds.push(label.id);
+                    renderEditSelectedLabels();
+                    renderEditExistingLabels();
+                } else {
+                    editSelectedLabelIds = editSelectedLabelIds.filter(id => id !== label.id);
+                    renderEditSelectedLabels();
+                    renderEditExistingLabels();
+                }
+            }
+        });
+
+        labelContainer.appendChild(labelText);
+        labelContainer.appendChild(deleteDropdown);
+        editExistingLabelsContainer.appendChild(labelContainer);
+    });
+}
 
         // Render label yang sudah dipilih di modal edit
         function renderEditSelectedLabels() {
@@ -1171,7 +1231,8 @@
                     const textColor = colorMap[label.color] || "#333";
 
                     const labelElement = document.createElement("div");
-                    labelElement.classList.add("d-flex", "align-items-center", "gap-2", "rounded-pill", "px-3", "py-2", "small", "me-2", "mb-2");
+                    labelElement.classList.add("d-flex", "align-items-center", "gap-2", "rounded-pill", "px-3",
+                        "py-2", "small", "me-2", "mb-2");
                     labelElement.style.backgroundColor = bgColor;
                     labelElement.style.color = textColor;
                     labelElement.style.border = `1px solid ${textColor}22`;
@@ -1433,6 +1494,80 @@
             editAddLabelBtn.classList.remove("d-none");
         }
     });
+    // Event listener untuk delete label dari existing labels
+document.addEventListener('click', async (e) => {
+    if (e.target.closest('.delete-existing-label-btn')) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const deleteBtn = e.target.closest('.delete-existing-label-btn');
+        const labelId = deleteBtn.getAttribute('data-label-id');
+        const labelName = deleteBtn.getAttribute('data-label-name');
+
+        if (!confirm(`Are you sure you want to delete label "${labelName}"?`)) {
+            return;
+        }
+
+        await deleteExistingLabel(labelId, labelName, deleteBtn);
+    }
+});
+
+// Function untuk delete label
+async function deleteExistingLabel(labelId, labelName, buttonElement) {
+    const token = getToken();
+    if (!token) {
+        showMessage("Session expired. Please login again.", "danger");
+        window.location.href = "{{ route('signin') }}";
+        return;
+    }
+
+    try {
+        // Show loading state
+        const originalText = buttonElement.innerHTML;
+        buttonElement.innerHTML = '<i class="ph ph-spinner ph-spin fs-5"></i> Deleting...';
+        buttonElement.disabled = true;
+
+        const response = await fetch(`https://pdu-dms.my.id/api/delete-label/${labelId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Accept': 'application/json'
+            }
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            // Show success message
+            showMessage(`Label "${labelName}" deleted successfully!`, "success");
+
+            // Remove from selected labels if selected
+            selectedLabelIds = selectedLabelIds.filter(id => id !== parseInt(labelId));
+            editSelectedLabelIds = editSelectedLabelIds.filter(id => id !== parseInt(labelId));
+
+            // Reload labels
+            await loadLabels();
+
+            // Re-render selected labels
+            renderSelectedLabels();
+            if (window.renderEditSelectedLabels) {
+                window.renderEditSelectedLabels();
+            }
+        } else {
+            throw new Error(result.message || 'Failed to delete label');
+        }
+
+    } catch (error) {
+        console.error('Delete label error:', error);
+        showMessage('Failed to delete label: ' + error.message, "danger");
+    } finally {
+        // Reset button state
+        if (buttonElement) {
+            buttonElement.innerHTML = originalText;
+            buttonElement.disabled = false;
+        }
+    }
+}
 
     // ==================== INITIALIZATION ====================
     document.addEventListener("DOMContentLoaded", function() {
