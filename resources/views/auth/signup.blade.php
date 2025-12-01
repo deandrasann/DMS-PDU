@@ -21,7 +21,7 @@
                 </div>
             @endif
             <!-- Form Login -->
-            <form method="POST" class="px-4" action="{{ route('register') }}">
+            <form method="POST" class="px-4" action="{{ route('register') }}" id="registerForm">
                 @csrf
                 <div class="mb-3">
                     <div class="input-group">
@@ -79,7 +79,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-orange w-100">Sign Up</button>
+                <button type="submit" class="btn btn-orange w-100" id="submitBtn">Sign Up</button>
                 @if ($errors->any() || session('error'))
                     <div class="text-center mb-3">
                         <small class="text-danger">
@@ -100,33 +100,52 @@
 
 @push('scripts')
     <script>
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('password');
-            const icon = this.querySelector('i');
+        document.addEventListener('DOMContentLoaded', function() {
 
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                icon.classList.remove("ph-eye");
-                icon.classList.add("ph-eye-slash");
+        const form = document.getElementById('registerForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (form && submitBtn) {
+            form.addEventListener('submit', function(e) {
+                // Cegah submit ganda
+                if (submitBtn.disabled) return;
+
+                // Ganti teks + spinner kecil (SAMA PERSIS seperti Sign In)
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Signing Up...
+                `;
+
+                // Tambah kelas disabled biar tombol kelihatan "non-aktif"
+                submitBtn.classList.add('disabled');
+            });
+        }
+
+        // Toggle password visibility (sama seperti sebelumnya)
+        document.getElementById('togglePassword')?.addEventListener('click', function() {
+            const input = document.getElementById('password');
+            const icon = this.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('ph-eye', 'ph-eye-slash');
             } else {
-                passwordInput.type = "password";
-                icon.classList.remove("ph-eye-slash");
-                icon.classList.add("ph-eye");
+                input.type = 'password';
+                icon.classList.replace('ph-eye-slash', 'ph-eye');
             }
         });
-        document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('confirmPassword');
-            const icon = this.querySelector('i');
 
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                icon.classList.remove("ph-eye");
-                icon.classList.add("ph-eye-slash");
+        document.getElementById('toggleConfirmPassword')?.addEventListener('click', function() {
+            const input = document.getElementById('confirmPassword');
+            const icon = this.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('ph-eye', 'ph-eye-slash');
             } else {
-                passwordInput.type = "password";
-                icon.classList.remove("ph-eye-slash");
-                icon.classList.add("ph-eye");
+                input.type = 'password';
+                icon.classList.replace('ph-eye-slash', 'ph-eye');
             }
         });
+    });
     </script>
 @endpush

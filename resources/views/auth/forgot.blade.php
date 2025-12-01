@@ -17,7 +17,7 @@
             @if (session('error'))
                 <div class="alert alert-danger text-center">{{ session('error') }}</div>
             @endif
-            <form method="POST" class="px-4"  action="{{ route('forgot.process') }}">
+            <form method="POST" class="px-4"  action="{{ route('forgot.process') }}" id="forgotForm">
                 @csrf
                 <div class="mb-4">
                     <div class="input-group">
@@ -28,8 +28,31 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-orange w-100">Send Code</button>
+                <button type="submit" class="btn btn-orange w-100" id="submitBtn">Send Code</button>
             </form>
         </div>
     </div>
 @endsection
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('forgotForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (form && submitBtn) {
+            form.addEventListener('submit', function (e) {
+                // Cegah klik ganda
+                if (submitBtn.disabled) return;
+
+                // Ubah tombol jadi loading (100% sama seperti Sign In)
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Sending Code...
+                `;
+                submitBtn.classList.add('disabled');
+            });
+        }
+    });
+</script>
+@endpush
