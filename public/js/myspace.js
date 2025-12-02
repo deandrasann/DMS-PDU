@@ -1,5 +1,3 @@
-// public/js/myspace.js
-
 class MySpaceManager {
     constructor() {
         this.token = window.token || '';
@@ -7,11 +5,19 @@ class MySpaceManager {
         this.isLastOpenedPage = window.isLastOpenedPage || false;
         this.isRecommendedPage = window.isRecommendedPage || false;
 
+        // ✅ PERBAIKAN: Definisikan State Filter DI SINI (Sebelum init dipanggil)
+        this.activeFilters = {
+            date_modified: '',
+            type: '',
+            label: '',
+            // owner: 'owned_by_me',
+            search: ''
+        };
+
         console.log('MySpaceManager initialized:', {
             isLastOpenedPage: this.isLastOpenedPage,
             isRecommendedPage: this.isRecommendedPage,
             currentPath: this.currentPath
-
         });
 
         this.init();
@@ -19,10 +25,14 @@ class MySpaceManager {
 
     init() {
         console.log('MySpaceManager init called');
+
+        // Sekarang aman dipanggil karena activeFilters sudah ada di constructor
         this.loadFilesAndFolders();
+
         this.attachEventListeners();
         this.fetchLabels();
 
+        // ❌ HAPUS definisi activeFilters dari sini agar tidak menimpa atau terlambat
     }
 
     // Fungsi untuk mengambil data labels dari API
@@ -51,67 +61,71 @@ async fetchLabels() {
     }
 }
 
-   // Fungsi untuk render labels - TAMBAHKAN DEBUG
-    renderExistingLabels(labels) {
-        const existingLabelsContainer = document.getElementById("existingLabels");
+   renderExistingLabels(labels) {
+        // Pastikan ID ini sesuai dengan yang ada di navbar.blade.php
+        const existingLabelsContainer = document.getElementById("navbarLabelsContainer");
 
         // DEBUG: Cek apakah element ditemukan
-        console.log('existingLabelsContainer:', existingLabelsContainer);
-        console.log('Labels data:', labels);
+        // console.log('existingLabelsContainer:', existingLabelsContainer);
+        // console.log('Labels data:', labels);
 
         if (!existingLabelsContainer) {
-            console.error('Element dengan ID "existingLabels" tidak ditemukan!');
+            console.error('Element dengan ID "navbarLabelsContainer" tidak ditemukan di Navbar!');
             return;
         }
 
         // Cek jika labels adalah array dan tidak kosong
         if (!Array.isArray(labels) || labels.length === 0) {
-            console.log('No labels found or labels is not an array');
             existingLabelsContainer.innerHTML = '<div class="text-muted small p-2">No labels found</div>';
             return;
         }
 
+        // Kosongkan container sebelum render ulang
         existingLabelsContainer.innerHTML = "";
 
         labels.forEach(label => {
+            // --- WARNA (TIDAK DIUBAH, SESUAI KODE ASLI) ---
             const bgColor = label.color ? `#${label.color}` : "#E6E5E3";
 
             // Buat element untuk setiap label
             const labelElement = document.createElement("div");
-            labelElement.classList.add("rounded-pill", "px-3", "py-2", "small", "mb-2");
+            labelElement.classList.add("rounded-pill", "px-3", "py-1", "small", "me-1", "mb-1");
+
+            // Apply Styles
             labelElement.style.backgroundColor = bgColor;
+            labelElement.style.display = "inline-block";
             labelElement.style.color = "#333";
             labelElement.style.border = "1px solid #ccc";
             labelElement.style.cursor = "pointer";
             labelElement.style.transition = "all 0.2s ease";
-            labelElement.style.width = "100%";
             labelElement.textContent = label.name;
-            labelElement.style.display = "block"; // ← PASTIKAN INI
-            labelElement.style.marginBottom = "8px"; // ← PASTIKAN INI
 
             // Hover effects
             labelElement.addEventListener("mouseenter", () => {
                 labelElement.style.opacity = "0.8";
-                labelElement.style.transform = "scale(1.05)";
+                labelElement.style.transform = "scale(1.05)"; // Sedikit efek zoom biar interaktif
             });
             labelElement.addEventListener("mouseleave", () => {
                 labelElement.style.opacity = "1";
                 labelElement.style.transform = "scale(1)";
             });
 
-            console.log('click handler');
+            // --- CLICK HANDLER (PERBAIKAN UTAMA) ---
+            labelElement.addEventListener("click", (e) => {
+                // Mencegah event bubbling jika perlu (opsional)
+                // e.stopPropagation();
 
-            // Click handler untuk memilih label
-            labelElement.addEventListener("click", () => {
-                // Update tombol dropdown untuk menunjukkan label yang dipilih
+                console.log(`Label clicked: ${label.name}`);
+
+                // 1. Update text dropdown di Navbar agar user tahu label apa yang dipilih
                 const dropdownToggle = document.querySelector('[data-target="#dd4"] span');
                 if (dropdownToggle) {
                     dropdownToggle.textContent = label.name;
                 }
 
-                // Tambahkan logika filter berdasarkan label di sini
-                console.log("Filter by label:", label.id, label.name);
-                // this.filterByLabel(label.id);
+                // 2. Panggil API Filter melalui fungsi helper di Class ini
+                // Pastikan 'this' merujuk ke class MySpaceManager (aman karena pakai arrow function)
+                this.applyFilter('label', label.id);
             });
 
             existingLabelsContainer.appendChild(labelElement);
@@ -184,7 +198,7 @@ hideLoading() {
     }
 
 
-    async loadFilesAndFolders(sortType = null) {
+ async loadFilesAndFolders(sortType = null) {
         const folderContainer = document.getElementById("folderContainer");
         const fileContainer = document.getElementById("fileContainer");
         const emptyTemplate = document.getElementById("empty-template");
@@ -195,43 +209,59 @@ hideLoading() {
         }
 
         try {
-            let url;
-            let transformData = false;
-            let folderData = null;
-
-            // ✅ DETECT RECOMMENDED PAGE
-            if (this.isRecommendedPage) {
-                url = "https://pdu-dms.my.id/api/recommended-files";
-                transformData = true;
-                if (sortType) {
-                    url += `?sort=${sortType}`;
-                }
-            }
-            // DETECT LAST OPENED PAGE
-            else if (this.isLastOpenedPage) {
-                url = "https://pdu-dms.my.id/api/last-opened-files";
-                transformData = true;
-                if (sortType) {
-                    url += `?sort=${sortType}`;
-                }
-            } else {
-                const baseUrl = "https://pdu-dms.my.id/api/my-files";
-                url = this.currentPath ? `${baseUrl}/${this.currentPath}` : baseUrl;
-                transformData = false;
-                if (sortType) {
-                    url += `?sort=${sortType}`;
-                }
-            }
-
-            console.log('Fetching from:', url);
-            console.log('Page Type:', {
-                isRecommendedPage: this.isRecommendedPage,
-                isLastOpenedPage: this.isLastOpenedPage
-            });
-
             this.showLoading();
 
-            const response = await fetch(url, {
+            let baseUrl;
+            let transformData = false; // Flag untuk handle format response beda
+            let folderData = null;
+
+            // 1. TENTUKAN BASE URL BERDASARKAN HALAMAN
+            if (this.isRecommendedPage) {
+                baseUrl = "https://pdu-dms.my.id/api/recommended-files";
+                transformData = true;
+            }
+            else if (this.isLastOpenedPage) {
+                baseUrl = "https://pdu-dms.my.id/api/last-opened-files";
+                transformData = true;
+            }
+            else {
+                // Default: My Files / Folder Browsing
+                const path = this.currentPath ? `api/folder/${this.currentPath}` : "api/my-files";
+                baseUrl = `https://pdu-dms.my.id/${path}`;
+                transformData = false;
+            }
+
+            // 2. SIAPKAN QUERY PARAMS (FILTER & SORT)
+            // Ini berlaku untuk SEMUA jenis halaman
+            const params = new URLSearchParams();
+
+            // Masukkan Filter dari State (activeFilters)
+            if (this.activeFilters.date_modified) params.append('date_modified', this.activeFilters.date_modified);
+            if (this.activeFilters.type) params.append('type', this.activeFilters.type);
+
+            // ✅ Filter Label (Fokus utama Anda saat ini)
+            if (this.activeFilters.label) params.append('label', this.activeFilters.label);
+
+            if (this.activeFilters.search) {
+                params.append('search', this.activeFilters.search);
+            }
+
+            // Owner selalu dikirim
+            params.append('owner', this.activeFilters.owner);
+
+            if (sortType) {
+                params.append('sort', sortType);
+            }
+
+            // Gabungkan URL
+            const finalUrl = `${baseUrl}?${params.toString()}`;
+            console.log('Fetching from:', finalUrl);
+
+
+            console.log('Active Filters:', this.activeFilters);
+
+            // 4. LAKUKAN FETCH
+            const response = await fetch(finalUrl, {
                 headers: {
                     "Authorization": "Bearer " + this.token,
                     "Accept": "application/json",
@@ -249,47 +279,62 @@ hideLoading() {
 
             const data = await response.json();
 
+            // 5. OLAH DATA (MAPPING HASIL)
             let folders = [];
             let files = [];
 
             if (transformData) {
                 if (this.isRecommendedPage) {
-                    // ✅ DATA DARI RECOMMENDED-FILES ENDPOINT (HANYA FILE)
+                    // Endpoint recommended biasanya return object { recommended_files: [...] }
                     files = data.recommended_files || [];
-                    folders = []; // Recommended page hanya menampilkan files
+                    folders = [];
                 } else {
-                    // DATA DARI LAST-OPENED-FILES ENDPOINT
+                    // Endpoint last-opened
                     folders = data.last_opened_folders || [];
                     files = data.last_opened_files || [];
                 }
             } else {
-                // DATA DARI MY-FILES ENDPOINT (ORIGINAL)
+                // Endpoint standard (My Files / Folder)
+                // Asumsi: data.files berisi array campuran folder & file, atau folder dipisah backend
+                // Kita gunakan filter is_folder untuk memisahkan
+
+                // Jika BE mengembalikan semua dalam 'files':
                 folders = data.files?.filter(f => f.is_folder) || [];
                 files = data.files?.filter(f => !f.is_folder) || [];
+
+                // Simpan metadata folder saat ini (untuk breadcrumb dll)
                 folderData = data;
             }
 
-            // ✅ UNTUK RECOMMENDED PAGE: Hanya render files, hide folder container
-            if (this.isRecommendedPage) {
-                if (folderContainer) {
-                    folderContainer.style.display = 'none'; // Sembunyikan folder section
-                }
-                this.renderFiles(files, fileContainer, emptyTemplate.content.cloneNode(true));
-            } else {
-                // Untuk halaman lain: render normal
-                if (folderContainer) {
-                    await this.renderFolders(folders, folderContainer, emptyTemplate.content.cloneNode(true), folderData);
+            // 6. RENDER KE HTML
 
+            // Handle Tampilan Folder (Hide jika Recommended Page)
+            if (this.isRecommendedPage) {
+                if (folderContainer) folderContainer.style.display = 'none';
+            } else {
+                if (folderContainer) {
+                    folderContainer.style.display = 'flex'; // Pastikan terlihat kembali
+                    await this.renderFolders(folders, folderContainer, emptyTemplate.content.cloneNode(true), folderData);
                 }
-                this.renderFiles(files, fileContainer, emptyTemplate.content.cloneNode(true));
             }
 
+            // Render File
+            this.renderFiles(files, fileContainer, emptyTemplate.content.cloneNode(true));
+
         } catch (err) {
-            console.error('Error:', err);
+            console.error('Error loadFilesAndFolders:', err);
             this.showError(folderContainer, fileContainer, err.message);
         } finally {
-            this.hideLoading();  // ⬅️ selalu dieksekusi terakhir!
+            this.hideLoading();
         }
+    }
+    applyFilter(key, value) {
+        // Update state
+        this.activeFilters[key] = value;
+        console.log(`Filter applied: ${key} = ${value}`);
+
+        // Reload data dengan filter baru
+        this.loadFilesAndFolders();
     }
 
     async renderFolders(folders, container, emptyTemplate, folderData = null) {
@@ -1134,6 +1179,74 @@ getMappedTextColor(backgroundColor) {
 }
 
     attachEventListeners() {
+        const self = this; // Capture 'this' context
+
+        // --- FILTER DATE MODIFIED (Asumsi dropdown ID #dd1) ---
+        document.querySelectorAll('#dd1 .item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Ambil value dari attribute atau text content
+                // Contoh HTML: <div class="item" data-value="last_month">Last Month</div>
+                const value = this.getAttribute('data-value');
+                const text = this.textContent;
+
+                // Update teks tombol dropdown
+                document.querySelector('[data-target="#dd1"] span').textContent = text;
+
+                // Panggil filter
+                self.applyFilter('date_modified', value);
+            });
+        });
+
+        const searchInput = document.getElementById('searchInput');
+        let debounceTimer;
+
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const keyword = e.target.value.trim();
+
+                // Reset timer setiap kali user mengetik
+                clearTimeout(debounceTimer);
+
+                // Tunggu 500ms (setengah detik) setelah user berhenti mengetik
+                debounceTimer = setTimeout(() => {
+                    console.log("🔍 Searching for:", keyword);
+
+                    // Panggil fungsi filter. Ini akan men-trigger loadFilesAndFolders otomatis
+                    self.applyFilter('search', keyword);
+                }, 500);
+            });
+
+            // Opsional: Supaya bisa langsung search kalau tekan Enter
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    clearTimeout(debounceTimer); // Batalkan debounce timer
+                    const keyword = e.target.value.trim();
+                    self.applyFilter('search', keyword);
+                }
+            });
+        }
+
+        // Di dalam method attachEventListeners()
+
+        // --- FILTER TYPE (Fix untuk PDF/Spreadsheet) ---
+        document.querySelectorAll('#dd2 .item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                // Gunakan e.currentTarget agar selalu mengambil elemen .item pembungkusnya,
+                // meskipun yang diklik adalah ikon di dalamnya.
+                const target = e.currentTarget;
+                const value = target.getAttribute('data-value');
+                const text = target.textContent.trim();
+
+                console.log("Type selected:", value); // Debugging
+
+                // Update teks tombol dropdown
+                const toggleBtn = document.querySelector('[data-target="#dd2"] span');
+                if(toggleBtn) toggleBtn.textContent = text;
+
+                // Panggil filter
+                this.applyFilter('type', value);
+            });
+        });
         this.attachInfoPanelListeners();
         this.attachFileOperationsListeners();
         this.attachFolderOperationsListeners();

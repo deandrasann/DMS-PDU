@@ -7,7 +7,7 @@
                 <span class="input-group-text bg-white border-0">
                     <i class="ph ph-magnifying-glass"></i>
                 </span>
-                <input type="text" class="form-control border-0 shadow-none" placeholder="Search in DMS PDU">
+                <input type="text" id="searchInput" class="form-control border-0 shadow-none" placeholder="Search in DMS PDU">
                 <span class="input-group-text bg-white border-0 filter-toggle" style="cursor:pointer;">
                     <i class="ph ph-sliders-horizontal fs-5"></i>
                 </span>
@@ -29,16 +29,16 @@
                             <i class="bi bi-chevron-down"></i>
                         </button>
                         <div class="dropdown-menu-custom" id="dd1">
-                            <div class="item" data-date="any_time">Any Time</div>
-                            <div class="item" data-date="today">Today</div>
-                            <div class="item" data-date="last_week">Last Week</div>
-                            <div class="item" data-date="last_month">Last Month</div>
-                            <div class="item" data-date="last_year">Last Year</div>
+                            <div class="item" data-value="any_time">Any Time</div>
+                            <div class="item" data-value="today">Today</div>
+                            <div class="item" data-value="last_week">Last Week</div>
+                            <div class="item" data-value="last_month">Last Month</div>
+                            <div class="item" data-value="last_year">Last Year</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- OWNER -->
+                {{-- <!-- OWNER -->
                 <div class="filter-row">
                     <label>Owner</label>
 
@@ -51,21 +51,31 @@
                             <div class="item" data-owner="not_owned_by_me">Not Owned by Me</div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
                 <!-- TYPE -->
                 <div class="filter-row">
                     <label>Type</label>
 
                     <div class="dropdown-container">
-                        <button class="dropdown-toggle-custom" data-target="#dd3">Any Type</button>
+                        <button class="dropdown-toggle-custom" data-target="#dd2">Any Type</button>
 
-                        <div class="dropdown-menu-custom" id="dd3">
-                            <div class="item" data-type="ANYTYPE">Any Type</div>
-                            <div class="item" data-type="DOCUMENT">Document</div>
-                            <div class="item" data-type="SPREADSHEET">Spreadsheet</div>
-                            <div class="item" data-type="PDF">PDF</div>
-                        </div>
+                            <div class="dropdown-menu-custom" id="dd2">
+                                <div class="item" data-value="">Any Type</div>
+
+                                <div class="item" data-value="PDF">
+                                    <i class="ph ph-file-pdf me-2"></i>PDF
+                                </div>
+                                <div class="item" data-value="Spreadsheet">
+                                    <i class="ph ph-file-xls me-2"></i>Spreadsheet
+                                </div>
+                                <div class="item" data-value="Document">
+                                    <i class="ph ph-file-doc me-2"></i>Document
+                                </div>
+                                <div class="item" data-value="Image">
+                                    <i class="ph ph-file-image me-2"></i>Image
+                                </div>
+                            </div>
                     </div>
                 </div>
 
@@ -81,11 +91,10 @@
                             <i class="bi bi-chevron-down"></i>
                         </button>
                         <div class="dropdown-menu-custom" id="dd4">
-                            <div class="item" data-label="any">Any</div>
-                            <!-- Container untuk semua label -->
-                            <div id="existingLabels" class="p-2 d-flex flex-wrap gap-2"></div>
-                            <div id="existingLabels" class="p-2 d-flex flex-wrap gap-2">asw</div>
+                            <div class="item" data-label="">Any Label</div>
 
+                            <div id="navbarLabelsContainer" class="p-2 d-flex flex-wrap gap-2">
+                                </div>
                         </div>
                     </div>
                 </div>
@@ -373,6 +382,7 @@
         </div>
     </div>
 </div>
+
 <script>
 // Toggle dropdown
 document.querySelectorAll('.dropdown-toggle-custom').forEach(btn => {
