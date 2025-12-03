@@ -32,21 +32,21 @@ class DashboardController extends Controller
 
         $currentPath = $path ?? '';
 
-        // Breadcrumb awal
+        // Breadcrumb dasar
         $breadcrumb = [
-            ['name' => 'Shared with Me', 'url' => route('shared')]
+            ['name' => 'Shared with Me', 'url' => route('shared')] // sesuaikan route name
         ];
 
-        $currentFolderName = null; // Untuk dikirim ke JS
+        $currentFolderName = null;
 
-        // Kalau ada path, ambil HANYA nama folder terakhir (current)
+        // Jika ada path (subfolder), ambil nama folder terakhir untuk JS
         if ($currentPath) {
             $segments = array_filter(explode('/', $currentPath));
             $lastSegmentId = end($segments);
 
             try {
                 $res = Http::withToken($token)
-                    ->timeout(3)
+                    ->timeout(10)
                     ->get("https://pdu-dms.my.id/api/my-files/{$lastSegmentId}");
 
                 if ($res->successful()) {
@@ -54,23 +54,28 @@ class DashboardController extends Controller
                     $currentFolderName = $data['name'] ?? $data['folder']['name'] ?? null;
                 }
             } catch (\Exception $e) {
-                Log::warning("Failed to fetch folder name for ID: {$lastSegmentId}");
+                Log::warning("Gagal ambil nama folder shared: {$lastSegmentId}", ['error' => $e->getMessage()]);
             }
 
-            // Breadcrumb sementara pakai ID (akan diupdate JS)
+            // Build breadcrumb dengan ID sebagai placeholder nama (akan di-update oleh JS)
             $accumulatedPath = '';
             foreach ($segments as $segmentId) {
                 $accumulatedPath = $accumulatedPath ? "$accumulatedPath/$segmentId" : $segmentId;
-
                 $breadcrumb[] = [
-                    'name' => $segmentId, // Placeholder
+                    'name' => $segmentId, // placeholder
                     'url'  => route('shared.subfolder', ['path' => $accumulatedPath]),
-                    'id'   => $segmentId  // Tambahkan ID untuk JS
+                    'id'   => $segmentId
                 ];
             }
         }
 
-        return view('shared', compact('token', 'currentPath', 'breadcrumb', 'currentFolderName'));
+        // Pass token dan data ke view
+        return view('shared', compact(
+            'token',
+            'currentPath',
+            'breadcrumb',
+            'currentFolderName'
+        ));
     }
         public function uploadFile()
     {

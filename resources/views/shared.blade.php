@@ -49,17 +49,21 @@
         </div>
     </template>
 
-    {{-- Token pasti ada --}}
-    @auth
-        @if (empty(auth()->user()->api_token))
-            @php
-                auth()
-                    ->user()
-                    ->update(['api_token' => \Illuminate\Support\Str::random(60)]);
-            @endphp
-        @endif
-        <meta name="api-token" content="{{ auth()->user()->api_token }}">
-    @endauth
+    <script>
+        window.token = "{{ session('token') ?? '' }}";
+    window.currentPath = "{{ $currentPath ?? '' }}";
+    window.currentFolderName = "{{ $currentFolderName ?? '' }}";
+
+    // Debug
+    if (window.token) {
+        console.log('Token dari session: ADA (panjang:', window.token.length, ')');
+    } else {
+        console.warn('Token TIDAK ADA → redirect ke signin');
+        alert("Session habis. Silakan login ulang.");
+        window.location.href = "/signin";
+    }
+    </script>
+
 
     {{-- Load PDF.js --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
@@ -70,11 +74,7 @@
     <script>
         class SharedWithMeManager {
             constructor() {
-                this.token = window.token ||
-                    (window.Laravel?.apiToken) ||
-                    localStorage.getItem('token') ||
-                    document.querySelector('meta[name="api-token"]')?.getAttribute('content') ||
-                    '';
+                this.token = window.token ||'';
 
                 // Ambil currentPath dari PHP
                 this.currentPath = "{{ $currentPath }}";
