@@ -84,7 +84,7 @@
 </div>
 
 <!-- Upload Modal -->
-{{-- <div class="modal fade" id="uploadFileModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true"
+<div class="modal fade" id="uploadFileModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true"
     data-bs-backdrop="false" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 rounded-4 shadow-lg">
@@ -141,12 +141,17 @@
                                 <!-- Label akan diisi via JavaScript -->
                             </div>
 
-                            <!-- Tombol Add Label (dipindahkan ke samping existing labels) -->
+                            <!-- Tombol Add Label (akan berubah jadi input) -->
                             <div id="addLabelContainer">
                                 <button type="button"
-                                    class="btn btn-outline-primary rounded-3 d-flex align-items-center text-dark"
+                                    class="btn btn-outline-primary rounded-3 d-flex align-items-center"
                                     id="addLabelBtn">
-                                    <i class="ph ph-plus "></i>
+                                    <i class="ph ph-plus me-2"></i> Add Label
+                                </button>
+                                <button type="button"
+                                    class="btn btn-outline-primary rounded-3 d-flex align-items-center"
+                                    id="addLabelBtn">
+                                    <i class="ph ph-plus me-2"></i> Delete Label
                                 </button>
 
                                 <!-- Input Label Baru (hidden default) -->
@@ -226,7 +231,7 @@
             </div>
         </div>
     </div>
-</div> --}}
+</div>
 
 <!-- Logout Confirmation Modal -->
 <div class="modal fade" id="logoutConfirmationModal" tabindex="-1" data-bs-backdrop="false" aria-hidden="true">
@@ -284,7 +289,7 @@
 </div>
 
 <!-- Edit File Modal -->
-{{-- <div class="modal fade" id="editFileModal" tabindex="-1" aria-labelledby="editFileModalLabel" aria-hidden="true"
+<div class="modal fade" id="editFileModal" tabindex="-1" aria-labelledby="editFileModalLabel" aria-hidden="true"
     data-bs-backdrop="false" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 rounded-4 shadow-lg">
@@ -380,11 +385,40 @@
             </div>
         </div>
     </div>
-</div> --}}
+</div>
 
-
+{{-- MODAL RENAME FOLDER --}}
+<div class="modal fade" id="renameFolderModal" tabindex="-1" aria-labelledby="renameFolderModalLabel" aria-hidden="true" data-bs-backdrop="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-semibold" id="renameFolderModalLabel">Rename Folder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form id="renameFolderForm">
+                    <input type="hidden" id="renameFolderId" name="folder_id">
+                    <div class="mb-3">
+                        <label for="newFolderName" class="form-label fw-medium">New Folder Name</label>
+                        <input type="text" class="form-control rounded-3 border-dark-subtle"
+                               id="newFolderName" name="new_name" required
+                               placeholder="Enter new folder name">
+                        <div class="form-text text-muted">
+                            Folder name cannot contain special characters.
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-blue rounded-3 px-4" id="confirmRenameFolder">Rename</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
+<<<<<<< HEAD
 //     // ==================== GLOBAL VARIABLES ====================
 //     let selectedLabelIds = []; // Untuk upload modal
 //     let allLabels = []; // Semua labels dari API
@@ -690,6 +724,268 @@
 
 //         modal.show();
 //     });
+=======
+    // ==================== GLOBAL VARIABLES ====================
+    let selectedLabelIds = []; // Untuk upload modal
+    let allLabels = []; // Semua labels dari API
+    let editSelectedLabelIds = []; // Untuk edit modal
+
+    // 🎨 Warna background untuk label
+    const labelColors = [
+        "FDDCD9", "EBE0D9", "FDE9DD", "EFEAFF", "FCF9DE",
+        "E4F3FE", "FCE7ED", "E6E5E3", "EEFEF1", "F0EFED"
+    ];
+
+    // 🎨 Map background → text color
+    const colorMap = {
+        "FDDCD9": "#CB564A",
+        "EBE0D9": "#763E1A",
+        "FDE9DD": "#C2825D",
+        "EFEAFF": "#7762BB",
+        "FCF9DE": "#BDB470",
+        "E4F3FE": "#5F92B6",
+        "FCE7ED": "#CA8499",
+        "E6E5E3": "#989797",
+        "EEFEF1": "#8ABB93",
+        "F0EFED": "#729D9C"
+    };
+
+    // ==================== GLOBAL FUNCTIONS ====================
+
+    // Fungsi untuk mendapatkan token
+    function getToken() {
+        return "{{ session('token') }}";
+    }
+
+    // Fungsi untuk menampilkan pesan feedback
+    function showMessage(message, type, containerId = null) {
+        let messageDiv;
+
+        if (containerId) {
+            messageDiv = document.getElementById(containerId);
+        } else {
+            // Default container untuk modal yang sedang aktif
+            const activeModal = document.querySelector('.modal.show');
+            if (activeModal) {
+                messageDiv = activeModal.querySelector('.alert');
+                if (!messageDiv) {
+                    // Buat elemen alert jika belum ada
+                    messageDiv = document.createElement('div');
+                    messageDiv.className = 'alert d-none';
+                    activeModal.querySelector('.modal-body').prepend(messageDiv);
+                }
+            } else {
+                // Fallback ke alert biasa jika tidak ada modal aktif
+                alert(message);
+                return;
+            }
+        }
+
+        if (!messageDiv) {
+            console.error('Message container not found');
+            return;
+        }
+
+        messageDiv.textContent = message;
+        messageDiv.className = `alert alert-${type} mt-3`;
+        messageDiv.classList.remove("d-none");
+
+        // Auto-hide untuk pesan sukses
+        if (type === "success") {
+            setTimeout(() => {
+                messageDiv.classList.add("d-none");
+            }, 5000);
+        }
+
+        // Scroll ke pesan
+        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // 🟢 Ambil semua label dari API
+    async function loadLabels() {
+        const token = getToken();
+        if (!token) {
+            console.error('No token available');
+            return;
+        }
+
+        try {
+            const res = await fetch("https://pdu-dms.my.id/api/labels", {
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            });
+
+            if (!res.ok) {
+                if (res.status === 401) {
+                    window.location.href = "{{ route('signin') }}";
+                    return;
+                }
+                throw new Error(`HTTP ${res.status}`);
+            }
+
+            const data = await res.json();
+            allLabels = data.data || [];
+
+            // Render labels untuk upload modal
+            renderExistingLabels();
+            renderSelectedLabels();
+
+            // Render labels untuk edit modal
+            if (window.renderEditExistingLabels) {
+                window.renderEditExistingLabels();
+            }
+
+            console.log('Labels loaded successfully:', allLabels.length);
+
+        } catch (err) {
+            console.error("Gagal memuat label:", err);
+        }
+    }
+
+    // Render daftar label yang tersedia (UPLOAD MODAL)
+    function renderExistingLabels() {
+        const existingLabelsContainer = document.getElementById("existingLabels");
+        if (!existingLabelsContainer) return;
+
+        existingLabelsContainer.innerHTML = "";
+
+        allLabels.forEach(label => {
+            const bgColor = label.color ? `#${label.color}` : "#E6E5E3";
+            const textColor = colorMap[label.color] || "#333";
+
+            const labelElement = document.createElement("button");
+            labelElement.type = "button";
+            labelElement.classList.add("btn", "rounded-pill", "px-3", "py-2", "small", "border-0", "me-2", "mb-2");
+            labelElement.textContent = label.name;
+
+            labelElement.style.backgroundColor = bgColor;
+            labelElement.style.color = textColor;
+            labelElement.style.border = `1px solid ${textColor}22`;
+            labelElement.style.cursor = "pointer";
+            labelElement.style.transition = "all 0.2s ease";
+
+            // Hover effects
+            labelElement.addEventListener("mouseenter", () => {
+                labelElement.style.opacity = "0.8";
+                labelElement.style.transform = "scale(1.05)";
+            });
+            labelElement.addEventListener("mouseleave", () => {
+                labelElement.style.opacity = "1";
+                labelElement.style.transform = "scale(1)";
+            });
+
+            // Click handler untuk memilih label
+            labelElement.addEventListener("click", () => {
+                if (!selectedLabelIds.includes(label.id)) {
+                    selectedLabelIds.push(label.id);
+                    renderSelectedLabels();
+                }
+            });
+
+            existingLabelsContainer.appendChild(labelElement);
+        });
+    }
+
+    // Render label yang sudah dipilih (UPLOAD MODAL)
+    function renderSelectedLabels() {
+        const selectedLabelsContainer = document.getElementById("selectedLabels");
+        if (!selectedLabelsContainer) return;
+
+        selectedLabelsContainer.innerHTML = "";
+
+        selectedLabelIds.forEach(labelId => {
+            const label = allLabels.find(l => l.id === labelId);
+            if (label) {
+                const bgColor = label.color ? `#${label.color}` : "#E6E5E3";
+                const textColor = colorMap[label.color] || "#333";
+
+                const labelElement = document.createElement("div");
+                labelElement.classList.add("d-flex", "align-items-center", "gap-2", "rounded-pill", "px-3", "py-2", "small", "me-2", "mb-2");
+                labelElement.style.backgroundColor = bgColor;
+                labelElement.style.color = textColor;
+                labelElement.style.border = `1px solid ${textColor}22`;
+
+                const labelText = document.createElement("span");
+                labelText.textContent = label.name;
+
+                const removeBtn = document.createElement("button");
+                removeBtn.type = "button";
+                removeBtn.classList.add("btn", "btn-sm", "p-0", "shadow-none");
+                removeBtn.innerHTML = '<i class="ph ph-x shadow-none" style="font-size: 12px;"></i>';
+                removeBtn.style.color = textColor;
+                removeBtn.style.border = "none";
+                removeBtn.style.background = "none";
+                removeBtn.style.cursor = "pointer";
+
+                removeBtn.addEventListener("click", () => {
+                    selectedLabelIds = selectedLabelIds.filter(id => id !== labelId);
+                    renderSelectedLabels();
+                });
+
+                labelElement.appendChild(labelText);
+                labelElement.appendChild(removeBtn);
+                selectedLabelsContainer.appendChild(labelElement);
+            }
+        });
+    }
+
+    // ==================== SIDEBAR TOGGLE FUNCTIONALITY ====================
+    document.addEventListener("DOMContentLoaded", () => {
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const contentArea = document.querySelector('.sidebar-collapse-content');
+        const texts = document.querySelectorAll('.sidebar-text');
+
+        toggleBtn.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+            contentArea.classList.toggle('collapsed');
+
+            if (sidebar.classList.contains('collapsed')) {
+                texts.forEach(t => {
+                    t.classList.add('opacity-0');
+                    setTimeout(() => t.classList.add('d-none'), 200);
+                });
+            } else {
+                texts.forEach(t => {
+                    t.classList.remove('d-none');
+                    setTimeout(() => t.classList.remove('opacity-0'), 50);
+                });
+            }
+        });
+    });
+
+    // ==================== MODAL OPENERS ====================
+    document.getElementById("openUploadFolderModal").addEventListener("click", function(e) {
+        e.preventDefault();
+        const modal = new bootstrap.Modal(document.getElementById("uploadFolderModal"));
+
+        // Reset form
+        document.getElementById("createFolderForm").reset();
+        document.getElementById("folderMessage").classList.add("d-none");
+
+        modal.show();
+    });
+
+    document.getElementById("openUploadModal").addEventListener("click", function(e) {
+        e.preventDefault();
+        const modal = new bootstrap.Modal(document.getElementById("uploadFileModal"));
+
+        // Reset form dan labels
+        document.getElementById("uploadForm").reset();
+        document.getElementById("fileName").textContent = "";
+        document.getElementById("uploadMessage").classList.add("d-none");
+
+        // Reset selected labels
+        selectedLabelIds = [];
+        const selectedLabelsContainer = document.getElementById("selectedLabels");
+        if (selectedLabelsContainer) {
+            selectedLabelsContainer.innerHTML = "";
+        }
+
+        modal.show();
+    });
+>>>>>>> 87ec885 (Revert "Merge branch 'master' into aul-fe")
 
     // ==================== LOGOUT FUNCTIONALITY ====================
     document.addEventListener("DOMContentLoaded", function() {
@@ -700,12 +996,21 @@
         const btnText = logoutBtn.querySelector('.btn-text');
         const btnLoading = logoutBtn.querySelector('.btn-loading');
 
+<<<<<<< HEAD
 //         // Buka modal saat klik "Log Out"
 //         logoutLink.addEventListener('click', function(e) {
 //             e.preventDefault();
 //             const modal = new bootstrap.Modal(document.getElementById('logoutConfirmationModal'));
 //             modal.show();
 //         });
+=======
+        // Buka modal saat klik "Log Out"
+        logoutLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            const modal = new bootstrap.Modal(document.getElementById('logoutConfirmationModal'));
+            modal.show();
+        });
+>>>>>>> 87ec885 (Revert "Merge branch 'master' into aul-fe")
 
         if (logoutBtn && loader) {
             logoutBtn.addEventListener('click', function () {
@@ -719,9 +1024,15 @@
 
                 // Submit form logout (pastikan ada form logout dengan id atau name "logout-form")
                 // Biasanya Laravel punya form logout seperti ini:
+<<<<<<< HEAD
                 const logoutForm = document.querySelector('form[action*="logout"]') ||
                                   document.getElementById('logout-form');
 
+=======
+                const logoutForm = document.querySelector('form[action*="logout"]') || 
+                                  document.getElementById('logout-form');
+                
+>>>>>>> 87ec885 (Revert "Merge branch 'master' into aul-fe")
                 if (logoutForm) {
                     logoutForm.submit();
                 } else {
@@ -732,6 +1043,7 @@
         }
     });
 
+<<<<<<< HEAD
 //     // ==================== LABEL MANAGEMENT FUNCTIONALITY ====================
 //     document.addEventListener("DOMContentLoaded", async () => {
 //         const token = getToken();
@@ -1603,4 +1915,754 @@
 //     document.addEventListener("DOMContentLoaded", function() {
 //         initializeEditFunctionality();
 //     });
+=======
+    // ==================== LABEL MANAGEMENT FUNCTIONALITY ====================
+    document.addEventListener("DOMContentLoaded", async () => {
+        const token = getToken();
+
+        if (!token) {
+            console.error('No token available in session');
+            window.location.href = "{{ route('signin') }}";
+            return;
+        }
+
+        const addLabelBtn = document.getElementById("addLabelBtn");
+        const newLabelContainer = document.getElementById("newLabelContainer");
+        const newLabelInput = document.getElementById("newLabelInput");
+        const saveNewLabelBtn = document.getElementById("saveNewLabelBtn");
+        const cancelNewLabelBtn = document.getElementById("cancelNewLabelBtn");
+
+        // 🔘 Klik tombol Add → ganti dengan input
+        addLabelBtn.addEventListener("click", () => {
+            addLabelBtn.classList.add("d-none");
+            newLabelContainer.classList.remove("d-none");
+            newLabelInput.focus();
+        });
+
+        // 💾 Simpan label baru
+        saveNewLabelBtn.addEventListener("click", async () => {
+            const name = newLabelInput.value.trim();
+            if (!name) {
+                showMessage("Label name cannot be empty", "danger", "uploadMessage");
+                return;
+            }
+
+            const color = labelColors[Math.floor(Math.random() * labelColors.length)];
+
+            try {
+                const res = await fetch("https://pdu-dms.my.id/api/create-label", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + token
+                    },
+                    body: JSON.stringify({
+                        name,
+                        color
+                    })
+                });
+
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        window.location.href = "{{ route('signin') }}";
+                        return;
+                    }
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const result = await res.json();
+
+                if (result.success === false) {
+                    throw new Error(result.message || "Failed to create label");
+                }
+
+                // Refresh labels
+                await loadLabels();
+
+                // Otomatis pilih label yang baru dibuat
+                if (result.data && result.data.id) {
+                    selectedLabelIds.push(result.data.id);
+                    renderSelectedLabels();
+                }
+
+                // Kembalikan ke tombol Add
+                resetAddLabelForm();
+
+                showMessage("Label created successfully!", "success", "uploadMessage");
+
+            } catch (err) {
+                showMessage("Failed to create label: " + err.message, "danger", "uploadMessage");
+            }
+        });
+
+        // ❌ Cancel pembuatan label baru
+        cancelNewLabelBtn.addEventListener("click", () => {
+            resetAddLabelForm();
+        });
+
+        // Fungsi untuk reset form add label
+        function resetAddLabelForm() {
+            newLabelInput.value = "";
+            newLabelContainer.classList.add("d-none");
+            addLabelBtn.classList.remove("d-none");
+        }
+
+        // Submit dengan Enter di input label baru
+        newLabelInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                saveNewLabelBtn.click();
+            }
+        });
+
+        // Jalankan load awal
+        loadLabels();
+    });
+
+    // ==================== UPLOAD FILE FUNCTIONALITY ====================
+    const uploadArea = document.getElementById("uploadArea");
+    const fileInput = document.getElementById("fileInput");
+    const fileNameDisplay = document.getElementById("fileName");
+
+    // Klik area upload → buka file picker
+    uploadArea.addEventListener("click", () => fileInput.click());
+
+    // Preview nama file
+    fileInput.addEventListener("change", () => {
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            fileNameDisplay.textContent = file.name;
+
+            // Auto-fill title dengan nama file tanpa extension
+            const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+            document.getElementById("title").value = fileNameWithoutExt;
+        } else {
+            fileNameDisplay.textContent = "";
+            document.getElementById("title").value = "";
+        }
+    });
+
+    // Efek drag & drop
+    uploadArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = "#0d6efd";
+        uploadArea.style.backgroundColor = "rgba(13, 110, 253, 0.05)";
+    });
+
+    uploadArea.addEventListener("dragleave", () => {
+        uploadArea.style.borderColor = "#dee2e6";
+        uploadArea.style.backgroundColor = "transparent";
+    });
+
+    uploadArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = "#dee2e6";
+        uploadArea.style.backgroundColor = "transparent";
+
+        fileInput.files = e.dataTransfer.files;
+
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            fileNameDisplay.textContent = file.name;
+
+            // Auto-fill title dengan nama file tanpa extension
+            const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+            document.getElementById("title").value = fileNameWithoutExt;
+        }
+    });
+
+    // Submit form upload file
+    document.getElementById("uploadForm").addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        const token = getToken();
+        if (!token) {
+            showMessage("Session expired. Please login again.", "danger", "uploadMessage");
+            window.location.href = "{{ route('signin') }}";
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const parentId = getParentIdFromUrl();
+
+        if (!file) {
+            showMessage("Please select a file to upload", "danger", "uploadMessage");
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            const title = document.getElementById("title").value.trim();
+
+            // Jika title diisi, gunakan sebagai custom filename
+            if (title) {
+                const originalExtension = file.name.split('.').pop();
+                const customFileName = `${title}.${originalExtension}`;
+                formData.append("files[]", file, customFileName);
+                formData.append("relative_paths[]", customFileName);
+            } else {
+                formData.append("files[]", file);
+                formData.append("relative_paths[]", file.name);
+            }
+
+            if (parentId) formData.append("parent_id", parentId);
+
+            // Tambahkan labels jika ada
+            if (selectedLabelIds.length > 0) {
+                selectedLabelIds.forEach(labelId => {
+                    formData.append("labels[]", labelId);
+                });
+            }
+
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+
+            // Tampilkan loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading...';
+
+            const res = await fetch("https://pdu-dms.my.id/api/upload-files", {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + token
+                },
+                body: formData
+            });
+
+            if (!res.ok) {
+                if (res.status === 401) {
+                    showMessage("Session expired. Please login again.", "danger", "uploadMessage");
+                    window.location.href = "{{ route('signin') }}";
+                    return;
+                }
+                throw new Error(`HTTP ${res.status}`);
+            }
+
+            const result = await res.json();
+            if (!res.ok) throw new Error(result.message || "Failed to upload file");
+
+            showMessage("File uploaded successfully!", "success", "uploadMessage");
+
+            setTimeout(() => {
+                bootstrap.Modal.getInstance(document.getElementById("uploadFileModal")).hide();
+                location.reload();
+            }, 1500);
+
+        } catch (err) {
+            showMessage("Failed to upload: " + err.message, "danger", "uploadMessage");
+
+            // Reset button state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Upload';
+        }
+    });
+
+    // ==================== CREATE FOLDER FUNCTIONALITY ====================
+
+    // Fungsi untuk mendapatkan parent_id dari URL
+    function getParentIdFromUrl() {
+        const currentUrl = window.location.href;
+        const urlParts = currentUrl.split('/');
+
+        const myspaceIndex = urlParts.indexOf('myspace');
+        if (myspaceIndex !== -1 && urlParts.length > myspaceIndex + 1) {
+            const potentialId = urlParts[myspaceIndex + 1];
+            if (potentialId && !isNaN(potentialId) && potentialId.trim() !== '') {
+                return parseInt(potentialId);
+            }
+        }
+
+        return null;
+    }
+
+    // Fungsi untuk membuat folder baru
+    document.getElementById("createFolderBtn").addEventListener("click", async function() {
+        const token = getToken();
+        if (!token) {
+            showMessage("Session expired. Please login again.", "danger", "folderMessage");
+            window.location.href = "{{ route('signin') }}";
+            return;
+        }
+
+        const folderName = document.getElementById("folderName").value.trim();
+        const messageDiv = document.getElementById("folderMessage");
+
+        if (!folderName) {
+            showMessage("Please enter a folder name", "danger", "folderMessage");
+            return;
+        }
+
+        const parentId = getParentIdFromUrl();
+
+        const folderData = {
+            name: folderName
+        };
+
+        if (parentId) {
+            folderData.parent_id = parentId;
+        }
+
+        try {
+            this.disabled = true;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
+
+            const res = await fetch("https://pdu-dms.my.id/api/create-folder", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify(folderData)
+            });
+
+            if (!res.ok) {
+                if (res.status === 401) {
+                    showMessage("Session expired. Please login again.", "danger", "folderMessage");
+                    window.location.href = "{{ route('signin') }}";
+                    return;
+                }
+                throw new Error(`HTTP ${res.status}`);
+            }
+
+            const result = await res.json();
+
+            if (res.ok) {
+                showMessage("Folder created successfully!", "success", "folderMessage");
+
+                setTimeout(() => {
+                    document.getElementById("createFolderForm").reset();
+                    bootstrap.Modal.getInstance(document.getElementById("uploadFolderModal")).hide();
+                    location.reload();
+                }, 1500);
+            } else {
+                throw new Error(result.message || "Failed to create folder");
+            }
+        } catch (err) {
+            console.error("Error creating folder:", err);
+            showMessage("Failed to create folder: " + err.message, "danger", "folderMessage");
+        } finally {
+            this.disabled = false;
+            this.innerHTML = "Create Folder";
+        }
+    });
+
+    // Submit form dengan tombol Enter
+    document.getElementById("folderName").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            document.getElementById("createFolderBtn").click();
+        }
+    });
+
+    // ==================== EDIT FILE FUNCTIONALITY ====================
+
+    // Global function untuk membuka modal edit dari mana saja
+    window.openEditModal = async function(fileId, fileName, fileLabels) {
+        // Set data file ke form
+        document.getElementById('editFileId').value = fileId;
+        document.getElementById('editTitle').value = fileName.replace(/\.[^/.]+$/, ""); // Remove extension
+        document.getElementById('editFileNameDisplay').textContent = fileName;
+
+        // Set file info
+        const fileExtension = fileName.split('.').pop().toUpperCase();
+        document.getElementById('editFileInfo').textContent = `${fileExtension} File`;
+
+        // Set labels yang sudah ada
+        editSelectedLabelIds = fileLabels.map(label => label.id);
+
+        // Pastikan labels sudah di-load
+        if (allLabels.length === 0) {
+            await loadLabels();
+        }
+
+        renderEditSelectedLabels();
+
+        // Buka modal
+        const modal = new bootstrap.Modal(document.getElementById('editFileModal'));
+        modal.show();
+    };
+
+    // Initialize edit functionality
+    function initializeEditFunctionality() {
+        // Event delegation untuk tombol edit file di seluruh aplikasi
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.edit-file-btn')) {
+                e.preventDefault();
+                const button = e.target.closest('.edit-file-btn');
+                const fileId = button.getAttribute('data-id');
+                const fileName = button.getAttribute('data-name');
+                const fileLabels = JSON.parse(button.getAttribute('data-labels') || '[]');
+
+                window.openEditModal(fileId, fileName, fileLabels);
+            }
+        });
+
+        initializeEditLabels();
+    }
+
+    function initializeEditLabels() {
+        const editExistingLabelsContainer = document.getElementById("editExistingLabels");
+        const editSelectedLabelsContainer = document.getElementById("editSelectedLabels");
+        const editAddLabelBtn = document.getElementById("editAddLabelBtn");
+        const editNewLabelContainer = document.getElementById("editNewLabelContainer");
+        const editNewLabelInput = document.getElementById("editNewLabelInput");
+        const editSaveNewLabelBtn = document.getElementById("editSaveNewLabelBtn");
+        const editCancelNewLabelBtn = document.getElementById("editCancelNewLabelBtn");
+
+        // Render daftar label yang tersedia untuk edit
+        function renderEditExistingLabels() {
+            if (!editExistingLabelsContainer) return;
+
+            editExistingLabelsContainer.innerHTML = "";
+
+            if (!allLabels || allLabels.length === 0) {
+                editExistingLabelsContainer.innerHTML = `
+                    <div class="text-muted small">No labels available. Create one first.</div>
+                `;
+                return;
+            }
+
+            allLabels.forEach(label => {
+                const bgColor = label.color ? `#${label.color}` : "#E6E5E3";
+                const textColor = colorMap[label.color] || "#333";
+
+                const labelElement = document.createElement("button");
+                labelElement.type = "button";
+                labelElement.classList.add("btn", "rounded-pill", "px-3", "py-2", "small", "border-0", "me-2", "mb-2");
+                labelElement.textContent = label.name;
+
+                labelElement.style.backgroundColor = bgColor;
+                labelElement.style.color = textColor;
+                labelElement.style.border = `1px solid ${textColor}22`;
+                labelElement.style.cursor = "pointer";
+                labelElement.style.transition = "all 0.2s ease";
+
+                // Jika label sudah dipilih, beri style berbeda
+                if (editSelectedLabelIds.includes(label.id)) {
+                    labelElement.style.opacity = "0.6";
+                    labelElement.style.transform = "scale(0.95)";
+                    labelElement.style.border = `2px solid ${textColor}`;
+                }
+
+                // Hover effects
+                labelElement.addEventListener("mouseenter", () => {
+                    labelElement.style.opacity = "0.8";
+                    labelElement.style.transform = "scale(1.05)";
+                });
+                labelElement.addEventListener("mouseleave", () => {
+                    if (!editSelectedLabelIds.includes(label.id)) {
+                        labelElement.style.opacity = "1";
+                        labelElement.style.transform = "scale(1)";
+                    } else {
+                        labelElement.style.opacity = "0.6";
+                        labelElement.style.transform = "scale(0.95)";
+                    }
+                });
+
+                // Click handler untuk memilih label
+                labelElement.addEventListener("click", () => {
+                    if (!editSelectedLabelIds.includes(label.id)) {
+                        editSelectedLabelIds.push(label.id);
+                        renderEditSelectedLabels();
+                        renderEditExistingLabels();
+                    } else {
+                        editSelectedLabelIds = editSelectedLabelIds.filter(id => id !== label.id);
+                        renderEditSelectedLabels();
+                        renderEditExistingLabels();
+                    }
+                });
+
+                editExistingLabelsContainer.appendChild(labelElement);
+            });
+        }
+
+        // Render label yang sudah dipilih di modal edit
+        function renderEditSelectedLabels() {
+            if (!editSelectedLabelsContainer) return;
+
+            editSelectedLabelsContainer.innerHTML = "";
+
+            if (editSelectedLabelIds.length === 0) {
+                editSelectedLabelsContainer.innerHTML = `
+                    <div class="text-muted small">No labels selected</div>
+                `;
+                return;
+            }
+
+            editSelectedLabelIds.forEach(labelId => {
+                const label = allLabels.find(l => l.id === labelId);
+                if (label) {
+                    const bgColor = label.color ? `#${label.color}` : "#E6E5E3";
+                    const textColor = colorMap[label.color] || "#333";
+
+                    const labelElement = document.createElement("div");
+                    labelElement.classList.add("d-flex", "align-items-center", "gap-2", "rounded-pill", "px-3", "py-2", "small", "me-2", "mb-2");
+                    labelElement.style.backgroundColor = bgColor;
+                    labelElement.style.color = textColor;
+                    labelElement.style.border = `1px solid ${textColor}22`;
+
+                    const labelText = document.createElement("span");
+                    labelText.textContent = label.name;
+
+                    const removeBtn = document.createElement("button");
+                    removeBtn.type = "button";
+                    removeBtn.classList.add("btn", "btn-sm", "p-0", "shadow-none");
+                    removeBtn.innerHTML = '<i class="ph ph-x shadow-none" style="font-size: 12px;"></i>';
+                    removeBtn.style.color = textColor;
+                    removeBtn.style.border = "none";
+                    removeBtn.style.background = "none";
+                    removeBtn.style.cursor = "pointer";
+
+                    removeBtn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        editSelectedLabelIds = editSelectedLabelIds.filter(id => id !== labelId);
+                        renderEditSelectedLabels();
+                        renderEditExistingLabels();
+                    });
+
+                    labelElement.appendChild(labelText);
+                    labelElement.appendChild(removeBtn);
+                    editSelectedLabelsContainer.appendChild(labelElement);
+                }
+            });
+        }
+
+        // 🔘 Klik tombol Add → ganti dengan input
+        if (editAddLabelBtn) {
+            editAddLabelBtn.addEventListener("click", () => {
+                editAddLabelBtn.classList.add("d-none");
+                editNewLabelContainer.classList.remove("d-none");
+                editNewLabelInput.focus();
+            });
+        }
+
+        // 💾 Simpan label baru di modal edit
+        if (editSaveNewLabelBtn) {
+            editSaveNewLabelBtn.addEventListener("click", async () => {
+                const name = editNewLabelInput.value.trim();
+                if (!name) {
+                    showMessage("Label name cannot be empty", "danger", "editFileMessage");
+                    return;
+                }
+
+                // Cek apakah label sudah ada
+                const existingLabel = allLabels.find(l => l.name.toLowerCase() === name.toLowerCase());
+                if (existingLabel) {
+                    showMessage("Label with this name already exists", "danger", "editFileMessage");
+                    return;
+                }
+
+                const color = labelColors[Math.floor(Math.random() * labelColors.length)];
+
+                try {
+                    const token = getToken();
+                    const res = await fetch("https://pdu-dms.my.id/api/create-label", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + token
+                        },
+                        body: JSON.stringify({
+                            name,
+                            color
+                        })
+                    });
+
+                    if (!res.ok) {
+                        if (res.status === 401) {
+                            window.location.href = "{{ route('signin') }}";
+                            return;
+                        }
+                        throw new Error(`HTTP ${res.status}`);
+                    }
+
+                    const result = await res.json();
+
+                    if (result.success === false) {
+                        throw new Error(result.message || "Failed to create label");
+                    }
+
+                    // Refresh labels
+                    await loadLabels();
+
+                    // Otomatis pilih label yang baru dibuat
+                    if (result.data && result.data.id) {
+                        editSelectedLabelIds.push(result.data.id);
+                        renderEditSelectedLabels();
+                        renderEditExistingLabels();
+                    }
+
+                    // Kembalikan ke tombol Add
+                    resetEditAddLabelForm();
+
+                    showMessage("Label created successfully!", "success", "editFileMessage");
+
+                } catch (err) {
+                    console.error('Error creating label:', err);
+                    showMessage("Failed to create label: " + err.message, "danger", "editFileMessage");
+                }
+            });
+        }
+
+        // ❌ Cancel pembuatan label baru di modal edit
+        if (editCancelNewLabelBtn) {
+            editCancelNewLabelBtn.addEventListener("click", () => {
+                resetEditAddLabelForm();
+            });
+        }
+
+        // Fungsi untuk reset form add label di modal edit
+        function resetEditAddLabelForm() {
+            if (editNewLabelInput) editNewLabelInput.value = "";
+            if (editNewLabelContainer) editNewLabelContainer.classList.add("d-none");
+            if (editAddLabelBtn) editAddLabelBtn.classList.remove("d-none");
+        }
+
+        // Submit dengan Enter di input label baru
+        if (editNewLabelInput) {
+            editNewLabelInput.addEventListener("keypress", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    if (editSaveNewLabelBtn) {
+                        editSaveNewLabelBtn.click();
+                    }
+                }
+            });
+        }
+
+        // Export functions untuk digunakan elsewhere
+        window.renderEditExistingLabels = renderEditExistingLabels;
+        window.renderEditSelectedLabels = renderEditSelectedLabels;
+
+        // Render initial labels
+        renderEditExistingLabels();
+    }
+
+    // Submit form edit file
+    document.getElementById("editFileForm").addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        const token = getToken();
+        if (!token) {
+            showMessage("Session expired. Please login again.", "danger", "editFileMessage");
+            window.location.href = "{{ route('signin') }}";
+            return;
+        }
+
+        const fileId = document.getElementById("editFileId").value;
+        const title = document.getElementById("editTitle").value.trim();
+        const originalFileName = document.getElementById("editFileNameDisplay").textContent;
+        const fileExtension = originalFileName.split('.').pop();
+
+        if (!title) {
+            showMessage("Please enter a file name", "danger", "editFileMessage");
+            return;
+        }
+
+        // Tambahkan extension jika user menghapusnya
+        const finalFileName = title.includes('.') ? title : `${title}.${fileExtension}`;
+
+        try {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+
+            // Tampilkan loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+
+            // Siapkan data sesuai format API
+            const requestData = {
+                name: finalFileName
+            };
+
+            // Tambahkan labels jika ada (format array of IDs)
+            if (editSelectedLabelIds.length > 0) {
+                requestData.labels = editSelectedLabelIds;
+            }
+
+            console.log('Sending update data:', requestData);
+            console.log('File ID:', fileId);
+
+            // GUNAKAN METHOD PATCH sesuai dokumentasi API
+            const res = await fetch(`https://pdu-dms.my.id/api/update-file/${fileId}`, {
+                method: "PATCH",
+                headers: {
+                    "Authorization": "Bearer " + token,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify(requestData)
+            });
+
+            console.log('Response status:', res.status);
+
+            if (!res.ok) {
+                let errorMessage = `HTTP ${res.status}`;
+                try {
+                    const errorData = await res.json();
+                    errorMessage = errorData.message || errorMessage;
+                } catch (parseError) {
+                    console.error('Error parsing error response:', parseError);
+                }
+                throw new Error(errorMessage);
+            }
+
+            const result = await res.json();
+            console.log('Update response:', result);
+
+            if (result.success === false) {
+                throw new Error(result.message || "Failed to update file");
+            }
+
+            showMessage("File updated successfully!", "success", "editFileMessage");
+
+            // Tutup modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById("editFileModal"));
+            modal.hide();
+
+            // Refresh halaman untuk menampilkan perubahan
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+
+        } catch (err) {
+            console.error('Error updating file:', err);
+            showMessage("Failed to update file: " + err.message, "danger", "editFileMessage");
+
+            // Reset button state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Save Changes';
+        }
+    });
+
+    // Reset form ketika modal ditutup
+    document.getElementById('editFileModal').addEventListener('hidden.bs.modal', function() {
+        // Reset selected labels
+        editSelectedLabelIds = [];
+
+        // Reset form
+        document.getElementById('editFileForm').reset();
+
+        // Clear selected labels display
+        const editSelectedLabelsContainer = document.getElementById("editSelectedLabels");
+        if (editSelectedLabelsContainer) {
+            editSelectedLabelsContainer.innerHTML = "";
+        }
+
+        // Reset add label form
+        const editNewLabelContainer = document.getElementById("editNewLabelContainer");
+        const editAddLabelBtn = document.getElementById("editAddLabelBtn");
+        if (editNewLabelContainer && editAddLabelBtn) {
+            editNewLabelContainer.classList.add("d-none");
+            editAddLabelBtn.classList.remove("d-none");
+        }
+    });
+
+    // ==================== INITIALIZATION ====================
+    document.addEventListener("DOMContentLoaded", function() {
+        initializeEditFunctionality();
+    });
+>>>>>>> 87ec885 (Revert "Merge branch 'master' into aul-fe")
 </script>
