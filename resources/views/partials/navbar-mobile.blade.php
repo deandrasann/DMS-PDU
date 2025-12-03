@@ -471,7 +471,13 @@
                         style="height: 50px; font-size: 17px; min-width: 120px;" data-bs-dismiss="modal">
                         Cancel
                     </button>
+<<<<<<< HEAD
                     <button type="submit" form="mobileChangePasswordForm"
+=======
+
+                    <!-- Change mentok kanan (ms-auto = margin-start auto) -->
+                    <button type="submit" id="submitChangePassword" form="changePasswordForm"
+>>>>>>> d71c637 (update navbar)
                         class="btn rounded-4 fw-semibold text-white ms-auto"
                         style="height: 50px; font-size: 17px; background-color: #007AFF; min-width: 120px;">
                         Change
