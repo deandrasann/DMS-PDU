@@ -66,10 +66,10 @@
                                 <div class="item" data-value="PDF">
                                     PDF
                                 </div>
-                                <div class="item" data-value="Spreadsheet">
+                                <div class="item" data-value="XLSX">
                                     Spreadsheet
                                 </div>
-                                <div class="item" data-value="Document">
+                                <div class="item" data-value="DOCS">
                                     Document
                                 </div>
                                 <div class="item" data-value="Image">
