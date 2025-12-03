@@ -83,7 +83,7 @@
     </div>
 </div>
 
-<!-- Upload Modal -->
+{{-- <!-- Upload Modal -->
 <div class="modal fade" id="uploadFileModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true"
     data-bs-backdrop="false" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -226,7 +226,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 
 <!-- Logout Confirmation Modal -->
 <div class="modal fade" id="logoutConfirmationModal" tabindex="-1" data-bs-backdrop="false" aria-hidden="true">
@@ -270,7 +270,7 @@
 </div>
 
 <!-- Edit File Modal -->
-<div class="modal fade" id="editFileModal" tabindex="-1" aria-labelledby="editFileModalLabel" aria-hidden="true"
+{{-- <div class="modal fade" id="editFileModal" tabindex="-1" aria-labelledby="editFileModalLabel" aria-hidden="true"
     data-bs-backdrop="false" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 rounded-4 shadow-lg">
@@ -366,7 +366,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 
 
 

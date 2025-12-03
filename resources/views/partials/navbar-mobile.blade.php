@@ -8,27 +8,153 @@
         <p class="fw-semibold fs-4 mb-0">@yield('title')</p>
     </div>
 
-    <!-- 🔹 Baris bawah: search bar -->
-    <div class="d-flex align-items-center gap-2 w-100">
-        <div class="d-flex align-items-center bg-white rounded-pill shadow-sm px-3 py-2 flex-grow-1">
+    <!-- 🔹 Baris bawah: search bar dengan filter dan sort -->
+    <div class="d-flex align-items-center gap-2 w-100 position-relative">
+        <!-- Search Box -->
+        <div class="d-flex align-items-center bg-white rounded-pill shadow-sm px-3 py-2 flex-grow-1 position-relative"
+             style="border: 1px solid #e0e0e0;">
             <!-- Search icon -->
             <i class="ph ph-magnifying-glass text-dark me-2"></i>
 
             <!-- Input -->
-            <input type="text" class="form-control border-0 shadow-none p-0 bg-transparent"
+            <input type="text" id="mobileSearchInput" class="form-control border-0 shadow-none p-0 bg-transparent"
                 placeholder="Search in DMS PDU" style="font-size: 0.9rem;">
 
             <!-- Filter icon -->
-            <i class="ph ph-sliders-horizontal text-dark ms-2" role="button"></i>
+            <i class="ph ph-sliders-horizontal text-dark ms-2 filter-toggle-mobile" role="button"></i>
         </div>
 
-        <!-- Sort button -->
-        <button class="btn btn-light rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center">
-            <i class="ph ph-arrows-down-up text-dark" style="font-size: 1.2rem;"></i>
-        </button>
+        <!-- Floating Filter Panel untuk Mobile -->
+        <div class="filter-panel-mobile mt-3" id="mobileFilterPanel" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 1050; background: white; margin-top: 5px;">
+            <div class="card card-body rounded-4 shadow-sm border-0" style="background: white;">
+
+                <!-- DATE MODIFIED -->
+                <div class="filter-row mb-3">
+                    <label class="form-label text-secondary fw-medium mb-2">Date Modified</label>
+                    <div class="dropdown-container">
+                        <button class="dropdown-toggle-custom-mobile d-flex justify-content-between align-items-center w-100 border rounded-3 p-2 bg-light"
+                                data-target="#mobileDd1">
+                            <span>Any Time</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu-custom-mobile border rounded-3 shadow-sm mt-1" id="mobileDd1" style="display: none; background: white;">
+                            <div class="item p-2 border-bottom" data-value="" data-filter-type="date_modified">Any Time</div>
+                            <div class="item p-2 border-bottom" data-value="today" data-filter-type="date_modified">Today</div>
+                            <div class="item p-2 border-bottom" data-value="last_week" data-filter-type="date_modified">Last Week</div>
+                            <div class="item p-2 border-bottom" data-value="last_month" data-filter-type="date_modified">Last Month</div>
+                            <div class="item p-2" data-value="last_year" data-filter-type="date_modified">Last Year</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TYPE -->
+                <div class="filter-row mb-3">
+                    <label class="form-label text-secondary fw-medium mb-2">Type</label>
+                    <div class="dropdown-container">
+                        <button class="dropdown-toggle-custom-mobile d-flex justify-content-between align-items-center w-100 border rounded-3 p-2 bg-light"
+                                data-target="#mobileDd2">
+                            <span>Any Type</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu-custom-mobile border rounded-3 shadow-sm mt-1" id="mobileDd2" style="display: none; background: white;">
+                            <div class="item p-2 border-bottom" data-value="" data-filter-type="type">Any Type</div>
+                            <div class="item p-2 border-bottom d-flex align-items-center" data-value="PDF" data-filter-type="type">
+                                <i class="ph ph-file-pdf me-2 text-danger"></i>PDF
+                            </div>
+                            <div class="item p-2 border-bottom d-flex align-items-center" data-value="Spreadsheet" data-filter-type="type">
+                                <i class="ph ph-file-xls me-2 text-success"></i>Spreadsheet
+                            </div>
+                            <div class="item p-2 border-bottom d-flex align-items-center" data-value="Document" data-filter-type="type">
+                                <i class="ph ph-file-doc me-2 text-primary"></i>Document
+                            </div>
+                            <div class="item p-2 d-flex align-items-center" data-value="Image" data-filter-type="type">
+                                <i class="ph ph-file-image me-2 text-warning"></i>Image
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LABEL -->
+                <div class="filter-row">
+                    <label class="form-label text-secondary fw-medium mb-2">Label</label>
+                    <div class="dropdown-container">
+                        <button class="dropdown-toggle-custom-mobile d-flex justify-content-between align-items-center w-100 border rounded-3 p-2 bg-light"
+                                data-target="#mobileDd4">
+                            <span>Any Label</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu-custom-mobile border rounded-3 shadow-sm mt-1" id="mobileDd4" style="display: none; background: white; max-height: 300px; overflow-y: auto;">
+                            <div class="item p-2 border-bottom" data-value="" data-filter-type="label">Any Label</div>
+                            <div id="mobileLabelsContainer" class="p-2 d-flex flex-wrap gap-1">
+                                <!-- Labels akan dimuat di sini -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between mt-3 pt-2 border-top">
+                    <button class="btn btn-outline-secondary btn-sm rounded-3 px-3" id="mobileResetFilters">
+                        Reset
+                    </button>
+                    <button class="btn btn-primary btn-sm rounded-3 px-3" id="mobileApplyFilters">
+                        Apply
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sort Button -->
+        <div class="sort-box-mobile position-relative">
+            <button class="btn btn-light rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center sort-toggle-mobile"
+                style="width: 45px; height: 45px; border: 1px solid #e0e0e0;">
+                <i class="ph ph-arrows-down-up text-dark" style="font-size: 1.2rem;"></i>
+            </button>
+
+            <!-- Sort Dropdown Menu -->
+            <div class="dropdown-menu-mobile shadow border-0 rounded-4 p-2"
+                 style="display: none; position: absolute; right: 0; top: 100%; min-width: 200px; z-index: 1050; background: white; margin-top: 5px;">
+                <a class="dropdown-item d-flex align-items-center gap-2 sort-option-mobile p-2 border-bottom" href="#"
+                    data-sort="alphabetical">
+                    <i class="ph ph-sort-ascending me-2"></i> Alphabetical
+                </a>
+                <a class="dropdown-item d-flex align-items-center gap-2 sort-option-mobile p-2 border-bottom" href="#"
+                    data-sort="reverse_alphabetical">
+                    <i class="ph ph-sort-descending me-2"></i> Reverse Alphabetical
+                </a>
+                <div class="dropdown-divider my-1"></div>
+                <a class="dropdown-item d-flex align-items-center gap-2 sort-option-mobile p-2 border-bottom" href="#" data-sort="latest">
+                    <i class="ph ph-clock me-2"></i> Latest
+                </a>
+                <a class="dropdown-item d-flex align-items-center gap-2 sort-option-mobile p-2 border-bottom" href="#" data-sort="oldest">
+                    <i class="ph ph-clock-counter-clockwise me-2"></i> Oldest
+                </a>
+                <div class="dropdown-divider my-1"></div>
+                <a class="dropdown-item d-flex align-items-center gap-2 sort-option-mobile p-2 border-bottom" href="#" data-sort="smallest">
+                    <i class="ph ph-arrow-down me-2"></i> Smallest
+                </a>
+                <a class="dropdown-item d-flex align-items-center gap-2 sort-option-mobile p-2" href="#" data-sort="largest">
+                    <i class="ph ph-arrow-up me-2"></i> Largest
+                </a>
+            </div>
+        </div>
+
+        <!-- Notification Button -->
+        <div class="notif-box-mobile">
+            <button class="btn btn-light rounded-circle shadow-sm p-2 d-flex align-items-center justify-content-center"
+                style="width: 45px; height: 45px; border: 1px solid #e0e0e0;">
+                <i class="ph ph-bell text-dark fs-5"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 🔹 Status bar untuk menunjukkan filter aktif -->
+    <div id="mobileActiveFilters" class="mt-2 d-flex flex-wrap gap-1" style="display: none !important;">
+        <!-- Filter chips akan muncul di sini -->
     </div>
 </div>
 
+<!-- Offcanvas Menu (Sidebar Mobile) -->
 <div class="offcanvas mobile-only offcanvas-start w-75" tabindex="-1" id="offcanvasExample"
     aria-labelledby="offcanvasExampleLabel">
     <div class="offcanvas-header">
@@ -77,7 +203,7 @@
             </li>
         </ul>
 
-        <!-- BAGIAN BAWAH: PROFILE + ACCOUNT SETTINGS (PERSIS GAMBAR iPhone) -->
+        <!-- BAGIAN BAWAH: PROFILE + ACCOUNT SETTINGS -->
         <div class="mt-auto">
             <div class="card border-0 shadow-sm rounded-3 p-2 mb-3">
                 <div class="d-flex align-items-center">
@@ -102,6 +228,8 @@
                         </div>
                     </div>
 
+
+
                     <!-- Gear Icon -->
                     <button type="button"
                         class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center flex-shrink-0"
@@ -114,6 +242,10 @@
         </div>
     </div>
 </div>
+
+
+
+<!-- Account Settings Modal untuk Mobile -->
 <div class="modal fade mobile-only" id="mobileAccountSettingsModal" tabindex="-1" data-bs-backdrop="false">
     <div class="modal-dialog modal-fullscreen-sm-down modal-dialog-centered">
         <div class="modal-content border-0" style="min-height: 100vh; margin: 0;">
@@ -127,13 +259,15 @@
             <!-- Body Form -->
             <div class="modal-body px-3 pb-5">
 
-                <form id="profileUpdateForm" enctype="multipart/form-data">
+                <form id="mobileProfileUpdateForm" action="{{ route('profile.update') }}" method="POST"
+                    enctype="multipart/form-data">
                     @csrf
+                    <input type="hidden" name="_method" value="PATCH">
 
                     <!-- Profile Photo Section -->
                     <div class="text-center my-4">
                         <img id="modalProfilePhoto"
-                             src="{{ session('new_profile_photo') ?? 
+                             src="{{ session('new_profile_photo') ??
                                    (session('user.photo_profile_path')
                                        ? 'https://pdu-dms.my.id/storage/profile_photos/' . session('user.photo_profile_path')
                                        : asset('storage/images/profile-pict.jpg')) }}?v={{ time() }}"
@@ -145,15 +279,15 @@
 
                         <!-- Delete (bulat) + Upload (persegi, auto width) -->
                         <div class="d-flex justify-content-center align-items-center gap-3">
-                            <button type="button" id="deletePhotoBtn"
+                            <button type="button" id="mobileDeletePhotoBtn"
                                     class="btn btn-outline-danger rounded-circle d-flex align-items-center justify-content-center"
                                     style="width: 40px; height: 40px;">
                                 <i class="ph ph-trash fs-5"></i>
                             </button>
 
-                            <input type="file" name="photo_profile" id="photoInput" class="d-none" accept="image/*">
+                            <input type="file" name="photo_profile" id="mobilePhotoInput" class="d-none" accept="image/*">
 
-                            <button type="button" id="uploadPhotoBtn"
+                            <button type="button" id="mobileUploadPhotoBtn"
                                     class="btn btn-outline-secondary rounded-4 px-4"
                                     style="height: 44px; font-size: 16px; max-width: fit-content; white-space: nowrap;">
                                 Upload
@@ -177,7 +311,7 @@
                                style="height: 50px; background:#f7f7f8; border:none; color:#8e8e93;">
                     </div>
 
-                    <!-- Password + Change Password (auto width, di bawah label) -->
+                    <!-- Password + Change Password -->
                     <div class="mb-5">
                         <label class="form-label text-secondary fw-medium">Password</label>
                         <div class="d-flex justify-content-between align-items-center">
@@ -188,21 +322,21 @@
                             </button>
                         </div>
                     </div>
-
                 </form>
             </div>
 
-            <!-- FIXED BOTTOM: Log Out & Save Changes mentok bawah -->
+
+            <!-- FIXED BOTTOM: Log Out & Save Changes -->
             <div class="position-fixed bottom-0 start-0 end-0 bg-white"
                  style="padding: 16px 16px 34px;">
                 <div class="d-flex">
                     <button type="button"
-                            onclick="event.preventDefault(); document.getElementById('logoutForm').submit();"
+                            onclick="event.preventDefault(); document.getElementById('mobileLogoutForm').submit();"
                             class="btn btn-danger rounded-4 fw-semibold"
                             style="height: 50px; font-size: 17px;">
                         Log Out
                     </button>
-                    <button type="submit" form="profileUpdateForm"
+                    <button type="submit" form="mobileProfileUpdateForm"
                             class="btn rounded-4 fw-semibold text-white ms-auto"
                             style="height: 50px; font-size: 17px; background-color: #007AFF;">
                         Save Changes
@@ -211,7 +345,7 @@
             </div>
 
             <!-- Hidden Logout Form -->
-            <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="d-none">
+            <form id="mobileLogoutForm" action="{{ route('logout') }}" method="POST" class="d-none">
                 @csrf
             </form>
 
@@ -219,8 +353,53 @@
     </div>
 </div>
 
+<!-- Delete Confirmation Modal untuk Mobile -->
+<div class="modal fade mobile-only" id="mobileDeleteConfirmationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg"
+            style="background-color: #fff; max-width: 500px;">
 
-<!-- Change Password Modal – Dengan Eye Toggle + Button Rata Kiri/Kanan -->
+            <!-- Close Button -->
+            <button type="button"
+                class="btn-close position-absolute top-0 end-0 mt-3 me-3"
+                data-bs-dismiss="modal" aria-label="Close"
+                style="z-index: 10; font-size: 1.1rem; opacity: 0.7;">
+            </button>
+
+            <div class="modal-body py-4 px-5">
+                <!-- Teks -->
+                <div style="padding-left: 1.75rem; padding-top:1rem;">
+                    <h5 class="fw-semibold mb-2 text-start"
+                        style="font-size: 1.25rem;">
+                        Delete profile picture?
+                    </h5>
+                    <p class="text-muted small mb-4 text-start"
+                        style="font-family: Rubik; line-height: 1.5; font-size: 0.875rem;">
+                        This action cannot be undone
+                    </p>
+                </div>
+
+                <!-- Tombol: Cancel + Delete -->
+                <div class="d-flex justify-content-between align-items-center"
+                    style="padding-left: 1.75rem;">
+                    <button type="button"
+                        class="btn btn-outline-secondary rounded-4 px-4 py-2"
+                        data-bs-dismiss="modal"
+                        style="min-width: 100px; font-size: 14px; border-color: #d1d5db; color: #6b7280;">
+                        Cancel
+                    </button>
+                    <button type="button" id="mobileConfirmDeleteBtn"
+                        class="btn btn-danger rounded-4 px-4 py-2 text-white"
+                        style="min-width: 100px; font-size: 14px; background-color: #dc3545; border: none;">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal untuk Mobile -->
 <div class="modal fade mobile-only" id="mobileChangePasswordModal" tabindex="-1" data-bs-backdrop="false">
     <div class="modal-dialog modal-fullscreen-sm-down modal-dialog-centered">
         <div class="modal-content border-0" style="min-height: 100vh; margin: 0;">
@@ -234,18 +413,18 @@
 
             <!-- Form Body -->
             <div class="modal-body px-4 pt-3 pb-5">
-                <form id="changePasswordForm">
+                <form id="mobileChangePasswordForm" action="{{ route('password.update') }}" method="POST">
                     @csrf
                     @method('POST')
 
                     <!-- Old Password -->
                     <div class="mb-3">
-                        <label class="form-label text-secondary fw-medium">Old password</label>
+                        <label class="form-label text-secondary fw-medium">Current Password</label>
                         <div class="input-group">
                             <input type="password" name="current_password" class="form-control rounded-3 border-0"
-                                placeholder="Insert old password" style="height: 50px; background:#f7f7f8;" required>
+                                placeholder="Enter old password" style="height: 50px; background:#f7f7f8;" required>
                             <span class="input-group-text bg-transparent border-0" style="height: 50px;">
-                                <i class="ph ph-eye-slash toggle-password cursor-pointer"
+                                <i class="ph ph-eye-slash toggle-password-mobile cursor-pointer"
                                     data-target="current_password"></i>
                             </span>
                         </div>
@@ -253,12 +432,12 @@
 
                     <!-- New Password -->
                     <div class="mb-3">
-                        <label class="form-label text-secondary fw-medium">New password</label>
+                        <label class="form-label text-secondary fw-medium">New Password</label>
                         <div class="input-group">
                             <input type="password" name="new_password" class="form-control rounded-3 border-0"
-                                placeholder="Insert new password" style="height: 50px; background:#f7f7f8;" required>
+                                placeholder="Enter new password" style="height: 50px; background:#f7f7f8;" required>
                             <span class="input-group-text bg-transparent border-0" style="height: 50px;">
-                                <i class="ph ph-eye-slash toggle-password cursor-pointer"
+                                <i class="ph ph-eye-slash toggle-password-mobile cursor-pointer"
                                     data-target="new_password"></i>
                             </span>
                         </div>
@@ -266,38 +445,33 @@
 
                     <!-- Confirm Password -->
                     <div class="mb-4">
-                        <label class="form-label text-secondary fw-medium">Confirm new password</label>
+                        <label class="form-label text-secondary fw-medium">Confirm New Password</label>
                         <div class="input-group">
                             <input type="password" name="new_password_confirmation"
-                                class="form-control rounded-3 border-0" placeholder="Type again new password"
+                                class="form-control rounded-3 border-0" placeholder="Confirm new password"
                                 style="height: 50px; background:#f7f7f8;" required>
                             <span class="input-group-text bg-transparent border-0" style="height: 50px;">
-                                <i class="ph ph-eye-slash toggle-password cursor-pointer"
+                                <i class="ph ph-eye-slash toggle-password-mobile cursor-pointer"
                                     data-target="new_password_confirmation"></i>
                             </span>
                         </div>
                     </div>
 
                     <div class="text-start mb-4">
-                        <a href="{{ route('forgot') }}" class="text-decoration-none" style="color:#f97316; font-size:14px;">Forgot
-                            Password?</a>
+                        <a href="{{ route('forgot') }}" class="text-decoration-none" style="color:#f97316; font-size:14px;">Forgot Password?</a>
                     </div>
                 </form>
             </div>
 
+            <!-- Fixed Bottom Buttons -->
             <div class="position-fixed bottom-0 start-0 end-0 bg-white"
                 style="padding: 16px 16px 34px;">
-
-                <!-- Pakai d-flex + ms-auto supaya Change mentok kanan -->
                 <div class="d-flex">
-                    <!-- Cancel mentok kiri -->
                     <button type="button" class="btn btn-light rounded-4 fw-semibold me-3"
                         style="height: 50px; font-size: 17px; min-width: 120px;" data-bs-dismiss="modal">
                         Cancel
                     </button>
-
-                    <!-- Change mentok kanan (ms-auto = margin-start auto) -->
-                    <button type="submit" form="changePasswordForm"
+                    <button type="submit" form="mobileChangePasswordForm"
                         class="btn rounded-4 fw-semibold text-white ms-auto"
                         style="height: 50px; font-size: 17px; background-color: #007AFF; min-width: 120px;">
                         Change
@@ -308,6 +482,349 @@
         </div>
     </div>
 </div>
+
+<!-- Loading Overlay untuk Auto Logout (Mobile) -->
+<div id="mobileAutoLogoutLoader"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.35); backdrop-filter:blur(2px); z-index:9999; align-items:center; justify-content:center;">
+    <div class="spinner-border text-light" style="width:3rem; height:3rem;"></div>
+</div>
+
+
+<script>
+// ===================================================================
+// FUNGSIONALITAS NAVBAR MOBILE - FIXED VERSION
+// ===================================================================
+function initMobileNavbar() {
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => document.querySelectorAll(s);
+
+    console.log('🔄 Mobile navbar initializing...');
+
+    // ========================================
+    // 1. CHECK MySpaceManager
+    // ========================================
+    const mySpaceManager = window.mySpaceManager;
+    if (!mySpaceManager) {
+        console.warn('⚠️ MySpaceManager not found, retrying...');
+        setTimeout(initMobileNavbar, 500);
+        return;
+    }
+
+    console.log('✅ MySpaceManager found!');
+
+    // ========================================
+    // 2. FILTER PANEL - FIXED TOGGLE
+    // ========================================
+    const filterToggleMobile = $('.filter-toggle-mobile');
+    const filterPanelMobile = $('#mobileFilterPanel');
+
+    if (filterToggleMobile && filterPanelMobile) {
+        console.log('🔧 Filter toggle found');
+
+        filterToggleMobile.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🎯 Filter toggle clicked');
+
+            // Gunakan kedua cara untuk memastikan tampil
+            if (filterPanelMobile.style.display === 'block' ||
+                filterPanelMobile.classList.contains('show')) {
+                // Hide
+                filterPanelMobile.style.display = 'none';
+                filterPanelMobile.classList.remove('show');
+                console.log('📦 Filter panel hidden');
+            } else {
+                // Show - HAPUS SEMUA display:none DULU
+                filterPanelMobile.style.display = '';
+                filterPanelMobile.classList.remove('d-none');
+
+                // Tampilkan dengan kedua cara
+                filterPanelMobile.style.display = 'block';
+                filterPanelMobile.classList.add('show');
+
+                // Force reflow untuk memastikan CSS diterapkan
+                filterPanelMobile.offsetHeight;
+
+                console.log('📦 Filter panel shown');
+            }
+
+            // Close other dropdowns
+            closeAllMobileDropdowns();
+            const sortDropdown = $('.dropdown-menu-mobile');
+            if (sortDropdown) {
+                sortDropdown.style.display = 'none';
+                sortDropdown.classList.remove('show');
+            }
+        });
+
+        // Klik di luar untuk tutup
+        document.addEventListener('click', (e) => {
+            if (filterPanelMobile &&
+                !filterPanelMobile.contains(e.target) &&
+                !e.target.classList.contains('filter-toggle-mobile') &&
+                !e.target.closest('.filter-toggle-mobile')) {
+
+                filterPanelMobile.style.display = 'none';
+                filterPanelMobile.classList.remove('show');
+            }
+        });
+    }
+
+    // ========================================
+    // 3. DROPDOWNS - FIXED TOGGLE
+    // ========================================
+    function closeAllMobileDropdowns() {
+        console.log('🔒 Closing all dropdowns');
+        $$('.dropdown-menu-custom-mobile').forEach(menu => {
+            if (menu) {
+                menu.style.display = 'none';
+                menu.classList.remove('show');
+            }
+        });
+        $$('.dropdown-toggle-custom-mobile').forEach(btn => {
+            if (btn) btn.classList.remove("active");
+        });
+    }
+
+    // Toggle dropdown mobile - SIMPLIFIED
+    $$('.dropdown-toggle-custom-mobile').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const targetId = this.dataset.target;
+            const menu = $(targetId);
+            if (!menu) {
+                console.error('❌ Menu not found:', targetId);
+                return;
+            }
+
+            console.log('🎯 Dropdown toggle clicked:', targetId);
+
+            // Check if currently open
+            const isOpen = menu.style.display === 'block' || menu.classList.contains('show');
+
+            // Close all first
+            closeAllMobileDropdowns();
+            if (filterPanelMobile) {
+                filterPanelMobile.style.display = 'none';
+                filterPanelMobile.classList.remove('show');
+            }
+            const sortDropdown = $('.dropdown-menu-mobile');
+            if (sortDropdown) {
+                sortDropdown.style.display = 'none';
+                sortDropdown.classList.remove('show');
+            }
+
+            // Toggle current
+            if (!isOpen) {
+                // Show dropdown - CLEAR semua display restrictions dulu
+                menu.style.display = '';
+                menu.classList.remove('d-none');
+
+                // Apply display block dan class show
+                menu.style.display = 'block';
+                menu.classList.add('show');
+                this.classList.add("active");
+
+                // Force reflow
+                menu.offsetHeight;
+
+                console.log('📦 Dropdown opened:', targetId);
+            } else {
+                menu.style.display = 'none';
+                menu.classList.remove('show');
+                this.classList.remove("active");
+            }
+        });
+    });
+
+    // Item click handlers
+    $$('.dropdown-menu-custom-mobile .item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const menu = this.closest('.dropdown-menu-custom-mobile');
+            if (!menu) return;
+
+            const btn = $(`[data-target="#${menu.id}"]`);
+
+            if (btn) {
+                const span = btn.querySelector("span");
+                if (span) {
+                    span.textContent = this.textContent.trim();
+                }
+
+                // Close dropdown
+                menu.style.display = 'none';
+                menu.classList.remove('show');
+                btn.classList.remove("active");
+
+                // Apply filter
+                const filterType = this.getAttribute('data-filter-type') || 'value';
+                const filterValue = this.getAttribute('data-value') || this.textContent.trim();
+
+                if (mySpaceManager && mySpaceManager.applyFilter) {
+                    mySpaceManager.applyFilter(filterType, filterValue);
+                }
+
+                // Close filter panel
+                if (filterPanelMobile) {
+                    filterPanelMobile.style.display = 'none';
+                    filterPanelMobile.classList.remove('show');
+                }
+            }
+        });
+    });
+
+    // ========================================
+    // 4. SEARCH FUNCTIONALITY
+    // ========================================
+    const mobileSearchInput = $('#mobileSearchInput');
+    if (mobileSearchInput && mySpaceManager.applyFilter) {
+        let debounceTimer;
+
+        mobileSearchInput.addEventListener('input', (e) => {
+            const keyword = e.target.value.trim();
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                mySpaceManager.applyFilter('search', keyword);
+            }, 500);
+        });
+
+        mobileSearchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                clearTimeout(debounceTimer);
+                const keyword = e.target.value.trim();
+                mySpaceManager.applyFilter('search', keyword);
+            }
+        });
+    }
+
+    // ========================================
+    // 5. SORT DROPDOWN - FIXED
+    // ========================================
+    const sortToggleMobile = $('.sort-toggle-mobile');
+    const sortDropdownMobile = $('.dropdown-menu-mobile');
+
+    if (sortToggleMobile && sortDropdownMobile && mySpaceManager.loadFilesAndFolders) {
+        sortToggleMobile.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Check if open
+            const isOpen = sortDropdownMobile.style.display === 'block' ||
+                          sortDropdownMobile.classList.contains('show');
+
+            // Close other dropdowns
+            closeAllMobileDropdowns();
+            if (filterPanelMobile) {
+                filterPanelMobile.style.display = 'none';
+                filterPanelMobile.classList.remove('show');
+            }
+
+            // Toggle sort dropdown
+            if (!isOpen) {
+                // Clear display restrictions
+                sortDropdownMobile.style.display = '';
+                sortDropdownMobile.classList.remove('d-none');
+
+                // Show
+                sortDropdownMobile.style.display = 'block';
+                sortDropdownMobile.classList.add('show');
+                console.log('📦 Sort dropdown opened');
+            } else {
+                sortDropdownMobile.style.display = 'none';
+                sortDropdownMobile.classList.remove('show');
+            }
+        });
+
+        // Sort option selection
+        $$('.sort-option-mobile').forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const sortType = this.dataset.sort;
+                console.log('🔀 Sorting by:', sortType);
+
+                // Close dropdown
+                sortDropdownMobile.style.display = 'none';
+                sortDropdownMobile.classList.remove('show');
+
+                // Apply sort
+                mySpaceManager.loadFilesAndFolders(sortType);
+            });
+        });
+    }
+
+    // ========================================
+    // 6. RESET & APPLY BUTTONS
+    // ========================================
+    $('#mobileResetFilters')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Reset UI
+        $$('.dropdown-toggle-custom-mobile span').forEach(span => {
+            if (!span) return;
+            if (span.closest('[data-target="#mobileDd1"]')) span.textContent = 'Any Time';
+            else if (span.closest('[data-target="#mobileDd2"]')) span.textContent = 'Any Type';
+            else if (span.closest('[data-target="#mobileDd4"]')) span.textContent = 'Any Label';
+        });
+
+        if (mobileSearchInput) mobileSearchInput.value = '';
+
+        // Reset filters
+        if (mySpaceManager.activeFilters) {
+            mySpaceManager.activeFilters = {
+                date_modified: '',
+                type: '',
+                label: '',
+                search: ''
+            };
+            mySpaceManager.loadFilesAndFolders();
+        }
+
+        // Close panels
+        closeAllMobileDropdowns();
+        if (filterPanelMobile) {
+            filterPanelMobile.style.display = 'none';
+            filterPanelMobile.classList.remove('show');
+        }
+    });
+
+    $('#mobileApplyFilters')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (filterPanelMobile) {
+            filterPanelMobile.style.display = 'none';
+            filterPanelMobile.classList.remove('show');
+        }
+    });
+
+    // ========================================
+    // 7. INITIALIZATION COMPLETE
+    // ========================================
+    console.log('✅ Mobile navbar fully initialized');
+    console.log('📊 Elements ready:');
+    console.log('- Filter toggle:', !!filterToggleMobile);
+    console.log('- Filter panel:', !!filterPanelMobile);
+    console.log('- Search input:', !!mobileSearchInput);
+    console.log('- Sort toggle:', !!sortToggleMobile);
+    console.log('- Sort dropdown:', !!sortDropdownMobile);
+}
+
+// Start initialization
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(initMobileNavbar, 100);
+    });
+} else {
+    setTimeout(initMobileNavbar, 100);
+}
+</script>
 {{-- <script>
     // Pastikan DOM sudah siap
     document.addEventListener('DOMContentLoaded', function () {
@@ -343,7 +860,7 @@
 
         if (uploadBtn && photoInput) {
             uploadBtn.addEventListener('click', () => photoInput.click());
-            
+
             photoInput.addEventListener('change', function () {
                 if (this.files && this.files[0]) {
                     const reader = new FileReader();
