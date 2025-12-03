@@ -1,17 +1,11 @@
+// public/js/myspace.js
+
 class MySpaceManager {
     constructor() {
         this.token = window.token || '';
         this.currentPath = window.currentPath || '';
         this.isLastOpenedPage = window.isLastOpenedPage || false;
         this.isRecommendedPage = window.isRecommendedPage || false;
-
-        // ✅ PERBAIKAN: Definisikan State Filter DI SINI (Sebelum init dipanggil)
-        this.activeFilters = {
-            date_modified: '',
-            type: '',
-            label: '',
-            search: ''
-        };
 
         console.log('MySpaceManager initialized:', {
             isLastOpenedPage: this.isLastOpenedPage,
@@ -24,163 +18,9 @@ class MySpaceManager {
 
     init() {
         console.log('MySpaceManager init called');
-
-        // Sekarang aman dipanggil karena activeFilters sudah ada di constructor
         this.loadFilesAndFolders();
-
         this.attachEventListeners();
-        this.fetchLabels();
-
-        // ❌ HAPUS definisi activeFilters dari sini agar tidak menimpa atau terlambat
     }
-
-    // Fungsi untuk mengambil data labels dari API
-async fetchLabels() {
-    try {
-        const response = await fetch(`https://pdu-dms.my.id/api/labels`, {
-            headers: {
-                "Authorization": "Bearer " + this.token,
-                "Accept": "application/json"
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-
-        if (result.message === "Labels retrieved successfully") {
-            this.renderExistingLabels(result.data);
-        } else {
-            console.error('Failed to fetch labels:', result.message);
-        }
-    } catch (error) {
-        console.error('Error fetching labels:', error);
-    }
-}
-
-   renderExistingLabels(labels) {
-        // Pastikan ID ini sesuai dengan yang ada di navbar.blade.php
-        const existingLabelsContainer = document.getElementById("navbarLabelsContainer");
-
-        // DEBUG: Cek apakah element ditemukan
-        // console.log('existingLabelsContainer:', existingLabelsContainer);
-        // console.log('Labels data:', labels);
-
-        if (!existingLabelsContainer) {
-            console.error('Element dengan ID "navbarLabelsContainer" tidak ditemukan di Navbar!');
-            return;
-        }
-
-        // Cek jika labels adalah array dan tidak kosong
-        if (!Array.isArray(labels) || labels.length === 0) {
-            existingLabelsContainer.innerHTML = '<div class="text-muted small p-2">No labels found</div>';
-            return;
-        }
-
-        // Kosongkan container sebelum render ulang
-        existingLabelsContainer.innerHTML = "";
-
-        labels.forEach(label => {
-            // --- WARNA (TIDAK DIUBAH, SESUAI KODE ASLI) ---
-            const bgColor = label.color ? `#${label.color}` : "#E6E5E3";
-
-            // Buat element untuk setiap label
-            const labelElement = document.createElement("div");
-            labelElement.classList.add("rounded-pill", "px-3", "py-1", "small", "me-1", "mb-1");
-
-            // Apply Styles
-            labelElement.style.backgroundColor = bgColor;
-            labelElement.style.display = "inline-block";
-            labelElement.style.color = "#333";
-            labelElement.style.border = "1px solid #ccc";
-            labelElement.style.cursor = "pointer";
-            labelElement.style.transition = "all 0.2s ease";
-            labelElement.textContent = label.name;
-
-            // Hover effects
-            labelElement.addEventListener("mouseenter", () => {
-                labelElement.style.opacity = "0.8";
-                labelElement.style.transform = "scale(1.05)"; // Sedikit efek zoom biar interaktif
-            });
-            labelElement.addEventListener("mouseleave", () => {
-                labelElement.style.opacity = "1";
-                labelElement.style.transform = "scale(1)";
-            });
-
-            // --- CLICK HANDLER (PERBAIKAN UTAMA) ---
-            labelElement.addEventListener("click", (e) => {
-                // Mencegah event bubbling jika perlu (opsional)
-                // e.stopPropagation();
-
-                console.log(`Label clicked: ${label.name}`);
-
-                // 1. Update text dropdown di Navbar agar user tahu label apa yang dipilih
-                const dropdownToggle = document.querySelector('[data-target="#dd4"] span');
-                if (dropdownToggle) {
-                    dropdownToggle.textContent = label.name;
-                }
-
-                // 2. Panggil API Filter melalui fungsi helper di Class ini
-                // Pastikan 'this' merujuk ke class MySpaceManager (aman karena pakai arrow function)
-                this.applyFilter('label', label.id);
-            });
-
-            existingLabelsContainer.appendChild(labelElement);
-        });
-
-        console.log('Labels rendered successfully');
-    }
-
-    showMessage(type, message) {
-        const div = document.createElement('div');
-        div.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-        div.style.cssText = `
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            min-width: 300px;
-        `;
-        div.innerHTML = `
-            <i class="ph ph-info me-2"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-
-        document.body.appendChild(div);
-
-        setTimeout(() => div.remove(), 5000);
-    }
-
-    showLoading() {
-    if (document.getElementById("global-loading-spinner")) return;
-
-    const div = document.createElement("div");
-    div.id = "global-loading-spinner";
-    div.className = "alert alert-light border position-fixed d-flex align-items-center gap-2";
-    div.style.cssText = `
-        top: 20px;
-        right: 20px;
-        z-index: 99999;
-        padding: 10px 16px;
-        border-radius: 10px;
-        box-shadow: 0 3px 12px rgba(0,0,0,.15);
-    `;
-    div.innerHTML = `
-        <div class="spinner-border text-primary spinner-border-sm"></div>
-        <span class="fw-semibold">Loading...</span>
-    `;
-
-    document.body.appendChild(div);
-}
-
-hideLoading() {
-    const el = document.getElementById("global-loading-spinner");
-    if (el) el.remove();
-}
-
-
 
     attachSortListeners() {
         document.querySelectorAll(".sort-option").forEach(option => {
@@ -197,7 +37,7 @@ hideLoading() {
     }
 
 
- async loadFilesAndFolders(sortType = null) {
+    async loadFilesAndFolders(sortType = null) {
         const folderContainer = document.getElementById("folderContainer");
         const fileContainer = document.getElementById("fileContainer");
         const emptyTemplate = document.getElementById("empty-template");
@@ -208,56 +48,41 @@ hideLoading() {
         }
 
         try {
-            this.showLoading();
-
-            let baseUrl;
-            let transformData = false; // Flag untuk handle format response beda
+            let url;
+            let transformData = false;
             let folderData = null;
 
-            // 1. TENTUKAN BASE URL BERDASARKAN HALAMAN
+            // ✅ DETECT RECOMMENDED PAGE
             if (this.isRecommendedPage) {
-                baseUrl = "https://pdu-dms.my.id/api/recommended-files";
+                url = "https://pdu-dms.my.id/api/recommended-files";
                 transformData = true;
+                if (sortType) {
+                    url += `?sort=${sortType}`;
+                }
             }
+            // DETECT LAST OPENED PAGE
             else if (this.isLastOpenedPage) {
-                baseUrl = "https://pdu-dms.my.id/api/last-opened-files";
+                url = "https://pdu-dms.my.id/api/last-opened-files";
                 transformData = true;
-            }
-            else {
-                // Default: My Files / Folder Browsing
-                const path = this.currentPath ? `api/my-files/${this.currentPath}` : "api/my-files";
-                baseUrl = `https://pdu-dms.my.id/${path}`;
+                if (sortType) {
+                    url += `?sort=${sortType}`;
+                }
+            } else {
+                const baseUrl = "https://pdu-dms.my.id/api/my-files";
+                url = this.currentPath ? `${baseUrl}/${this.currentPath}` : baseUrl;
                 transformData = false;
+                if (sortType) {
+                    url += `?sort=${sortType}`;
+                }
             }
 
-            // 2. SIAPKAN QUERY PARAMS (FILTER & SORT)
-            // Ini berlaku untuk SEMUA jenis halaman
-            const params = new URLSearchParams();
+            console.log('Fetching from:', url);
+            console.log('Page Type:', {
+                isRecommendedPage: this.isRecommendedPage,
+                isLastOpenedPage: this.isLastOpenedPage
+            });
 
-            // Masukkan Filter dari State (activeFilters)
-            if (this.activeFilters.date_modified) params.append('date_modified', this.activeFilters.date_modified);
-            if (this.activeFilters.type) params.append('type', this.activeFilters.type);
-
-            // ✅ Filter Label (Fokus utama Anda saat ini)
-            if (this.activeFilters.label) params.append('label', this.activeFilters.label);
-
-            if (this.activeFilters.search) {
-                params.append('search', this.activeFilters.search);
-            }
-
-            if (sortType) {
-                params.append('sort', sortType);
-            }
-
-            // Gabungkan URL
-            const finalUrl = `${baseUrl}?${params.toString()}`;
-            console.log('Fetching from:', finalUrl);
-
-
-            console.log('Active Filters:', this.activeFilters);
-
-            // 4. LAKUKAN FETCH
-            const response = await fetch(finalUrl, {
+            const response = await fetch(url, {
                 headers: {
                     "Authorization": "Bearer " + this.token,
                     "Accept": "application/json",
@@ -275,62 +100,44 @@ hideLoading() {
 
             const data = await response.json();
 
-            // 5. OLAH DATA (MAPPING HASIL)
             let folders = [];
             let files = [];
 
             if (transformData) {
                 if (this.isRecommendedPage) {
-                    // Endpoint recommended biasanya return object { recommended_files: [...] }
+                    // ✅ DATA DARI RECOMMENDED-FILES ENDPOINT (HANYA FILE)
                     files = data.recommended_files || [];
-                    folders = [];
+                    folders = []; // Recommended page hanya menampilkan files
                 } else {
-                    // Endpoint last-opened
+                    // DATA DARI LAST-OPENED-FILES ENDPOINT
                     folders = data.last_opened_folders || [];
                     files = data.last_opened_files || [];
                 }
             } else {
-                // Endpoint standard (My Files / Folder)
-                // Asumsi: data.files berisi array campuran folder & file, atau folder dipisah backend
-                // Kita gunakan filter is_folder untuk memisahkan
-
-                // Jika BE mengembalikan semua dalam 'files':
+                // DATA DARI MY-FILES ENDPOINT (ORIGINAL)
                 folders = data.files?.filter(f => f.is_folder) || [];
                 files = data.files?.filter(f => !f.is_folder) || [];
-
-                // Simpan metadata folder saat ini (untuk breadcrumb dll)
                 folderData = data;
             }
 
-            // 6. RENDER KE HTML
-
-            // Handle Tampilan Folder (Hide jika Recommended Page)
+            // ✅ UNTUK RECOMMENDED PAGE: Hanya render files, hide folder container
             if (this.isRecommendedPage) {
-                if (folderContainer) folderContainer.style.display = 'none';
-            } else {
                 if (folderContainer) {
-                    folderContainer.style.display = 'flex'; // Pastikan terlihat kembali
+                    folderContainer.style.display = 'none'; // Sembunyikan folder section
+                }
+                this.renderFiles(files, fileContainer, emptyTemplate.content.cloneNode(true));
+            } else {
+                // Untuk halaman lain: render normal
+                if (folderContainer) {
                     await this.renderFolders(folders, folderContainer, emptyTemplate.content.cloneNode(true), folderData);
                 }
+                this.renderFiles(files, fileContainer, emptyTemplate.content.cloneNode(true));
             }
 
-            // Render File
-            this.renderFiles(files, fileContainer, emptyTemplate.content.cloneNode(true));
-
         } catch (err) {
-            console.error('Error loadFilesAndFolders:', err);
+            console.error('Error:', err);
             this.showError(folderContainer, fileContainer, err.message);
-        } finally {
-            this.hideLoading();
         }
-    }
-    applyFilter(key, value) {
-        // Update state
-        this.activeFilters[key] = value;
-        console.log(`Filter applied: ${key} = ${value}`);
-
-        // Reload data dengan filter baru
-        this.loadFilesAndFolders();
     }
 
     async renderFolders(folders, container, emptyTemplate, folderData = null) {
@@ -519,8 +326,7 @@ hideLoading() {
 createFileElement(file) {
     const card = document.createElement("div");
     card.className = "card rounded-4 border-dark-subtle border-1 me-3 file-card";
-    // card.style.width = "160px";
-    // card.style.minWidth = "120px";
+    card.style.width = "160px";
     card.style.height = "180px";
     card.style.backgroundColor = "#F2F2F0";
     card.style.cursor = "pointer";
@@ -1034,7 +840,7 @@ getMappedTextColor(backgroundColor) {
 
     async duplicateFile(fileId, fileName, buttonElement) {
         if (!this.token) {
-            this.showMessage("danger", "Token tidak ditemukan. Silakan login ulang.");
+            alert("Token tidak ditemukan. Silakan login ulang.");
             return;
         }
 
@@ -1176,96 +982,11 @@ getMappedTextColor(backgroundColor) {
 }
 
     attachEventListeners() {
-        const self = this; // Capture 'this' context
-
-        // --- FILTER DATE MODIFIED (Asumsi dropdown ID #dd1) ---
-        document.querySelectorAll('#dd1 .item').forEach(item => {
-            item.addEventListener('click', function() {
-                // Ambil value dari attribute atau text content
-                // Contoh HTML: <div class="item" data-value="last_month">Last Month</div>
-                const value = this.getAttribute('data-value');
-                const text = this.textContent;
-
-                // Update teks tombol dropdown
-                document.querySelector('[data-target="#dd1"] span').textContent = text;
-
-                // Panggil filter
-                self.applyFilter('date_modified', value);
-            });
-        });
-
-        const searchInput = document.getElementById('searchInput');
-        let debounceTimer;
-
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                const keyword = e.target.value.trim();
-
-                // Reset timer setiap kali user mengetik
-                clearTimeout(debounceTimer);
-
-                // Tunggu 500ms (setengah detik) setelah user berhenti mengetik
-                debounceTimer = setTimeout(() => {
-                    console.log("🔍 Searching for:", keyword);
-
-                    // Panggil fungsi filter. Ini akan men-trigger loadFilesAndFolders otomatis
-                    self.applyFilter('search', keyword);
-                }, 500);
-            });
-
-            // Opsional: Supaya bisa langsung search kalau tekan Enter
-            searchInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    clearTimeout(debounceTimer); // Batalkan debounce timer
-                    const keyword = e.target.value.trim();
-                    self.applyFilter('search', keyword);
-                }
-            });
-        }
-
-        // Di dalam method attachEventListeners()
-
-        // --- FILTER TYPE (Fix untuk PDF/Spreadsheet) ---
-        document.querySelectorAll('#dd2 .item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                // Gunakan e.currentTarget agar selalu mengambil elemen .item pembungkusnya,
-                // meskipun yang diklik adalah ikon di dalamnya.
-                const target = e.currentTarget;
-                const value = target.getAttribute('data-value');
-                const text = target.textContent.trim();
-
-                console.log("Type selected:", value); // Debugging
-
-                // Update teks tombol dropdown
-                const toggleBtn = document.querySelector('[data-target="#dd2"] span');
-                if(toggleBtn) toggleBtn.textContent = text;
-
-                // Panggil filter
-                this.applyFilter('type', value);
-            });
-        });
         this.attachInfoPanelListeners();
         this.attachFileOperationsListeners();
         this.attachFolderOperationsListeners();
         this.attachRenameFolderListeners();
         this.attachSortListeners();
-        this.attachLabelFilterListeners();
-    }
-
-    attachLabelFilterListeners() {
-        // Reset filter label ketika memilih "Any"
-        const anyLabelItem = document.querySelector('#dd4 .item[data-label="any"]');
-        if (anyLabelItem) {
-            anyLabelItem.addEventListener('click', () => {
-                const dropdownToggle = document.querySelector('[data-target="#dd4"] span');
-                if (dropdownToggle) {
-                    dropdownToggle.textContent = "Any";
-                    // Reset filter label
-                    console.log("Reset label filter");
-                    // this.resetLabelFilter();
-                }
-            });
-        }
     }
 
     attachInfoPanelListeners() {
@@ -1413,7 +1134,7 @@ document.addEventListener('click', (e) => {
 
             const fileId = btn.getAttribute("data-id");
 
-            // if (!confirm("Yakin mau menghapus file ini?")) return;
+            if (!confirm("Yakin mau menghapus file ini?")) return;
 
             try {
                 const response = await fetch(`https://pdu-dms.my.id/api/delete-file/${fileId}`, {
@@ -1442,7 +1163,6 @@ document.addEventListener('click', (e) => {
                         }
                     }
                     // alert("File berhasil dihapus");
-                    this.showMessage("success", "File berhasil dihapus");
                 } else {
                     let errorMessage = "Gagal menghapus file";
                     if (result.message) {
@@ -1452,12 +1172,12 @@ document.addEventListener('click', (e) => {
                     } else if (response.status === 403) {
                         errorMessage = "Anda tidak memiliki izin untuk menghapus file ini";
                     }
-                    this.showMessage('danger', errorMessage);
+                    alert(errorMessage);
                 }
 
             } catch (err) {
                 console.error('Delete file error:', err);
-                this.showMessage('danger', 'Gagal menghapus file');
+                alert("Gagal menghapus file: " + err.message);
             }
         });
 
@@ -1473,7 +1193,7 @@ document.addEventListener('click', (e) => {
             const fileName = btn.getAttribute("data-name");
 
             if (!this.token) {
-                this.showMessage("danger", "Token tidak ditemukan. Silakan login ulang.");
+                alert("Token tidak ditemukan. Silakan login ulang.");
                 return;
             }
 
@@ -1506,14 +1226,13 @@ document.addEventListener('click', (e) => {
 
             } catch (error) {
                 console.error(error);
-                this.showMessage("danger", error.message);
-                // alert("Gagal mengunduh file: " + error.message);
+                alert("Gagal mengunduh file: " + error.message);
             }
         });
     }
 
     attachFolderOperationsListeners() {
-        // Event listener untuk delete file
+        // Event listener untuk delete folder
         document.addEventListener("click", async (e) => {
             const btn = e.target.closest(".folder-delete-btn");
             if (!btn) return;
@@ -1521,22 +1240,31 @@ document.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
 
-            const fileId = btn.getAttribute("data-id");
+            const folderId = btn.getAttribute("data-id");
+            const folderName = btn.getAttribute("data-name");
 
-            // if (!confirm("Yakin mau menghapus file ini?")) return;
+            if (!confirm(`Yakin mau menghapus folder "${folderName}"?`)) return;
 
             try {
-                const response = await fetch(`https://pdu-dms.my.id/api/delete-file/${fileId}`, {
+                const payload = {
+                    ids: [parseInt(folderId)],
+                    parent_id: "",
+                    all: ""
+                };
+
+                const response = await fetch("https://pdu-dms.my.id/api/delete-file", {
                     method: "DELETE",
                     headers: {
                         "Accept": "application/json",
                         "Authorization": "Bearer " + this.token,
                         "Content-Type": "application/json"
-                    }
+                    },
+                    body: JSON.stringify(payload)
                 });
 
                 const result = await response.json();
-                            if (response.ok) {
+
+                if (response.ok) {
                     btn.closest(".folder-item").remove();
 
                     const folderContainer = document.getElementById("folderContainer");
@@ -1547,104 +1275,17 @@ document.addEventListener('click', (e) => {
                         emptyTemplate.querySelector("p").textContent = "Create a folder to get organized";
                         folderContainer.appendChild(emptyTemplate);
                     }
-                    this.showMessage('success', 'Folder berhasil dihapus');
 
-                    // alert("Folder berhasil dihapus");
+                    alert("Folder berhasil dihapus");
                 } else {
-                    this.showMessage("danger", "Gagal menghapus folder: " + (result.message || "Unknown error"));
-                    // alert("Gagal menghapus folder: " + (result.message || "Unknown error"));
+                    alert("Gagal menghapus folder: " + (result.message || "Unknown error"));
                 }
 
-                // if (response.ok) {
-                //     const fileCard = btn.closest(".file-card");
-                //     if (fileCard) {
-                //         fileCard.remove();
-
-                //         const fileContainer = document.getElementById("fileContainer");
-                //         const remainingFiles = fileContainer.querySelectorAll('.file-card');
-                //         if (remainingFiles.length === 0) {
-                //             const emptyTemplate = document.getElementById("empty-template").content.cloneNode(true);
-                //             emptyTemplate.querySelector("i").className = "ph ph-file";
-                //             emptyTemplate.querySelector("p").textContent = "Upload your first file to begin";
-                //             fileContainer.appendChild(emptyTemplate);
-                //         }
-                //     }
-                //     // alert("File berhasil dihapus");
-                //     this.showMessage("success", "File berhasil dihapus");
-                // } else {
-                //     let errorMessage = "Gagal menghapus file";
-                //     if (result.message) {
-                //         errorMessage += ": " + result.message;
-                //     } else if (response.status === 404) {
-                //         errorMessage = "File tidak ditemukan atau sudah dihapus";
-                //     } else if (response.status === 403) {
-                //         errorMessage = "Anda tidak memiliki izin untuk menghapus file ini";
-                //     }
-                //     this.showMessage('danger', errorMessage);
-                // }
-
             } catch (err) {
-                console.error('Delete file error:', err);
-                this.showMessage('danger', 'Gagal menghapus file');
+                console.error(err);
+                alert("Gagal menghapus folder");
             }
         });
-        // Event listener untuk delete folder
-        // document.addEventListener("click", async (e) => {
-        //     const btn = e.target.closest(".folder-delete-btn");
-        //     if (!btn) return;
-
-        //     e.preventDefault();
-        //     e.stopPropagation();
-
-        //     const folderId = btn.getAttribute("data-id");
-        //     const folderName = btn.getAttribute("data-name");
-
-        //     if (!confirm(`Yakin mau menghapus folder "${folderName}"?`)) return;
-
-        //     try {
-        //         const payload = {
-        //             ids: [parseInt(folderId)],
-        //             parent_id: "",
-        //             all: ""
-        //         };
-
-        //         const response = await fetch(`https://pdu-dms.my.id/api/delete-file/${fileId}`, {
-        //             method: "DELETE",
-        //             headers: {
-        //                 "Accept": "application/json",
-        //                 "Authorization": "Bearer " + this.token,
-        //                 "Content-Type": "application/json"
-        //             },
-        //             body: JSON.stringify(payload)
-        //         });
-
-        //         const result = await response.json();
-
-        //         if (response.ok) {
-        //             btn.closest(".folder-item").remove();
-
-        //             const folderContainer = document.getElementById("folderContainer");
-        //             const remainingFolders = folderContainer.querySelectorAll('.folder-item');
-        //             if (remainingFolders.length === 0) {
-        //                 const emptyTemplate = document.getElementById("empty-template").content.cloneNode(true);
-        //                 emptyTemplate.querySelector("i").className = "ph ph-folder-open";
-        //                 emptyTemplate.querySelector("p").textContent = "Create a folder to get organized";
-        //                 folderContainer.appendChild(emptyTemplate);
-        //             }
-        //             this.showMessage('success', 'Folder berhasil dihapus');
-
-        //             // alert("Folder berhasil dihapus");
-        //         } else {
-        //             this.showMessage("danger", "Gagal menghapus folder: " + (result.message || "Unknown error"));
-        //             // alert("Gagal menghapus folder: " + (result.message || "Unknown error"));
-        //         }
-
-        //     } catch (err) {
-        //         console.error(err);
-        //         this.showMessage("danger", "Gagal menghapus folder");
-        //         // alert("Gagal menghapus folder");
-        //     }
-        // });
 
         // Event listener untuk download folder
         document.addEventListener("click", async (e) => {
@@ -1657,8 +1298,7 @@ document.addEventListener('click', (e) => {
             const folderName = btn.getAttribute("data-name");
 
             if (!this.token) {
-
-                this.showMessage("danger", "Token tidak ditemukan. Silakan login ulang.");
+                alert("Token tidak ditemukan. Silakan login ulang.");
                 return;
             }
 
@@ -1711,7 +1351,7 @@ document.addEventListener('click', (e) => {
 
             } catch (error) {
                 console.error(error);
-                this.showMessage("danger", "Gagal mengunduh folder: " + error.message);
+                alert("Gagal mengunduh folder: " + error.message);
             } finally {
                 btn.innerHTML = '<i class="ph ph-download fs-5"></i> Download';
                 btn.disabled = false;
@@ -1793,13 +1433,13 @@ document.addEventListener('click', (e) => {
         const newName = document.getElementById('newFolderName').value.trim();
 
         if (!newName) {
-            this.showMessage('danger', 'Folder name cannot be empty');
+            alert('Folder name cannot be empty');
             return;
         }
 
         // Validasi nama folder
         if (!this.isValidFolderName(newName)) {
-            this.showMessage('danger', 'Folder name contains invalid characters. Please use only letters, numbers, spaces, hyphens, and underscores.');
+            alert('Folder name contains invalid characters. Please use only letters, numbers, spaces, hyphens, and underscores.');
             return;
         }
 
@@ -1832,7 +1472,7 @@ document.addEventListener('click', (e) => {
 
                 // Update UI
                 this.updateFolderNameInUI(folderId, newName);
-                this.showMessage('success','Folder renamed successfully!');
+                alert('Folder renamed successfully!');
 
             } else {
                 throw new Error(result.message || 'Failed to rename folder');
@@ -1840,7 +1480,7 @@ document.addEventListener('click', (e) => {
 
         } catch (error) {
             console.error('Error renaming folder:', error);
-            this.showMessage('danger','Failed to rename folder: ' + error.message);
+            alert('Failed to rename folder: ' + error.message);
         } finally {
             // Reset button state
             const renameBtn = document.getElementById('confirmRenameFolder');
@@ -2017,7 +1657,7 @@ document.addEventListener('click', (e) => {
     }
 
     handleUnauthorized() {
-        this.showMessage('danger','Session expired. Please login again.');
+        alert('Session expired. Please login again.');
         window.location.href = "/signin";
     }
 
@@ -2185,13 +1825,8 @@ class ShareManager {
 
     // INI YANG PALING PENTING: KIRIM SHARE KE API
     async shareItem() {
-    if (!this.itemId) {
-        alert('Item tidak ditemukan!');
-        return;
-    }
-
-    if (this.selectedUsers.length === 0) {
-        alert('Tambahkan minimal satu orang');
+    if (!this.itemId || this.selectedUsers.length === 0) {
+        alert('Pilih item dan minimal satu penerima!');
         return;
     }
 
@@ -2224,18 +1859,12 @@ class ShareManager {
             throw new Error(result.message || 'Gagal membagikan');
         }
 
-        // Sukses!
         alert(`Berhasil dibagikan ke ${this.selectedUsers.length} orang!`);
-
-        const modal = bootstrap.Modal.getInstance(document.getElementById('advancedShareModal'));
-        modal.hide();
-
-        // Optional: reload atau update UI
-        // location.reload();
+        bootstrap.Modal.getInstance(document.getElementById('advancedShareModal')).hide();
 
     } catch (err) {
         console.error('Share error:', err);
-        alert('Gagal: ' + err.message);
+        alert('Gagal: ' + (err.message || 'Server error'));
     } finally {
         btn.disabled = false;
         btn.innerHTML = originalText;

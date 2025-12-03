@@ -11,7 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="icon" href="img/favicon.png" type="image/x-icon">
-    <script src="https://cdn.jsdelivr.net/npm/phosphor-icons@1.4.2/src/index.min.js"></script>
 </head>
 
 @if (session('token'))
@@ -43,36 +42,9 @@
             @yield('content')
         </div>
 
-        @yield('modals')
-
-
-
     </div>
 
-<div class="d-block d-lg-none">
-    <div class="btn-group dropup position-fixed floating-btn-wrapper">
-        <button class="btn btn-float rounded-circle shadow floating-btn"
-                data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="ph-bold ph-plus fs-5"></i>
-        </button>
 
-        <ul class="dropdown-menu dropdown-menu-end border-0 rounded-4 p-2 shadow-lg">
-            <li>
-                <a class="dropdown-item d-flex align-items-center" href="#" id="mobileOpenUploadModal">
-                    <i class="ph ph-file-arrow-up me-2"></i> Upload File
-                </a>
-            </li>
-            <li>
-                <a class="dropdown-item d-flex align-items-center" href="#" id="mobileOpenUploadFolderModal">
-                    <i class="ph ph-folder-simple-plus me-2"></i> Upload Folder
-                </a>
-            </li>
-        </ul>
-    </div>
-</div>
-
-
-</body>
 
     <!-- JS -->
     {{-- <div class="position-fixed h-100 z-3">
@@ -1323,6 +1295,15 @@ async function deleteExistingLabel(labelId, labelName, buttonElement) {
         });
     }
 });
+        <!--Icons-->
+        <script src="https://cdn.jsdelivr.net/npm/phosphor-icons@1.4.2/src/index.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+        <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const $ = (s) => document.querySelector(s);
                 const $$ = (s) => document.querySelectorAll(s);
