@@ -81,10 +81,12 @@
                 this.baseUrl = '/shared-with-me';
                 this.currentFolderName = "{{ $currentFolderName ?? '' }}";
                 if (!this.token) {
+                    console.log("No API token found");
                     alert("Session habis. Silakan login ulang.");
                     window.location.href = "/signin";
                     return;
                 }
+                console.log("Using API token:", this.token);
 
                 this.init();
             }
@@ -256,7 +258,7 @@
         <div class="position-relative folder-item-wrapper">
             <div class="folder-card" style="cursor:pointer; position:relative; overflow:visible !important;" data-folder-id="${folder.id}">
                 <img src="/img/folder.svg" alt="Folder" class="img-fluid w-100 h-100 object-fit-contain" style="min-height:100px;">
-                
+
                 <div class="position-absolute top-0 start-0 p-2 p-sm-3 w-100 h-100 d-flex flex-column justify-content-between pointer-events-none">
                     <div class="pointer-events-auto">
                         <p class="fw-normal mt-2 mb-0 text-truncate" title="${folder.name}">${folder.name}</p>
@@ -266,7 +268,7 @@
 
                 <!-- TITIK TIGA TETAP DI DALAM CARD TAPI AKAN DIPORTAL -->
                 <div class="position-absolute bottom-0 end-0 mb-2 me-2" style="z-index:10;">
-                    <button class="btn btn-link text-dark p-0 dropdown-toggle-portal" 
+                    <button class="btn btn-link text-dark p-0 dropdown-toggle-portal"
                             data-folder-id="${folder.id}"
                             data-folder-name="${folder.name}"
                             data-shared-by="${folder.shared_by_name || 'Someone'}"
@@ -585,7 +587,7 @@
                                 <div class="detail-item">
                                     <label class="text-muted small fw-semibold mb-2 d-block">Who has access</label>
                                     <div class="d-flex align-items-center gap-2">
-                                        <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" 
+                                        <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
                                             style="width: 32px; height: 32px;">
                                             <i class="ph ph-users text-primary" style="font-size: 16px;"></i>
                                         </div>
@@ -673,7 +675,7 @@
                         <div class="detail-item">
                             <label class="text-muted small fw-semibold mb-2 d-block">Who has access</label>
                             <div class="d-flex align-items-center gap-2">
-                                <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" 
+                                <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center"
                                     style="width: 32px; height: 32px;">
                                     <i class="ph ph-users text-primary" style="font-size: 16px;"></i>
                                 </div>
