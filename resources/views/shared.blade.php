@@ -30,16 +30,6 @@
     </div>
 </template>
 
-{{-- Token pasti ada --}}
-@auth
-    @if(empty(auth()->user()->api_token))
-        @php
-            auth()->user()->update(['api_token' => \Illuminate\Support\Str::random(60)]);
-        @endphp
-    @endif
-    <meta name="api-token" content="{{ auth()->user()->api_token }}">
-@endauth
-
 <script>
 class SharedWithMeManager {
     constructor() {
@@ -50,11 +40,14 @@ class SharedWithMeManager {
                  document.querySelector('meta[name="api-token"]')?.getAttribute('content') ||
                  '';
 
+    console.log("Using API Token:", this.token);
+
     if (!this.token) {
         alert("Session habis. Silakan login ulang.");
         window.location.href = "/signin";
         return;
     }
+
     this.init();
 }
 
@@ -94,12 +87,13 @@ class SharedWithMeManager {
                 shared_by_name: f.shared_by?.name || f.shared_by_name || 'Someone'
             }));
 
+
             const normalizedFiles = files.map(f => ({
                 id: f.file_id || f.id,
                 name: f.file_name || f.name,
                 mime: this.guessMime(f.file_name || f.name),
                 labels: f.labels || [],
-                url: f.file_path ? `https://pdu-dms.my.id/storage/${f.file_path}` : null
+                url: f.file_path ? `https://pdu-dms.my.id/api/view-file/${f.file_id}` : null
             }));
 
             // GUNAKAN FUNGSI ASLI KAMU 100% (tidak diubah sama sekali)

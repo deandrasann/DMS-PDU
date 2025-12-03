@@ -505,7 +505,7 @@ function initMobileNavbar() {
     // ========================================
     const mySpaceManager = window.mySpaceManager;
     if (!mySpaceManager) {
-        console.warn('⚠️ MySpaceManager not found, retrying...');
+        // console.warn('⚠️ MySpaceManager not found, retrying...');
         setTimeout(initMobileNavbar, 500);
         return;
     }
