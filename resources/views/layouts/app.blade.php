@@ -75,13 +75,10 @@
 </body>
 
     <!-- JS -->
-<<<<<<< HEAD
     {{-- <div class="position-fixed h-100 z-3">
-=======
 
     <body class="d-flex vh-100 overflow-hidden">
         {{-- <div class="position-fixed h-100 z-3">
->>>>>>> d6e6c77 (fix breadcrumb shared with me)
         @include('partials.sidebar')
     </div> --}}
 
@@ -89,7 +86,6 @@
         {{-- <div class="d-flex flex-column flex-grow-1 sidebar-collapse-content h-100 overflow-auto p-4">
         @yield('content')
     </div> --}}
-<<<<<<< HEAD
     <!--Icons-->
     <!-- JS -->
 
@@ -1327,24 +1323,9 @@ async function deleteExistingLabel(labelId, labelName, buttonElement) {
         });
     }
 });
-
-document.addEventListener('DOMContentLoaded', function () {
-    const $  = (s) => document.querySelector(s);
-    const $$ = (s) => document.querySelectorAll(s);
-=======
-        <!--Icons-->
-        <script src="https://cdn.jsdelivr.net/npm/phosphor-icons@1.4.2/src/index.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-        <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const $ = (s) => document.querySelector(s);
                 const $$ = (s) => document.querySelectorAll(s);
->>>>>>> d6e6c77 (fix breadcrumb shared with me)
 
                 function syncProfilePhotosOnLoad() {
                     // Ambil foto dari desktop sebagai referensi
@@ -1512,7 +1493,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             '.desktop-only #submitChangePassword');
                         const orig = btn.innerHTML;
                         btn.disabled = true;
-                        btn.innerHTML = 'Processing...';
+                        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processing...';
 
                         try {
                             await axios.post('{{ route('password.update') }}', new FormData(this));
