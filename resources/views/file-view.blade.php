@@ -83,8 +83,13 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
             <script>
                 const url = @json($url);
+                const token = @json($token ?? session('token'));
+
                 fetch(url, {
-                    headers: { 'Authorization': 'Bearer {{ $token ?? '' }}' }
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/octet-stream'
+                    }
                 })
                 .then(response => {
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -105,4 +110,7 @@
         @endif
     </div>
 </div>
+
+<script>
+</script>
 @endsection

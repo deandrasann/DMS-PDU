@@ -31,7 +31,7 @@ class ShareController extends Controller
 
             $response = Http::connectTimeout(5)
                 ->withHeaders([
-                'Authorization' => 'Bearer ' . $userToken,
+                    'Authorization' => 'Bearer ' . $userToken,
                     'Accept' => 'application/json',
                 ])->get("https://pdu-dms.my.id/api/share/$token");
 
@@ -39,13 +39,18 @@ class ShareController extends Controller
                 $data = $response->json();
 
                 $fileId = $data['data']['file_id'] ?? null;
-                $fileType = $data['data']['type'] ?? null;
+                $fileType = $data['data']['file_type'] ?? null;
+
+                Log::info("Fetched share link data", [
+                    'file_id' => $fileId,
+                    'file_type' => $fileType,
+                ]);
 
                 // if redirect
-                if ($fileType === 'pdf') {
+                if ($fileType === 'application/pdf') {
                     return redirect()->route('pdf.view', $fileId);
                 } else {
-                return redirect()->route('file-view', $fileId);
+                return redirect()->route('file.view', $fileId);
                 }
 
             } else {

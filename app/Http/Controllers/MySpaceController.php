@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class MySpaceController extends Controller
 {
@@ -468,7 +469,12 @@ private function isEmail($name)
 
  public function viewFile($fileId)
 {
-    $token = session('token');
+    $token = Session::get('token');
+
+    Log::info('Viewing file', [
+        'file_id' => $fileId,
+        'token_present' => $token,
+    ]);
 
     if (!$token) {
         Log::warning('No token in session for file view', ['file_id' => $fileId]);
@@ -476,9 +482,15 @@ private function isEmail($name)
     }
 
     try {
+
+        Log::info('User Token', [
+            'token_present' => $token,
+        ]);
+
         $listResponse = Http::connectTimeout(5)
             ->withHeaders([
                 'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/json',
             ])
             ->timeout(30)
             ->get("https://pdu-dms.my.id/api/file-info/{$fileId}");

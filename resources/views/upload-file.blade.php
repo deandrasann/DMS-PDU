@@ -26,6 +26,7 @@
                             drag & drop files or <span class="text-decoration-none text-orange">click here</span>
                         </p>
                         <small class="text-muted">Supported file types: CSV, DOCX, PDF, PPTX, XLSX</small>
+                        <small class="text-muted">Max Size: 10MB</small>
                         <div id="fileName" class="mt-2 text-primary fw-semibold"></div>
                     </div>
 
