@@ -6,29 +6,25 @@
     <div>
         <h4 class="fw-semibold mb-4">Shared with Me</h4>
     </div>
-    {{-- Breadcrumb untuk navigasi folder --}}
     @if (!empty($breadcrumb) && count($breadcrumb) > 1)
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-            <a href="{{ route('shared') }}" class="text-decoration-none text-dark">Shared with Me</a>
-        </li>
-        @if(isset($breadcrumb) && count($breadcrumb) > 1)
-            @foreach(array_slice($breadcrumb, 1) as $crumb)
-                @if($loop->last)
-                    <li class="breadcrumb-item active text-dark" aria-current="page">
-                        {{ $crumb['name'] }}
-                    </li>
-                @else
-                    <li class="breadcrumb-item">
-                        <a href="{{ $crumb['url'] }}" class="text-decoration-none text-dark">
+                @foreach ($breadcrumb as $crumb)
+                    @if ($loop->last)
+                        <li class="breadcrumb-item active text-dark text-decoration-none" aria-current="page"
+                            @if (isset($crumb['id'])) data-id="{{ $crumb['id'] }}" @endif>
                             {{ $crumb['name'] }}
-                        </a>
-                    </li>
-                @endif
-            @endforeach
-        @endif
-    </ol>
+                        </li>
+                    @else
+                        <li class="breadcrumb-item text-dark"
+                            @if (isset($crumb['id'])) data-id="{{ $crumb['id'] }}" @endif>
+                            <a href="{{ $crumb['url'] }}" class="text-decoration-none text-dark">
+                                {{ $crumb['name'] }}
+                            </a>
+                        </li>
+                    @endif
+                @endforeach
+            </ol>
         </nav>
     @endif
     <div class="container py-2">
@@ -80,19 +76,21 @@
                     document.querySelector('meta[name="api-token"]')?.getAttribute('content') ||
                     '';
 
+                // Ambil currentPath dari PHP
+                this.currentPath = "{{ $currentPath }}";
+                this.baseUrl = '/shared-with-me';
+                this.currentFolderName = "{{ $currentFolderName ?? '' }}";
                 if (!this.token) {
                     alert("Session habis. Silakan login ulang.");
                     window.location.href = "/signin";
                     return;
                 }
 
-                // Ambil currentPath dari PHP
-                this.currentPath = "{{ $currentPath }}";
-                this.baseUrl = '/shared-with-me';
                 this.init();
             }
 
             init() {
+                this.updateBreadcrumbFromStorage();
                 this.loadItems();
                 this.attachGlobalListeners();
             }
@@ -182,23 +180,38 @@
                 return segments.length > 0 ? segments[segments.length - 1] : null;
             }
 
-            // updateBreadcrumb(folderName) {
-            //     const breadcrumb = document.querySelector('.breadcrumb');
-            //     if (!breadcrumb) return;
+            updateBreadcrumbFromStorage() {
+                const breadcrumb = document.querySelector('.breadcrumb');
+                if (!breadcrumb) return;
 
-            //     // Hapus semua item setelah "Shared with Me"
-            //     const items = breadcrumb.querySelectorAll('.breadcrumb-item');
-            //     items.forEach((item, index) => {
-            //         if (index > 0) item.remove();
-            //     });
+                const folderMapping = JSON.parse(sessionStorage.getItem('folderMapping') || '{}');
 
-            //     // Tambahkan nama folder saat ini sebagai item terakhir
-            //     const lastItem = document.createElement('li');
-            //     lastItem.className = 'breadcrumb-item active text-dark';
-            //     lastItem.setAttribute('aria-current', 'page');
-            //     lastItem.textContent = folderName || 'Folder';
-            //     breadcrumb.appendChild(lastItem);
-            // }
+                // Simpan nama folder current jika ada
+                if (this.currentPath && this.currentFolderName) {
+                    const lastSegmentId = this.getLastSegmentFromPath();
+                    if (lastSegmentId) {
+                        folderMapping[lastSegmentId] = this.currentFolderName;
+                        sessionStorage.setItem('folderMapping', JSON.stringify(folderMapping));
+                    }
+                }
+
+                // Update semua breadcrumb item yang punya data-id
+                const items = breadcrumb.querySelectorAll('.breadcrumb-item[data-id]');
+                items.forEach(item => {
+                    const folderId = item.dataset.id;
+                    const folderName = folderMapping[folderId];
+
+                    if (folderName) {
+                        // Update text di link atau di span
+                        const link = item.querySelector('a');
+                        if (link) {
+                            link.textContent = folderName;
+                        } else {
+                            item.textContent = folderName;
+                        }
+                    }
+                });
+            }
 
             // Helper tambahan (hanya ini yang ditambah)
             guessMime(name) {
@@ -223,12 +236,15 @@
                     container.appendChild(empty);
                     return;
                 }
+                const folderMapping = JSON.parse(sessionStorage.getItem('folderMapping') || '{}');
                 folders.forEach(folder => {
+                    folderMapping[folder.id] = folder.name;
                     const col = document.createElement("div");
                     col.className = "col-6 col-sm-4 col-md-3 col-lg-2 folder-item";
                     col.innerHTML = this.createFolderHTML(folder);
                     container.appendChild(col);
                 });
+                sessionStorage.setItem('folderMapping', JSON.stringify(folderMapping));
             }
 
             createFolderHTML(folder) {
