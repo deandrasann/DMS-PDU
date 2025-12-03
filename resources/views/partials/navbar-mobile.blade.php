@@ -77,7 +77,7 @@
             </li>
         </ul>
 
-        <!-- BAGIAN BAWAH: PROFILE + ACCOUNT SETTINGS (PERSIS GAMBAR iPhone) -->
+        <!-- BAGIAN BAWAH: PROFILE + ACCOUNT SETTINGS -->
         <div class="mt-auto">
             <div class="card border-0 shadow-sm rounded-3 p-2 mb-3">
                 <div class="d-flex align-items-center">
