@@ -133,7 +133,7 @@
                     <!-- Profile Photo Section -->
                     <div class="text-center my-4">
                         <img id="modalProfilePhoto"
-                             src="{{ session('new_profile_photo') ?? 
+                             src="{{ session('new_profile_photo') ??
                                    (session('user.photo_profile_path')
                                        ? 'https://pdu-dms.my.id/storage/profile_photos/' . session('user.photo_profile_path')
                                        : asset('storage/images/profile-pict.jpg')) }}?v={{ time() }}"
@@ -295,13 +295,11 @@
                         style="height: 50px; font-size: 17px; min-width: 120px;" data-bs-dismiss="modal">
                         Cancel
                     </button>
-<<<<<<< HEAD
-                    <button type="submit" form="mobileChangePasswordForm"
-=======
+                    <button type="submit" form="mobileChangePasswordForm"></button>
 
-                    <!-- Change mentok kanan (ms-auto = margin-start auto) -->
+                    <button type="submit" id="submitChangePassword" form="changePasswordForm"></button>
+
                     <button type="submit" id="submitChangePassword" form="changePasswordForm"
->>>>>>> d71c637 (update navbar)
                         class="btn rounded-4 fw-semibold text-white ms-auto"
                         style="height: 50px; font-size: 17px; background-color: #007AFF; min-width: 120px;">
                         Change
@@ -347,7 +345,7 @@
 
         if (uploadBtn && photoInput) {
             uploadBtn.addEventListener('click', () => photoInput.click());
-            
+
             photoInput.addEventListener('change', function () {
                 if (this.files && this.files[0]) {
                     const reader = new FileReader();

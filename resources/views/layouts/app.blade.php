@@ -56,7 +56,6 @@
 
 
         {{-- <div class="d-flex flex-column flex-grow-1 sidebar-collapse-content h-100 overflow-auto p-4">
-        {{-- <div class="d-flex flex-column flex-grow-1 sidebar-collapse-content h-100 overflow-auto p-4">
         @yield('content')
     </div> --}}
     <!--Icons-->
@@ -1315,6 +1314,12 @@ async function deleteExistingLabel(labelId, labelName, buttonElement) {
                     const mobilePhoto = $('#mobileProfilePhoto');
                     const modalPhoto = $('#modalProfilePhoto');
 
+                function syncProfilePhotosOnLoad() {
+                    // Ambil foto dari desktop sebagai referensi
+                    const desktopPhoto = $('#profilePreviewBtn, #profilePreviewDropdown');
+                    const mobilePhoto = $('#mobileProfilePhoto');
+                    const modalPhoto = $('#modalProfilePhoto');
+
                     if (desktopPhoto && mobilePhoto && desktopPhoto.src) {
                         // Sync mobile dengan desktop
                         mobilePhoto.src = desktopPhoto.src;
@@ -1346,26 +1351,7 @@ async function deleteExistingLabel(labelId, labelName, buttonElement) {
                         }
                     });
                 });
-                // Dropdown biasa (sort, filter, dll)
-                $$('.desktop-only .dropdown-toggle-custom').forEach(btn => {
-                    btn.addEventListener('click', e => {
-                        e.stopPropagation();
-                        const menu = $(btn.dataset.target);
-                        const isOpen = menu?.style.display === 'block';
-                        closeAllDesktop();
-                        if (!isOpen && menu) {
-                            menu.style.display = 'block';
-                            btn.classList.add('active');
-                        }
-                    });
-                });
 
-                // Profile dropdown desktop
-                $('.desktop-only #profileBtn')?.addEventListener('click', e => {
-                    e.stopPropagation();
-                    const dd = $('.desktop-only #profileDropdown');
-                    if (dd) dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
-                });
                 // Profile dropdown desktop
                 $('.desktop-only #profileBtn')?.addEventListener('click', e => {
                     e.stopPropagation();
@@ -1379,17 +1365,7 @@ async function deleteExistingLabel(labelId, labelName, buttonElement) {
                     const panel = $('.desktop-only #filterPanel');
                     if (panel) panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
                 });
-                // Filter panel desktop
-                $('.desktop-only .filter-toggle')?.addEventListener('click', e => {
-                    e.stopPropagation();
-                    const panel = $('.desktop-only #filterPanel');
-                    if (panel) panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-                });
 
-                // Klik di luar → hanya nutup desktop
-                document.addEventListener('click', e => {
-                    if (!e.target.closest('.desktop-only')) closeAllDesktop();
-                });
                 // Klik di luar → hanya nutup desktop
                 document.addEventListener('click', e => {
                     if (!e.target.closest('.desktop-only')) closeAllDesktop();
@@ -1402,24 +1378,7 @@ async function deleteExistingLabel(labelId, labelName, buttonElement) {
                     $$('#mobileProfilePhoto, #modalProfilePhoto, #profilePreviewBtn, #profilePreviewDropdown, #profilePreviewModal')
                         .forEach(img => img && (img.src = src));
                 }
-                // ===================================================================
-                // 2. MOBILE & DESKTOP: Upload Foto (satu fungsi untuk semua!)
-                // ===================================================================
-                function updateAllProfilePhotos(src) {
-                    $$('#mobileProfilePhoto, #modalProfilePhoto, #profilePreviewBtn, #profilePreviewDropdown, #profilePreviewModal')
-                        .forEach(img => img && (img.src = src));
-                }
 
-                // Upload dari mobile
-                $('.mobile-only #uploadPhotoBtn')?.addEventListener('click', () => $('.mobile-only #photoInput')
-                ?.click());
-                $('.mobile-only #photoInput')?.addEventListener('change', function() {
-                    if (this.files?.[0]) {
-                        const reader = new FileReader();
-                        reader.onload = e => updateAllProfilePhotos(e.target.result);
-                        reader.readAsDataURL(this.files[0]);
-                    }
-                });
                 // Upload dari mobile
                 $('.mobile-only #uploadPhotoBtn')?.addEventListener('click', () => $('.mobile-only #photoInput')
                 ?.click());
@@ -1441,16 +1400,6 @@ async function deleteExistingLabel(labelId, labelName, buttonElement) {
                         reader.readAsDataURL(this.files[0]);
                     }
                 });
-                // Upload dari desktop
-                $('.desktop-only #uploadPhotoBtn')?.addEventListener('click', () => $('.desktop-only #photoFileInput')
-                    ?.click());
-                $('.desktop-only #photoFileInput')?.addEventListener('change', function() {
-                    if (this.files?.[0]) {
-                        const reader = new FileReader();
-                        reader.onload = e => updateAllProfilePhotos(e.target.result);
-                        reader.readAsDataURL(this.files[0]);
-                    }
-                });
 
                 // ===================================================================
                 // 3. DELETE FOTO (mobile + desktop)
@@ -1458,25 +1407,7 @@ async function deleteExistingLabel(labelId, labelName, buttonElement) {
                 $$('.mobile-only #deletePhotoBtn, .desktop-only #deletePhotoBtn').forEach(btn => {
                     btn?.addEventListener('click', async () => {
                         if (!confirm('Hapus foto profil?')) return;
-                // ===================================================================
-                // 3. DELETE FOTO (mobile + desktop)
-                // ===================================================================
-                $$('.mobile-only #deletePhotoBtn, .desktop-only #deletePhotoBtn').forEach(btn => {
-                    btn?.addEventListener('click', async () => {
-                        if (!confirm('Hapus foto profil?')) return;
 
-                        try {
-                            const {
-                                data
-                            } = await axios.post('{{ route('profile.delete.photo') }}');
-                            const url = data.photo_url + '?t=' + Date.now();
-                            updateAllProfilePhotos(url);
-                            alert('Foto dihapus!');
-                        } catch (err) {
-                            alert('Gagal hapus foto');
-                        }
-                    });
-                });
                         try {
                             const {
                                 data
@@ -1503,30 +1434,7 @@ async function deleteExistingLabel(labelId, labelName, buttonElement) {
                         alert('Gagal');
                     }
                 });
-                // Konfirmasi delete desktop
-                $('.desktop-only #confirmDeleteBtn')?.addEventListener('click', async () => {
-                    try {
-                        const {
-                            data
-                        } = await axios.post('{{ route('profile.delete.photo') }}');
-                        updateAllProfilePhotos(data.photo_url + '?t=' + Date.now());
-                        bootstrap.Modal.getInstance($('.desktop-only #deleteConfirmationModal'))?.hide();
-                        alert('Foto dihapus!');
-                    } catch (err) {
-                        alert('Gagal');
-                    }
-                });
 
-                // ===================================================================
-                // 4. UPDATE PROFILE (mobile + desktop)
-                // ===================================================================
-                $$('#profileUpdateForm').forEach(form => {
-                    form.addEventListener('submit', async function(e) {
-                        e.preventDefault();
-                        const btn = this.querySelector('button[type="submit"]');
-                        const orig = btn.innerHTML;
-                        btn.disabled = true;
-                        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
                 // ===================================================================
                 // 4. UPDATE PROFILE (mobile + desktop)
                 // ===================================================================
@@ -1546,33 +1454,12 @@ async function deleteExistingLabel(labelId, labelName, buttonElement) {
                             updateAllProfilePhotos(url);
                             $$('.mobile-only #mobileProfileName, .desktop-only .profile-fullname')
                                 .forEach(el => el.textContent = data.fullname || data.name);
-                        try {
-                            const {
-                                data
-                            } = await axios.post(this.action, new FormData(this));
-                            const url = (data.photo_url || data.photo_path) + '?t=' + Date.now();
-                            updateAllProfilePhotos(url);
-                            $$('.mobile-only #mobileProfileName, .desktop-only .profile-fullname')
-                                .forEach(el => el.textContent = data.fullname || data.name);
 
                             // Tutup modal sesuai versi
                             const modalId = this.closest('.modal')?.id;
                             if (modalId) bootstrap.Modal.getInstance(document.getElementById(
                                 modalId))?.hide();
-                            // Tutup modal sesuai versi
-                            const modalId = this.closest('.modal')?.id;
-                            if (modalId) bootstrap.Modal.getInstance(document.getElementById(
-                                modalId))?.hide();
 
-                            alert('Profil diperbarui!');
-                        } catch (err) {
-                            alert(err.response?.data?.message || 'Gagal update');
-                        } finally {
-                            btn.disabled = false;
-                            btn.innerHTML = orig;
-                        }
-                    });
-                });
                             alert('Profil diperbarui!');
                         } catch (err) {
                             alert(err.response?.data?.message || 'Gagal update');
@@ -1607,37 +1494,7 @@ async function deleteExistingLabel(labelId, labelName, buttonElement) {
                         }
                     });
                 });
-                        try {
-                            await axios.post('{{ route('password.update') }}', new FormData(this));
-                            alert('Password diubah! Keluar otomatis...');
-                            setTimeout(() => location.href = '/signin', 1500);
-                        } catch (err) {
-                            alert(err.response?.data?.message || 'Gagal ubah password');
-                        } finally {
-                            btn.disabled = false;
-                            btn.innerHTML = orig;
-                        }
-                    });
-                });
 
-                // ===================================================================
-                // 6. TOGGLE EYE PASSWORD
-                // ===================================================================
-                $$('.toggle-password').forEach(icon => {
-                    icon.onclick = function() {
-                        const input = document.querySelector(`input[name="${this.dataset.target}"]`);
-                        if (!input) return;
-                        if (input.type === 'password') {
-                            input.type = 'text';
-                            this.classList.replace('ph-eye-slash', 'ph-eye');
-                        } else {
-                            input.type = 'password';
-                            this.classList.replace('ph-eye', 'ph-eye-slash');
-                        }
-                    };
-                });
-            });
-        </script>
                 // ===================================================================
                 // 6. TOGGLE EYE PASSWORD
                 // ===================================================================

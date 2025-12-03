@@ -733,21 +733,12 @@
         const btnText = logoutBtn.querySelector('.btn-text');
         const btnLoading = logoutBtn.querySelector('.btn-loading');
 
-<<<<<<< HEAD
-//         // Buka modal saat klik "Log Out"
-//         logoutLink.addEventListener('click', function(e) {
-//             e.preventDefault();
-//             const modal = new bootstrap.Modal(document.getElementById('logoutConfirmationModal'));
-//             modal.show();
-//         });
-=======
         // Buka modal saat klik "Log Out"
         logoutLink.addEventListener('click', function(e) {
             e.preventDefault();
             const modal = new bootstrap.Modal(document.getElementById('logoutConfirmationModal'));
             modal.show();
         });
->>>>>>> 87ec885 (Revert "Merge branch 'master' into aul-fe")
 
         if (logoutBtn && loader) {
             logoutBtn.addEventListener('click', function () {
