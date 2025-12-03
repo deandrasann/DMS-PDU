@@ -236,7 +236,7 @@
                             '.desktop-only #submitChangePassword');
                         const orig = btn.innerHTML;
                         btn.disabled = true;
-                        btn.innerHTML = 'Processing...';
+                        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processing...';
 
                         try {
                             await axios.post('{{ route('password.update') }}', new FormData(this));

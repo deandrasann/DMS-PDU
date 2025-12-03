@@ -297,7 +297,7 @@
                     </button>
 
                     <!-- Change mentok kanan (ms-auto = margin-start auto) -->
-                    <button type="submit" form="changePasswordForm"
+                    <button type="submit" id="submitChangePassword" form="changePasswordForm"
                         class="btn rounded-4 fw-semibold text-white ms-auto"
                         style="height: 50px; font-size: 17px; background-color: #007AFF; min-width: 120px;">
                         Change
