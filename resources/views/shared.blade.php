@@ -6,27 +6,27 @@
     <div>
         <h4 class="fw-semibold mb-4">Shared with Me</h4>
     </div>
-    @if (!empty($breadcrumb) && count($breadcrumb) > 1)
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb">
-                @foreach ($breadcrumb as $crumb)
-                    @if ($loop->last)
-                        <li class="breadcrumb-item active text-dark text-decoration-none" aria-current="page"
-                            @if (isset($crumb['id'])) data-id="{{ $crumb['id'] }}" @endif>
+    @if (!empty($breadcrumb))
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            @foreach ($breadcrumb as $crumb)
+                @if ($loop->last)
+                    <li class="breadcrumb-item active text-dark text-decoration-none" aria-current="page"
+                        @if (isset($crumb['id'])) data-id="{{ $crumb['id'] }}" @endif>
+                        {{ $crumb['name'] }}
+                    </li>
+                @else
+                    <li class="breadcrumb-item text-dark"
+                        @if (isset($crumb['id'])) data-id="{{ $crumb['id'] }}" @endif>
+                        <a href="{{ $crumb['url'] }}" class="text-decoration-none text-dark">
                             {{ $crumb['name'] }}
-                        </li>
-                    @else
-                        <li class="breadcrumb-item text-dark"
-                            @if (isset($crumb['id'])) data-id="{{ $crumb['id'] }}" @endif>
-                            <a href="{{ $crumb['url'] }}" class="text-decoration-none text-dark">
-                                {{ $crumb['name'] }}
-                            </a>
-                        </li>
-                    @endif
-                @endforeach
-            </ol>
-        </nav>
-    @endif
+                        </a>
+                    </li>
+                @endif
+            @endforeach
+        </ol>
+    </nav>
+@endif
     <div class="container py-2">
         <!-- Shared Folders -->
         <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4">
