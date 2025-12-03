@@ -1493,7 +1493,7 @@ document.addEventListener('click', (e) => {
         const folderElement = document.querySelector(`.folder-rename-btn[data-id="${folderId}"]`)?.closest('.folder-item');
         if (!folderElement) return;
 
-        // Update folder name in the card
+        // ileolder name in the card
         const folderNameElement = folderElement.querySelector('.fw-normal');
         if (folderNameElement) {
             folderNameElement.textContent = newName;
