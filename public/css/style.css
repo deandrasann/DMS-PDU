@@ -1039,6 +1039,10 @@ body.modal-open .sidebar-collapse-content * {
     color: black;
 }
 
+  .file-card{
+    width: 160px;
+  }
+
 
 @media (max-width: 991.98px) {
   .sidebar-collapse-content {
@@ -1048,6 +1052,7 @@ body.modal-open .sidebar-collapse-content * {
   .content-wrapper {
     margin-top: 60px !important;
   }
+
 
   /* === FIX UTAMA UNTUK DROPDOWN TERTUTUP CARD === */
 
@@ -1096,6 +1101,11 @@ body.modal-open .sidebar-collapse-content * {
     }
 }
 @media (max-width: 576px) {
+
+
+  .file-card{
+    width: 120px;
+  }
   /* Modal tanpa backdrop gelap */
     .modal-backdrop {
       background-color: transparent !important;

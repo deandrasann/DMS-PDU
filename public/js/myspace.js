@@ -10,7 +10,6 @@ class MySpaceManager {
             date_modified: '',
             type: '',
             label: '',
-            // owner: 'owned_by_me',
             search: ''
         };
 
@@ -226,7 +225,7 @@ hideLoading() {
             }
             else {
                 // Default: My Files / Folder Browsing
-                const path = this.currentPath ? `api/folder/${this.currentPath}` : "api/my-files";
+                const path = this.currentPath ? `api/my-files/${this.currentPath}` : "api/my-files";
                 baseUrl = `https://pdu-dms.my.id/${path}`;
                 transformData = false;
             }
@@ -245,9 +244,6 @@ hideLoading() {
             if (this.activeFilters.search) {
                 params.append('search', this.activeFilters.search);
             }
-
-            // Owner selalu dikirim
-            params.append('owner', this.activeFilters.owner);
 
             if (sortType) {
                 params.append('sort', sortType);
@@ -523,7 +519,8 @@ hideLoading() {
 createFileElement(file) {
     const card = document.createElement("div");
     card.className = "card rounded-4 border-dark-subtle border-1 me-3 file-card";
-    card.style.width = "160px";
+    // card.style.width = "160px";
+    // card.style.minWidth = "120px";
     card.style.height = "180px";
     card.style.backgroundColor = "#F2F2F0";
     card.style.cursor = "pointer";

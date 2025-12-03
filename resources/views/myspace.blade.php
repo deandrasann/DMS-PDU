@@ -220,7 +220,7 @@
         </div>
     </div>
 
-    <!-- Upload Modal -->
+    <!-- Upload File Modal -->
 <div class="modal fade" id="uploadFileModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true"
     data-bs-backdrop="false" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -364,6 +364,8 @@
         </div>
     </div>
 </div>
+
+<!-- Edit File Modal -->
 <div class="modal fade" id="editFileModal" tabindex="-1" aria-labelledby="editFileModalLabel" aria-hidden="true"
     data-bs-backdrop="false" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -461,4 +463,4 @@
         </div>
     </div>
 </div>
-    @endsection
+@endsection

@@ -64,16 +64,16 @@
                                 <div class="item" data-value="">Any Type</div>
 
                                 <div class="item" data-value="PDF">
-                                    <i class="ph ph-file-pdf me-2"></i>PDF
+                                    PDF
                                 </div>
                                 <div class="item" data-value="Spreadsheet">
-                                    <i class="ph ph-file-xls me-2"></i>Spreadsheet
+                                    Spreadsheet
                                 </div>
                                 <div class="item" data-value="Document">
-                                    <i class="ph ph-file-doc me-2"></i>Document
+                                    Document
                                 </div>
                                 <div class="item" data-value="Image">
-                                    <i class="ph ph-file-image me-2"></i>Image
+                                    Image
                                 </div>
                             </div>
                     </div>
