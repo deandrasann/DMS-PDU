@@ -489,7 +489,7 @@ private function isEmail($name)
 
             if (!$listResponse->successful()) {
                 Log::error('Failed to fetch files for file view', [
-                    'status' => $listResponse->status(),
+                    'status' => $response->status(),
                     'file_id' => $fileId,
                 ]);
                 abort(404, 'Cannot fetch files');
