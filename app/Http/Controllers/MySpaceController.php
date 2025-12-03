@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
-
 class MySpaceController extends Controller
 {
     public function index($path = '')
@@ -469,13 +468,13 @@ private function isEmail($name)
         'token_present' => $token,
     ]);
 
-
         if (!$token) {
             Log::warning('No token in session for file view', ['file_id' => $fileId]);
             return redirect()->route('signin')->with('error', 'Please login first');
         }
 
     try {
+
         Log::info('User Token', [
             'token_present' => $token,
         ]);
@@ -483,6 +482,7 @@ private function isEmail($name)
         $listResponse = Http::connectTimeout(5)
             ->withHeaders([
                 'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/json',
             ])
             ->timeout(30)
             ->get("https://pdu-dms.my.id/api/file-info/{$fileId}");
