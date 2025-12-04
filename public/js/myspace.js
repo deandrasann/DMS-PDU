@@ -2018,7 +2018,7 @@ document.addEventListener('click', (e) => {
 
     handleUnauthorized() {
         this.showMessage('danger','Session expired. Please login again.');
-        window.location.href = "/signin";
+        // window.location.href = "/signin";
     }
 
     showError(folderContainer, fileContainer, message) {

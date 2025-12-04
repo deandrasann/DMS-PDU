@@ -500,14 +500,14 @@ function initMobileNavbar() {
     const $ = (s) => document.querySelector(s);
     const $$ = (s) => document.querySelectorAll(s);
 
-    console.log('🔄 Mobile navbar initializing...');
+    // console.log('🔄 Mobile navbar initializing...');
 
     // ========================================
     // 1. CHECK MySpaceManager
     // ========================================
     const mySpaceManager = window.mySpaceManager;
     if (!mySpaceManager) {
-        console.warn('⚠️ MySpaceManager not found, retrying...');
+        // console.warn('⚠️ MySpaceManager not found, retrying...');
         setTimeout(initMobileNavbar, 500);
         return;
     }
