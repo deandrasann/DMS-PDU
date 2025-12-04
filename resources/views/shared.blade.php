@@ -4,64 +4,64 @@
 @section('title', 'Shared with Me')
 
 @section('content')
-<div>
-    <h4 class="fw-semibold mb-4">Shared with Me</h4>
-</div>
-@if (!empty($breadcrumb))
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            @foreach ($breadcrumb as $crumb)
-                @if ($loop->last)
-                    <li class="breadcrumb-item active text-dark text-decoration-none" aria-current="page"
-                        @if (isset($crumb['id'])) data-id="{{ $crumb['id'] }}" @endif>
-                        {{ $crumb['name'] }}
-                    </li>
-                @else
-                    <li class="breadcrumb-item text-dark"
-                        @if (isset($crumb['id'])) data-id="{{ $crumb['id'] }}" @endif>
-                        <a href="{{ $crumb['url'] }}" class="text-decoration-none text-dark">
+    <div>
+        <h4 class="fw-semibold mb-4">Shared with Me</h4>
+    </div>
+    @if (!empty($breadcrumb))
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                @foreach ($breadcrumb as $crumb)
+                    @if ($loop->last)
+                        <li class="breadcrumb-item active text-dark text-decoration-none" aria-current="page"
+                            @if (isset($crumb['id'])) data-id="{{ $crumb['id'] }}" @endif>
                             {{ $crumb['name'] }}
-                        </a>
-                    </li>
-                @endif
-            @endforeach
-        </ol>
-    </nav>
-@endif
-<div class="container py-2">
-    <!-- Shared Folders -->
-    <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4">
-        <h4 class="fw-semibold mb-4">Shared Folders</h4>
-        <div id="folderContainer" class="row g-3"></div>
+                        </li>
+                    @else
+                        <li class="breadcrumb-item text-dark"
+                            @if (isset($crumb['id'])) data-id="{{ $crumb['id'] }}" @endif>
+                            <a href="{{ $crumb['url'] }}" class="text-decoration-none text-dark">
+                                {{ $crumb['name'] }}
+                            </a>
+                        </li>
+                    @endif
+                @endforeach
+            </ol>
+        </nav>
+    @endif
+    <div class="container py-2">
+        <!-- Shared Folders -->
+        <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4">
+            <h4 class="fw-semibold mb-4">Shared Folders</h4>
+            <div id="folderContainer" class="row g-3"></div>
+        </div>
+
+        <!-- Shared Files -->
+        <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4">
+            <h4 class="fw-semibold mb-4">Shared Files</h4>
+            <div id="fileContainer" class="row g-3 ms-1 me-2"></div>
+        </div>
     </div>
 
-    <!-- Shared Files -->
-    <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4">
-        <h4 class="fw-semibold mb-4">Shared Files</h4>
-        <div id="fileContainer" class="row g-3 ms-1 me-2"></div>
-    </div>
-</div>
-
-<!-- Template kosong (sama persis MySpace) -->
-<template id="empty-template">
-    <div class="d-flex flex-column grow justify-content-center align-items-center text-center p-5 text-muted">
-        <i class="ph ph-folder-open" style="font-size: 80px; color: #9E9E9C;"></i>
-        <p class="mt-3">Tidak ada item di sini.</p>
-    </div>
-</template>
-<script>
+    <!-- Template kosong (sama persis MySpace) -->
+    <template id="empty-template">
+        <div class="d-flex flex-column grow justify-content-center align-items-center text-center p-5 text-muted">
+            <i class="ph ph-folder-open" style="font-size: 80px; color: #9E9E9C;"></i>
+            <p class="mt-3">Tidak ada item di sini.</p>
+        </div>
+    </template>
+    <script>
         window.token = "{{ session('token') ?? '' }}";
-    window.currentPath = "{{ $currentPath ?? '' }}";
-    window.currentFolderName = "{{ $currentFolderName ?? '' }}";
+        window.currentPath = "{{ $currentPath ?? '' }}";
+        window.currentFolderName = "{{ $currentFolderName ?? '' }}";
 
-    // Debug
-    if (window.token) {
-        console.log('Token dari session: ADA (panjang:', window.token.length, ')');
-    } else {
-        console.warn('Token TIDAK ADA → redirect ke signin');
-        alert("Session habis. Silakan login ulang.");
-        window.location.href = "/signin";
-    }
+        // Debug
+        if (window.token) {
+            console.log('Token dari session: ADA (panjang:', window.token.length, ')');
+        } else {
+            console.warn('Token TIDAK ADA → redirect ke signin');
+            alert("Session habis. Silakan login ulang.");
+            window.location.href = "/signin";
+        }
     </script>
 
 
@@ -70,10 +70,10 @@
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
     </script>
-<script>
-class SharedWithMeManager {
-    constructor() {
-                this.token = window.token ||'';
+    <script>
+        class SharedWithMeManager {
+            constructor() {
+                this.token = window.token || '';
 
                 // Ambil currentPath dari PHP
                 this.currentPath = "{{ $currentPath }}";
@@ -94,7 +94,7 @@ class SharedWithMeManager {
                 this.attachGlobalListeners();
             }
 
-    async loadItems() {
+            async loadItems() {
                 const folderContainer = document.getElementById("folderContainer");
                 const fileContainer = document.getElementById("fileContainer");
                 const emptyTemplate = document.getElementById("empty-template");
@@ -160,7 +160,7 @@ class SharedWithMeManager {
                         size: f.size || '—',
                         created_at: f.created_at || 'Unknown',
                         updated_at: f.updated_at || 'Unknown',
-                        url: f.file_path ? `https://pdu-dms.my.id/storage/${f.file_path}` : null,
+                        url: f.file_path ? `https://pdu-dms.my.id/api/view-file/${f.file_id}` : null,
                         shared_by_name: f.shared_by?.name || f.shared_by_name || f.owner?.name || 'Someone'
                     }));
 
@@ -212,21 +212,21 @@ class SharedWithMeManager {
                 });
             }
 
-    // Helper tambahan (hanya ini yang ditambah)
-    guessMime(name) {
-        const ext = (name || '').toLowerCase().split('.').pop();
-        const map = {
-            pdf: "application/pdf",
-            doc: "application/msword",
-            docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            xls: "application/vnd.ms-excel",
-            xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        };
-        return map[ext] || "application/octet-stream";
-    }
+            // Helper tambahan (hanya ini yang ditambah)
+            guessMime(name) {
+                const ext = (name || '').toLowerCase().split('.').pop();
+                const map = {
+                    pdf: "application/pdf",
+                    doc: "application/msword",
+                    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    xls: "application/vnd.ms-excel",
+                    xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                };
+                return map[ext] || "application/octet-stream";
+            }
 
-    // SEMUA FUNGSI DI BAWAH INI TIDAK DIUBAH SAMA SEKALI (100% ORIGINAL)
-    renderFolders(folders, container, tmpl) {
+            // SEMUA FUNGSI DI BAWAH INI TIDAK DIUBAH SAMA SEKALI (100% ORIGINAL)
+            renderFolders(folders, container, tmpl) {
                 container.innerHTML = '';
                 if (folders.length === 0) {
                     const empty = tmpl.content.cloneNode(true);
@@ -246,7 +246,7 @@ class SharedWithMeManager {
                 sessionStorage.setItem('folderMapping', JSON.stringify(folderMapping));
             }
 
-    createFolderHTML(folder) {
+            createFolderHTML(folder) {
                 // Tentukan path baru: currentPath + folder.id
                 const newPath = this.currentPath ? `${this.currentPath}/${folder.id}` : folder.id;
                 const url = `${this.baseUrl}/${newPath}`;
@@ -280,38 +280,40 @@ class SharedWithMeManager {
     `;
             }
 
-    renderFiles(files, container, tmpl) {
-        container.innerHTML = '';
-        if (files.length === 0) {
-            const empty = tmpl.content.cloneNode(true);
-            empty.querySelector("i").className = "ph ph-file";
-            empty.querySelector("p").textContent = "No shared files yet";
-            container.appendChild(empty);
-            return;
-        }
-        files.forEach(file => {
-            const card = this.createFileCard(file);
-            container.appendChild(card);
-        });
-    }
+            renderFiles(files, container, tmpl) {
+                container.innerHTML = '';
+                if (files.length === 0) {
+                    const empty = tmpl.content.cloneNode(true);
+                    empty.querySelector("i").className = "ph ph-file";
+                    empty.querySelector("p").textContent = "No shared files yet";
+                    container.appendChild(empty);
+                    return;
+                }
+                files.forEach(file => {
+                    const card = this.createFileCard(file);
+                    container.appendChild(card);
+                });
+            }
 
-    createFileCard(file) {
-        const card = document.createElement("div");
-        card.className = "card rounded-4 border-dark-subtle border-1 me-3 file-card";
-        card.style.width = "160px";
-        card.style.height = "180px";
-        card.style.backgroundColor = "#F2F2F0";
-        card.style.cursor = "pointer";
+            createFileCard(file) {
+                const card = document.createElement("div");
+                card.className = "card rounded-4 border-dark-subtle border-1 me-3 file-card";
+                card.style.width = "160px";
+                card.style.height = "180px";
+                card.style.backgroundColor = "#F2F2F0";
+                card.style.cursor = "pointer";
 
-        const { icon } = this.getFileIcon(file.mime);
-        // const openUrl = file.mime?.includes('pdf') ? `/files/${file.id}` : `/file-view/${file.id}`;
-        const openUrl = file.is_folder
-            ? `https://pdu-dms.my.id/api/my-files/${file.id}`
-            : (file.mime?.includes('pdf') ? `/files/${file.id}` : `/file-view/${file.id}`);
+                const {
+                    icon
+                } = this.getFileIcon(file.mime);
+                // const openUrl = file.mime?.includes('pdf') ? `/files/${file.id}` : `/file-view/${file.id}`;
+                const openUrl = file.is_folder ?
+                    `https://pdu-dms.my.id/api/my-files/${file.id}` :
+                    (file.mime?.includes('pdf') ? `/files/${file.id}` : `/file-view/${file.id}`);
 
-        const labelsHTML = this.createLabelsHTML(file.labels || []);
+                const labelsHTML = this.createLabelsHTML(file.labels || []);
 
-        card.innerHTML = `
+                card.innerHTML = `
             <div class="mt-3 mx-2 preview-container" style="height:100px;display:flex;align-items:center;justify-content:center;">
                 <div id="preview-${file.id}" class="d-flex justify-content-center align-items-center w-100 h-100">
                     <i class="ph ${icon} fs-1 text-muted"></i>
@@ -344,61 +346,98 @@ class SharedWithMeManager {
             </div>
         `;
 
-        card.addEventListener('click', e => {
-            if (e.target.closest('.dropdown') || e.target.closest('.dropdown-menu')) return;
-            window.open(openUrl, '_blank');
-        });
+                card.addEventListener('click', e => {
+                    if (e.target.closest('.dropdown') || e.target.closest('.dropdown-menu')) return;
+                    window.open(openUrl, '_blank');
+                });
 
-        if (file.mime?.includes('pdf') && file.url) {
-            setTimeout(() => this.renderPDFPreview(file.url, `preview-${file.id}`), 100);
-        }
+                if (file.mime?.includes('pdf') && file.url) {
+                    setTimeout(() => this.renderPDFPreview(file.url, `preview-${file.id}`), 100);
+                }
 
-        return card;
-    }
+                return card;
+            }
 
-    getFileIcon(mime) {
-        if (!mime) return { icon: "ph-file" };
-        if (mime.includes("pdf")) return { icon: "ph-file-pdf" };
-        if (mime.includes("doc") || mime.includes("document")) return { icon: "ph-file-doc" };
-        if (mime.includes("xls") || mime.includes("sheet")) return { icon: "ph-file-xls" };
-        return { icon: "ph-file" };
-    }
+            getFileIcon(mime) {
+                if (!mime) return {
+                    icon: "ph-file"
+                };
+                if (mime.includes("pdf")) return {
+                    icon: "ph-file-pdf"
+                };
+                if (mime.includes("doc") || mime.includes("document")) return {
+                    icon: "ph-file-doc"
+                };
+                if (mime.includes("xls") || mime.includes("sheet")) return {
+                    icon: "ph-file-xls"
+                };
+                return {
+                    icon: "ph-file"
+                };
+            }
 
-    createLabelsHTML(labels) {
-        if (!labels || labels.length === 0) return '<span class="badge bg-secondary rounded-2 px-2"><small>File</small></span>';
-        return labels.map(l => `
+            createLabelsHTML(labels) {
+                if (!labels || labels.length === 0)
+                    return '<span class="badge bg-secondary rounded-2 px-2"><small>File</small></span>';
+                return labels.map(l => `
             <span class="badge rounded-2 px-2 mb-1" style="background:#${l.color};color:${this.getTextColor(l.color)}">
                 ${l.name}
             </span>
         `).join('');
-    }
+            }
 
-    getTextColor(bg) {
-        const map = { "FDDCD9":"#CB564A", "EBE0D9":"#763E1A", "FDE9DD":"#C2825D", "EFEAFF":"#7762BB", "FCF9DE":"#BDB470", "E4F3FE":"#5F92B6", "FCE7ED":"#CA8499", "E6E5E3":"#989797", "EEFEF1":"#8ABB93", "F0EFED":"#729D9C" };
-        return map[bg?.toUpperCase()] || "#000";
-    }
+            getTextColor(bg) {
+                const map = {
+                    "FDDCD9": "#CB564A",
+                    "EBE0D9": "#763E1A",
+                    "FDE9DD": "#C2825D",
+                    "EFEAFF": "#7762BB",
+                    "FCF9DE": "#BDB470",
+                    "E4F3FE": "#5F92B6",
+                    "FCE7ED": "#CA8499",
+                    "E6E5E3": "#989797",
+                    "EEFEF1": "#8ABB93",
+                    "F0EFED": "#729D9C"
+                };
+                return map[bg?.toUpperCase()] || "#000";
+            }
 
-    async renderPDFPreview(url, containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-        try {
-            container.innerHTML = '<div class="spinner-border spinner-border-sm text-primary"></div>';
-            const loadingTask = pdfjsLib.getDocument({ url, httpHeaders: { Authorization: "Bearer " + this.token } });
-            const pdf = await loadingTask.promise;
-            const page = await pdf.getPage(1);
-            const scale = Math.min(120 / page.getViewport({scale:1}).width, 1.5);
-            const viewport = page.getViewport({scale});
-            const canvas = document.createElement("canvas");
-            canvas.width = viewport.width; canvas.height = viewport.height;
-            canvas.style.width = "100%"; canvas.style.height = "100%";
-            await page.render({canvasContext: canvas.getContext("2d"), viewport}).promise;
-            container.innerHTML = ''; container.appendChild(canvas);
-        } catch (e) {
-            container.innerHTML = '<i class="ph ph-file-pdf fs-1 text-muted"></i>';
-        }
-    }
+            async renderPDFPreview(url, containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                try {
+                    container.innerHTML = '<div class="spinner-border spinner-border-sm text-primary"></div>';
+                    const loadingTask = pdfjsLib.getDocument({
+                        url,
+                        httpHeaders: {
+                            Authorization: "Bearer " + this.token
+                        }
+                    });
+                    const pdf = await loadingTask.promise;
+                    const page = await pdf.getPage(1);
+                    const scale = Math.min(120 / page.getViewport({
+                        scale: 1
+                    }).width, 1.5);
+                    const viewport = page.getViewport({
+                        scale
+                    });
+                    const canvas = document.createElement("canvas");
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    canvas.style.width = "100%";
+                    canvas.style.height = "100%";
+                    await page.render({
+                        canvasContext: canvas.getContext("2d"),
+                        viewport
+                    }).promise;
+                    container.innerHTML = '';
+                    container.appendChild(canvas);
+                } catch (e) {
+                    container.innerHTML = '<i class="ph ph-file-pdf fs-1 text-muted"></i>';
+                }
+            }
 
-    attachGlobalListeners() {
+            attachGlobalListeners() {
                 // Klik pada folder card (untuk membuka folder di shared-with-me)
                 document.addEventListener('click', (e) => {
                     const folderCard = e.target.closest('.folder-card');
@@ -674,10 +713,10 @@ class SharedWithMeManager {
                 alert("Session habis. Silakan login ulang.");
                 window.location.href = "/signin";
             }
-}
+        }
 
-document.addEventListener("DOMContentLoaded", () => {
-    new SharedWithMeManager();
-});
-</script>
+        document.addEventListener("DOMContentLoaded", () => {
+            new SharedWithMeManager();
+        });
+    </script>
 @endsection
