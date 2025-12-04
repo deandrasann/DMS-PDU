@@ -498,7 +498,7 @@ function initMobileNavbar() {
     const $ = (s) => document.querySelector(s);
     const $$ = (s) => document.querySelectorAll(s);
 
-    console.log('🔄 Mobile navbar initializing...');
+    // console.log('🔄 Mobile navbar initializing...');
 
     // ========================================
     // 1. CHECK MySpaceManager
