@@ -7,7 +7,27 @@
 <div>
     <h4 class="fw-semibold mb-4">Shared with Me</h4>
 </div>
-
+@if (!empty($breadcrumb))
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            @foreach ($breadcrumb as $crumb)
+                @if ($loop->last)
+                    <li class="breadcrumb-item active text-dark text-decoration-none" aria-current="page"
+                        @if (isset($crumb['id'])) data-id="{{ $crumb['id'] }}" @endif>
+                        {{ $crumb['name'] }}
+                    </li>
+                @else
+                    <li class="breadcrumb-item text-dark"
+                        @if (isset($crumb['id'])) data-id="{{ $crumb['id'] }}" @endif>
+                        <a href="{{ $crumb['url'] }}" class="text-decoration-none text-dark">
+                            {{ $crumb['name'] }}
+                        </a>
+                    </li>
+                @endif
+            @endforeach
+        </ol>
+    </nav>
+@endif
 <div class="container py-2">
     <!-- Shared Folders -->
     <div class="d-flex flex-column shrink-0 p-3 bg-light shadow w-100 mb-4 rounded-4">
@@ -29,84 +49,168 @@
         <p class="mt-3">Tidak ada item di sini.</p>
     </div>
 </template>
+<script>
+        window.token = "{{ session('token') ?? '' }}";
+    window.currentPath = "{{ $currentPath ?? '' }}";
+    window.currentFolderName = "{{ $currentFolderName ?? '' }}";
 
+    // Debug
+    if (window.token) {
+        console.log('Token dari session: ADA (panjang:', window.token.length, ')');
+    } else {
+        console.warn('Token TIDAK ADA → redirect ke signin');
+        alert("Session habis. Silakan login ulang.");
+        window.location.href = "/signin";
+    }
+    </script>
+
+
+    {{-- Load PDF.js --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+    </script>
 <script>
 class SharedWithMeManager {
     constructor() {
-    // Cara ini PASTI berhasil karena sama persis seperti MySpace
-    this.token = window.token ||
-                 (window.Laravel?.apiToken) ||
-                 localStorage.getItem('token') ||
-                 document.querySelector('meta[name="api-token"]')?.getAttribute('content') ||
-                 '';
+                this.token = window.token ||'';
 
-    console.log("Using API Token:", this.token);
-
-    if (!this.token) {
-        alert("Session habis. Silakan login ulang.");
-        window.location.href = "/signin";
-        return;
-    }
-
-    this.init();
-}
-
-    init() {
-        this.loadSharedItems();
-        this.attachGlobalListeners();
-    }
-
-    async loadSharedItems() {
-        const folderContainer = document.getElementById("folderContainer");
-        const fileContainer   = document.getElementById("fileContainer");
-        const emptyTemplate   = document.getElementById("empty-template");
-
-        try {
-            const res = await fetch("https://pdu-dms.my.id/api/shared-with-me", {
-                headers: {
-                    "Authorization": "Bearer " + this.token,
-                    "Accept": "application/json"
+                // Ambil currentPath dari PHP
+                this.currentPath = "{{ $currentPath }}";
+                this.baseUrl = '/shared-with-me';
+                this.currentFolderName = "{{ $currentFolderName ?? '' }}";
+                if (!this.token) {
+                    alert("Session habis. Silakan login ulang.");
+                    window.location.href = "/signin";
+                    return;
                 }
-            });
 
-            if (!res.ok) {
-                if (res.status === 401) return this.handleUnauthorized();
-                throw new Error("Gagal memuat data");
+                this.init();
             }
 
-            const { data = [] } = await res.json();
+            init() {
+                this.updateBreadcrumbFromStorage();
+                this.loadItems();
+                this.attachGlobalListeners();
+            }
 
-            // Pisahkan folder & file berdasarkan is_folder
-            const folders = data.filter(item => item.is_folder === true || item.is_folder === 1);
-            const files   = data.filter(item => !item.is_folder && item.is_folder !== 1);
+    async loadItems() {
+                const folderContainer = document.getElementById("folderContainer");
+                const fileContainer = document.getElementById("fileContainer");
+                const emptyTemplate = document.getElementById("empty-template");
 
-            // Normalisasi struktur agar sesuai dengan fungsi render lama kamu
-            const normalizedFolders = folders.map(f => ({
-                id: f.file_id || f.id,
-                name: f.file_name || f.name,
-                shared_by_name: f.shared_by?.name || f.shared_by_name || 'Someone'
-            }));
+                try {
+                    let normalizedFolders = [];
+                    let normalizedFiles = [];
 
+                    if (!this.currentPath) {
+                        // MODE ROOT: /api/shared-with-me
+                        const res = await fetch("https://pdu-dms.my.id/api/shared-with-me", {
+                            headers: {
+                                "Authorization": "Bearer " + this.token,
+                                "Accept": "application/json"
+                            }
+                        });
 
-            const normalizedFiles = files.map(f => ({
-                id: f.file_id || f.id,
-                name: f.file_name || f.name,
-                mime: this.guessMime(f.file_name || f.name),
-                labels: f.labels || [],
-                url: f.file_path ? `https://pdu-dms.my.id/api/view-file/${f.file_id}` : null
-            }));
+                        if (!res.ok) throw new Error("Gagal memuat shared items");
 
-            // GUNAKAN FUNGSI ASLI KAMU 100% (tidak diubah sama sekali)
-            this.renderFolders(normalizedFolders, folderContainer, emptyTemplate);
-            this.renderFiles(normalizedFiles, fileContainer, emptyTemplate);
+                        const response = await res.json();
+                        const items = response.data || response.items || response || [];
 
-        } catch (err) {
-            console.error(err);
-            const msg = `<p class="text-danger text-center">Error: ${err.message}</p>`;
-            folderContainer.innerHTML = msg;
-            fileContainer.innerHTML   = msg;
-        }
-    }
+                        normalizedFolders = items.filter(i => i.is_folder === true || i.is_folder === 1);
+                        normalizedFiles = items.filter(i => !i.is_folder && i.is_folder !== 1);
+
+                    } else {
+                        // MODE SUBFOLDER: /api/my-files/{id}
+                        const folderId = this.getLastSegmentFromPath();
+                        const res = await fetch(`https://pdu-dms.my.id/api/my-files/${folderId}`, {
+                            headers: {
+                                "Authorization": "Bearer " + this.token,
+                                "Accept": "application/json"
+                            }
+                        });
+
+                        if (!res.ok) throw new Error("Gagal membuka folder");
+
+                        const data = await res.json();
+
+                        // Struktur standar dari /api/my-files
+                        normalizedFolders = data.folders || [];
+                        normalizedFiles = data.files || [];
+
+                        // // Update breadcrumb dengan nama folder saat ini
+                        // this.updateBreadcrumb(data.name || this.getLastSegmentFromPath());
+                    }
+
+                    // Normalisasi data biar sama formatnya
+                    const folders = normalizedFolders.map(f => ({
+                        id: f.id || f.file_id,
+                        name: f.name || f.file_name,
+                        shared_by_name: f.shared_by?.name || f.shared_by_name || f.owner?.name || 'Someone',
+                        size: f.size || '—',
+                        created_at: f.created_at || 'Unknown',
+                        updated_at: f.updated_at || 'Unknown'
+                    }));
+
+                    const files = normalizedFiles.map(f => ({
+                        id: f.id || f.file_id,
+                        name: f.name || f.file_name,
+                        mime: f.mime_type || f.mime || this.guessMime(f.name || f.file_name),
+                        labels: f.labels || [],
+                        size: f.size || '—',
+                        created_at: f.created_at || 'Unknown',
+                        updated_at: f.updated_at || 'Unknown',
+                        url: f.file_path ? `https://pdu-dms.my.id/storage/${f.file_path}` : null,
+                        shared_by_name: f.shared_by?.name || f.shared_by_name || f.owner?.name || 'Someone'
+                    }));
+
+                    this.renderFolders(folders, folderContainer, emptyTemplate);
+                    this.renderFiles(files, fileContainer, emptyTemplate);
+
+                } catch (err) {
+                    console.error(err);
+                    folderContainer.innerHTML = `<p class="text-danger text-center">${err.message}</p>`;
+                    fileContainer.innerHTML = `<p class="text-danger text-center">${err.message}</p>`;
+                }
+            }
+
+            getLastSegmentFromPath() {
+                const segments = this.currentPath.split('/').filter(seg => seg);
+                return segments.length > 0 ? segments[segments.length - 1] : null;
+            }
+
+            updateBreadcrumbFromStorage() {
+                const breadcrumb = document.querySelector('.breadcrumb');
+                if (!breadcrumb) return;
+
+                const folderMapping = JSON.parse(sessionStorage.getItem('folderMapping') || '{}');
+
+                // Simpan nama folder current jika ada
+                if (this.currentPath && this.currentFolderName) {
+                    const lastSegmentId = this.getLastSegmentFromPath();
+                    if (lastSegmentId) {
+                        folderMapping[lastSegmentId] = this.currentFolderName;
+                        sessionStorage.setItem('folderMapping', JSON.stringify(folderMapping));
+                    }
+                }
+
+                // Update semua breadcrumb item yang punya data-id
+                const items = breadcrumb.querySelectorAll('.breadcrumb-item[data-id]');
+                items.forEach(item => {
+                    const folderId = item.dataset.id;
+                    const folderName = folderMapping[folderId];
+
+                    if (folderName) {
+                        // Update text di link atau di span
+                        const link = item.querySelector('a');
+                        if (link) {
+                            link.textContent = folderName;
+                        } else {
+                            item.textContent = folderName;
+                        }
+                    }
+                });
+            }
 
     // Helper tambahan (hanya ini yang ditambah)
     guessMime(name) {
@@ -123,52 +227,58 @@ class SharedWithMeManager {
 
     // SEMUA FUNGSI DI BAWAH INI TIDAK DIUBAH SAMA SEKALI (100% ORIGINAL)
     renderFolders(folders, container, tmpl) {
-        container.innerHTML = '';
-        if (folders.length === 0) {
-            const empty = tmpl.content.cloneNode(true);
-            empty.querySelector("i").className = "ph ph-folder-open";
-            empty.querySelector("p").textContent = "No shared folders yet";
-            container.appendChild(empty);
-            return;
-        }
-        folders.forEach(folder => {
-            const col = document.createElement("div");
-            col.className = "col-6 col-sm-4 col-md-3 col-lg-2 folder-item";
-            col.innerHTML = this.createFolderHTML(folder);
-            container.appendChild(col);
-        });
-    }
+                container.innerHTML = '';
+                if (folders.length === 0) {
+                    const empty = tmpl.content.cloneNode(true);
+                    empty.querySelector("i").className = "ph ph-folder-open";
+                    empty.querySelector("p").textContent = "No shared folders yet";
+                    container.appendChild(empty);
+                    return;
+                }
+                const folderMapping = JSON.parse(sessionStorage.getItem('folderMapping') || '{}');
+                folders.forEach(folder => {
+                    folderMapping[folder.id] = folder.name;
+                    const col = document.createElement("div");
+                    col.className = "col-6 col-sm-4 col-md-3 col-lg-2 folder-item";
+                    col.innerHTML = this.createFolderHTML(folder);
+                    container.appendChild(col);
+                });
+                sessionStorage.setItem('folderMapping', JSON.stringify(folderMapping));
+            }
 
     createFolderHTML(folder) {
-        return `
-            <div class="position-relative">
-                <div class="folder-card" style="cursor:pointer;">
-                    <img src="/img/folder.svg" alt="Folder" class="img-fluid w-100 h-100 object-fit-contain" style="min-height:100px;">
-                    <div class="position-absolute top-0 start-0 p-2 p-sm-3 w-100 h-100 d-flex flex-column justify-content-between">
-                        <div>
-                            <p class="fw-normal mt-2 mb-0 text-truncate" title="${folder.name}">${folder.name}</p>
-                            <small class="fw-light">Shared by ${folder.shared_by_name || 'Someone'}</small>
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <div class="dropdown">
-                                <button class="btn btn-link text-dark p-0" data-bs-toggle="dropdown">
-                                    <i class="ph ph-dots-three-vertical fs-5 text-muted"></i>
-                                </button>
-                                <ul class="dropdown-menu shadow rounded-3 border-0 p-2">
-                                    <li><a class="dropdown-item d-flex align-items-center gap-2" href="/shared-with-me/folder/${folder.id}">
-                                        <i class="ph ph-arrow-up-right fs-5"></i> Open
-                                    </a></li>
-                                    <li><a class="dropdown-item d-flex align-items-center gap-2 folder-info-btn" href="#" data-folder='${JSON.stringify(folder)}'>
-                                        <i class="ph ph-info fs-5"></i> Get Info
-                                    </a></li>
-                                </ul>
-                            </div>
-                        </div>
+                // Tentukan path baru: currentPath + folder.id
+                const newPath = this.currentPath ? `${this.currentPath}/${folder.id}` : folder.id;
+                const url = `${this.baseUrl}/${newPath}`;
+
+                return `
+        <div class="position-relative folder-item-wrapper">
+            <div class="folder-card" style="cursor:pointer; position:relative; overflow:visible !important;" data-folder-id="${folder.id}">
+                <img src="/img/folder.svg" alt="Folder" class="img-fluid w-100 h-100 object-fit-contain" style="min-height:100px;">
+                
+                <div class="position-absolute top-0 start-0 p-2 p-sm-3 w-100 h-100 d-flex flex-column justify-content-between pointer-events-none">
+                    <div class="pointer-events-auto">
+                        <p class="fw-normal mt-2 mb-0 text-truncate" title="${folder.name}">${folder.name}</p>
+                        <small class="fw-light text-muted">Shared by ${folder.shared_by_name || 'Someone'}</small>
                     </div>
                 </div>
+
+                <!-- TITIK TIGA TETAP DI DALAM CARD TAPI AKAN DIPORTAL -->
+                <div class="position-absolute bottom-0 end-0 mb-2 me-2" style="z-index:10;">
+                    <button class="btn btn-link text-dark p-0 dropdown-toggle-portal" 
+                            data-folder-id="${folder.id}"
+                            data-folder-name="${folder.name}"
+                            data-shared-by="${folder.shared_by_name || 'Someone'}"
+                            data-folder-size="${folder.size || '—'}"
+                            data-created-at="${folder.created_at || 'Unknown'}"
+                            data-updated-at="${folder.updated_at || 'Unknown'}">
+                        <i class="ph ph-dots-three-vertical fs-5 text-muted"></i>
+                    </button>
+                </div>
             </div>
-        `;
-    }
+        </div>
+    `;
+            }
 
     renderFiles(files, container, tmpl) {
         container.innerHTML = '';
@@ -289,32 +399,281 @@ class SharedWithMeManager {
     }
 
     attachGlobalListeners() {
-        document.addEventListener("click", async e => {
-            const btn = e.target.closest(".download-btn");
-            if (!btn) return;
-            e.preventDefault(); e.stopPropagation();
-            const id = btn.dataset.id, name = btn.dataset.name;
-            try {
-                const res = await fetch(`https://pdu-dms.my.id/api/view-file/${id}`, {
-                    headers: { Authorization: "Bearer " + this.token }
+                // Klik pada folder card (untuk membuka folder di shared-with-me)
+                document.addEventListener('click', (e) => {
+                    const folderCard = e.target.closest('.folder-card');
+                    if (folderCard) {
+                        e.preventDefault();
+                        const folderId = folderCard.dataset.folderId;
+                        const newPath = this.currentPath ? `${this.currentPath}/${folderId}` : folderId;
+                        window.location.href = `${this.baseUrl}/${newPath}`;
+                    }
                 });
-                const blob = await res.blob();
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement("a"); a.href = url; a.download = name;
-                a.click(); URL.revokeObjectURL(url);
-            } catch (err) { alert("Download gagal"); }
-        });
 
-        document.addEventListener("click", e => {
-            const btn = e.target.closest(".info-btn, .folder-info-btn");
-            if (btn) alert("Info panel belum diimplementasikan di versi ringkas ini.\nTapi tampilan card-nya sudah sama persis!");
-        });
-    }
+                document.addEventListener("click", async e => {
+                    const btn = e.target.closest(".download-btn");
+                    if (!btn) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const id = btn.dataset.id,
+                        name = btn.dataset.name;
+                    try {
+                        const res = await fetch(`https://pdu-dms.my.id/api/view-file/${id}`, {
+                            headers: {
+                                Authorization: "Bearer " + this.token
+                            }
+                        });
+                        const blob = await res.blob();
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = name;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    } catch (err) {
+                        alert("Download gagal");
+                    }
+                });
 
-    handleUnauthorized() {
-        alert("Session habis. Silakan login ulang.");
-        window.location.href = "/signin";
-    }
+                // === PORTAL DROPDOWN FOLDER
+                let activePortal = null;
+
+                document.addEventListener("click", e => {
+                    const btn = e.target.closest(".dropdown-toggle-portal");
+                    if (!btn) {
+                        // Klik di luar = tutup portal
+                        if (activePortal) {
+                            activePortal.remove();
+                            activePortal = null;
+                        }
+                        return;
+                    }
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Tutup yang lama
+                    if (activePortal) activePortal.remove();
+
+                    const rect = btn.getBoundingClientRect();
+
+                    // Buat dropdown portal di body
+                    const portal = document.createElement("div");
+                    portal.className = "dropdown-portal shadow-lg border-0 rounded-3";
+                    portal.style.position = "fixed";
+                    portal.style.top = `${rect.bottom + 8}px`;
+                    portal.style.left = `${rect.left}px`;
+                    portal.style.zIndex = "9999";
+                    portal.style.background = "rgba(255, 255, 255, 0.92)"; // transparan
+                    portal.style.backdropFilter = "blur(12px)";
+                    portal.style.minWidth = "150px";
+                    portal.style.overflow = "hidden";
+                    // Link Open mengarah ke shared-with-me
+                    const newPath = this.currentPath ?
+                        `${this.currentPath}/${btn.dataset.folderId}` :
+                        btn.dataset.folderId;
+
+                    portal.innerHTML = `
+            <ul class="dropdown-menu shadow show p-2 m-0" style="position:relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border: none;">
+                <li><a class="dropdown-item d-flex align-items-center gap-2 rounded-2" href="${this.baseUrl}/${newPath}">
+                    <i class="ph ph-arrow-up-right fs-5"></i> Open
+                </a></li>
+                <li><a class="dropdown-item d-flex align-items-center gap-2 rounded-2 folder-portal-info" href="#">
+                    <i class="ph ph-info fs-5"></i> Get Info
+                </a></li>
+            </ul>
+        `;
+
+                    document.body.appendChild(portal);
+                    activePortal = portal;
+
+                    // Get Info di portal — VERSI 100% SAMA DENGAN MYSPACE
+                    portal.querySelector(".folder-portal-info").addEventListener("click", ev => {
+                        ev.preventDefault();
+
+                        // Cegah buka dua kali
+                        if (document.querySelector(".info-portal")) return;
+
+                        // Ambil data folder dari button
+                        const folder = {
+                            id: btn.dataset.folderId,
+                            name: btn.dataset.folderName,
+                            shared_by_name: btn.dataset.sharedBy,
+                            size: btn.dataset.folderSize || "—", // kalau ada size dari API
+                            created_at: btn.dataset.createdAt || "Unknown",
+                            updated_at: btn.dataset.updatedAt || "Unknown"
+                        };
+
+                        const info = document.createElement("div");
+                        info.className = "info-portal shadow-lg bg-white rounded-4 border-0";
+                        info.style.position = "fixed";
+                        info.style.top = "60px";
+                        info.style.right = "20px";
+                        info.style.width = "250px";
+                        info.style.maxHeight = "90vh";
+                        info.style.overflowY = "auto";
+                        info.style.zIndex = "10000";
+                        info.style.fontSize = "0.925rem";
+
+                        info.innerHTML = `
+                            <div class="p-3" style="background: linear-gradient(to bottom, #f8f9fa, #ffffff); border-radius: 16px 16px 0 0;">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-semibold mb-0">Folder Information</h6>
+                                    <button type="button" class="btn-close btn-close-portal" style="font-size: 0.7rem; opacity: 0.6;"></button>
+                                </div>
+                            </div>
+
+                            <div class="p-3 pt-0">
+                                <div class="detail-item mb-3">
+                                    <label class="text-muted small fw-semibold mb-1 d-block">Folder Name</label>
+                                    <p class="mb-0 fw-medium text-truncate">${folder.name}</p>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <label class="text-muted small fw-semibold mb-1 d-block">Type</label>
+                                    <p class="mb-0 fw-medium">Folder</p>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <label class="text-muted small fw-semibold mb-1 d-block">Size</label>
+                                    <p class="mb-0 fw-medium">${folder.size}</p>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <label class="text-muted small fw-semibold mb-1 d-block">Created Date</label>
+                                    <p class="mb-0 fw-medium text-secondary small">${folder.created_at}</p>
+                                </div>
+                                <div class="detail-item mb-3">
+                                    <label class="text-muted small fw-semibold mb-1 d-block">Owner</label>
+                                    <p class="mb-0 fw-medium">${folder.shared_by_name}</p>
+                                </div>
+
+                                <div class="detail-item">
+                                    <label class="text-muted small fw-semibold mb-2 d-block">Who has access</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" 
+                                            style="width: 32px; height: 32px;">
+                                            <i class="ph ph-users text-primary" style="font-size: 16px;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-medium small">Shared with you</div>
+                                            <div class="text-muted" style="font-size: 0.75rem;">by ${folder.shared_by_name}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        document.body.appendChild(info);
+
+                        // Tutup panel
+                        info.querySelector(".btn-close-portal").onclick = () => info.remove();
+                    });
+                });
+
+                document.addEventListener("click", e => {
+                    const btn = e.target.closest(".info-btn");
+                    if (!btn) return;
+                    e.preventDefault();
+
+                    // Cegah buka dua kali
+                    if (document.querySelector(".info-portal")) return;
+
+                    let file;
+                    try {
+                        file = JSON.parse(btn.dataset.file);
+                    } catch {
+                        file = btn.dataset.file || {};
+                    }
+
+                    const sharedBy = btn.dataset.sharedBy || file.shared_by?.name || file.shared_by_name ||
+                        'Someone';
+                    const fileType = file.mime?.includes('pdf') ? 'PDF' :
+                        file.mime?.includes('doc') ? 'DOC' :
+                        file.mime?.includes('xls') ? 'XLSX' :
+                        file.mime?.includes('image') ? 'Image' : 'File';
+
+                    const info = document.createElement("div");
+                    info.className = "info-portal shadow-lg bg-white rounded-4 border-0";
+                    info.style.position = "fixed";
+                    info.style.top = "60px";
+                    info.style.right = "20px";
+                    info.style.width = "250px";
+                    info.style.maxHeight = "90vh";
+                    info.style.overflowY = "auto";
+                    info.style.zIndex = "10000";
+                    info.style.fontSize = "0.925rem";
+
+                    info.innerHTML = `
+                    <div class="p-3" style="background: linear-gradient(to bottom, #f8f9fa, #ffffff); border-radius: 16px 16px 0 0;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="fw-semibold mb-0">File Information</h6>
+                            <button type="button" class="btn-close btn-close-portal" style="font-size: 0.7rem; opacity: 0.6;"></button>
+                        </div>
+                    </div>
+
+                    <div class="p-3 pt-0">
+                        <div class="detail-item mb-3">
+                            <label class="text-muted small fw-semibold mb-1 d-block">File Name</label>
+                            <p class="mb-0 fw-medium text-truncate">${file.name}</p>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <label class="text-muted small fw-semibold mb-1 d-block">Type</label>
+                            <p class="mb-0 fw-medium">${fileType}</p>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <label class="text-muted small fw-semibold mb-1 d-block">Size</label>
+                            <p class="mb-0 fw-medium">${file.size || '—'}</p>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <label class="text-muted small fw-semibold mb-1 d-block">Created Date</label>
+                            <p class="mb-0 fw-medium text-secondary small">
+                                ${file.created_at ? new Date(file.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Unknown'}
+                            </p>
+                        </div>
+                        <div class="detail-item mb-3">
+                            <label class="text-muted small fw-semibold mb-1 d-block">Owner</label>
+                            <p class="mb-0 fw-medium">${sharedBy}</p>
+                        </div>
+
+                        <div class="detail-item">
+                            <label class="text-muted small fw-semibold mb-2 d-block">Who has access</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" 
+                                    style="width: 32px; height: 32px;">
+                                    <i class="ph ph-users text-primary" style="font-size: 16px;"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-medium small">Shared with you</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">by ${sharedBy}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                    document.body.appendChild(info);
+
+                    // Tutup panel
+                    info.querySelector(".btn-close-portal").onclick = () => info.remove();
+                });
+                // Tutup panel kalau klik di luar
+                document.addEventListener("click", e => {
+                    if (!e.target.closest(".dropdown-menu") && !e.target.closest(".dropdown")) {
+                        document.querySelectorAll(".info-panel").forEach(p => p.style.display = "none");
+                    }
+                });
+
+                // Close button di panel
+                document.addEventListener("click", e => {
+                    const close = e.target.closest(".close-info-panel");
+                    if (close) {
+                        close.closest(".info-panel").style.display = "none";
+                    }
+                });
+            }
+
+            handleUnauthorized() {
+                alert("Session habis. Silakan login ulang.");
+                window.location.href = "/signin";
+            }
 }
 
 document.addEventListener("DOMContentLoaded", () => {

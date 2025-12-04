@@ -39,7 +39,15 @@ Route::post('/new-password', [AuthController::class, 'setNewPassword'])->name('s
 // Dashboard routes
 Route::get('/recommended', [MySpaceController::class, 'recommended'])->name('recommended');
 Route::get('/last-opened', [MySpaceController::class, 'lastOpened'])->name('last');
-Route::get('/shared-with-me', [DashboardController::class, 'sharedWithMe'])->name('shared');
+Route::prefix('shared-with-me')->group(function () {
+    // Route utama
+    Route::get('/', [DashboardController::class, 'sharedWithMe'])->name('shared');
+
+    // Dynamic path untuk navigasi folder
+    Route::get('/{path}', [DashboardController::class, 'sharedWithMe'])
+        ->where('path', '.*')
+        ->name('shared.subfolder');
+});
 Route::get('/upload', [DashboardController::class, 'uploadFile'])->name('upload');
 
 // Profile routes
