@@ -68,6 +68,7 @@
 
     this.init();
 }
+        }
 
             init() {
                 this.updateBreadcrumbFromStorage();
