@@ -93,36 +93,60 @@
                             }
                         });
 
-            if (!res.ok) {
-                if (res.status === 401) return this.handleUnauthorized();
-                throw new Error("Gagal memuat data");
-            }
+                        if (!res.ok) throw new Error("Gagal memuat shared items");
 
-            const { data = [] } = await res.json();
+                        const response = await res.json();
+                        const items = response.data || response.items || response || [];
 
-            // Pisahkan folder & file berdasarkan is_folder
-            const folders = data.filter(item => item.is_folder === true || item.is_folder === 1);
-            const files   = data.filter(item => !item.is_folder && item.is_folder !== 1);
+                        normalizedFolders = items.filter(i => i.is_folder === true || i.is_folder === 1);
+                        normalizedFiles = items.filter(i => !i.is_folder && i.is_folder !== 1);
 
-            // Normalisasi struktur agar sesuai dengan fungsi render lama kamu
-            const normalizedFolders = folders.map(f => ({
-                id: f.file_id || f.id,
-                name: f.file_name || f.name,
-                shared_by_name: f.shared_by?.name || f.shared_by_name || 'Someone'
-            }));
+                    } else {
+                        // MODE SUBFOLDER: /api/my-files/{id}
+                        const folderId = this.getLastSegmentFromPath();
+                        const res = await fetch(`https://pdu-dms.my.id/api/my-files/${folderId}`, {
+                            headers: {
+                                "Authorization": "Bearer " + this.token,
+                                "Accept": "application/json"
+                            }
+                        });
 
+                        if (!res.ok) throw new Error("Gagal membuka folder");
 
-            const normalizedFiles = files.map(f => ({
-                id: f.file_id || f.id,
-                name: f.file_name || f.name,
-                mime: this.guessMime(f.file_name || f.name),
-                labels: f.labels || [],
-                url: f.file_path ? `https://pdu-dms.my.id/api/view-file/${f.file_id}` : null
-            }));
+                        const data = await res.json();
 
-            // GUNAKAN FUNGSI ASLI KAMU 100% (tidak diubah sama sekali)
-            this.renderFolders(normalizedFolders, folderContainer, emptyTemplate);
-            this.renderFiles(normalizedFiles, fileContainer, emptyTemplate);
+                        // Struktur standar dari /api/my-files
+                        normalizedFolders = data.folders || [];
+                        normalizedFiles = data.files || [];
+
+                        // // Update breadcrumb dengan nama folder saat ini
+                        // this.updateBreadcrumb(data.name || this.getLastSegmentFromPath());
+                    }
+
+                    // Normalisasi data biar sama formatnya
+                    const folders = normalizedFolders.map(f => ({
+                        id: f.id || f.file_id,
+                        name: f.name || f.file_name,
+                        shared_by_name: f.shared_by?.name || f.shared_by_name || f.owner?.name || 'Someone',
+                        size: f.size || '—',
+                        created_at: f.created_at || 'Unknown',
+                        updated_at: f.updated_at || 'Unknown'
+                    }));
+
+                    const files = normalizedFiles.map(f => ({
+                        id: f.id || f.file_id,
+                        name: f.name || f.file_name,
+                        mime: f.mime_type || f.mime || this.guessMime(f.name || f.file_name),
+                        labels: f.labels || [],
+                        size: f.size || '—',
+                        created_at: f.created_at || 'Unknown',
+                        updated_at: f.updated_at || 'Unknown',
+                        url: f.file_path ? `https://pdu-dms.my.id/api/view-file/${f.file_id}` : null,
+                        shared_by_name: f.shared_by?.name || f.shared_by_name || f.owner?.name || 'Someone'
+                    }));
+
+                    this.renderFolders(folders, folderContainer, emptyTemplate);
+                    this.renderFiles(files, fileContainer, emptyTemplate);
 
                 } catch (err) {
                     console.error(err);
@@ -416,6 +440,7 @@
                 window.location.href = "/signin";
             }
         }
+
         // // === FUNGSI GLOBAL: BUKA FOLDER SHARED (PAKAI API YANG SUDAH ADA) ===
         // function openSharedFolder(folderId) {
         //     // Simpan ID folder yang mau dibuka
