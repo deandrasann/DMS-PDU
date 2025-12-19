@@ -20,7 +20,7 @@ class ShareController extends Controller
 
         if (!$userToken) {
             return redirect()->route('signin', [
-                'redirect' => "https://dms-pdu-production.up.railway.app/share/$token"
+                'redirect' => "https://dms-pdu-production-ee0e.up.railway.app/share/$token"
             ]);
         }
 
@@ -40,11 +40,16 @@ class ShareController extends Controller
 
                 $fileId = $data['data']['file_id'] ?? null;
                 $fileType = $data['data']['file_type'] ?? null;
+                $isFolder = $data['data']['is_folder'] ?? false;
 
                 Log::info("Fetched share link data", [
                     'file_id' => $fileId,
                     'file_type' => $fileType,
                 ]);
+
+                if ($isFolder) {
+                    return redirect()->route('shared.subfolder', ['path' => $fileId]);
+                }
 
                 // if redirect based on file type
                 if ($fileType === 'application/pdf') {
