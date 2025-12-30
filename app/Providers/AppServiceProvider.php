@@ -46,15 +46,15 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer('partials.navbar', function ($view) {
             $token = Session::get('token');
+            $r2BaseUrl = rtrim(env('R2_URL'), '/');
 
             $profile = [
                 'fullname' => 'User Default',
                 'email' => 'default@mail.com',
-                'photo' => asset('storage/images/profile-pict.jpg'),
+                'photo' => asset('images/profile-pict.jpg'),
             ];
 
             if ($token) {
-                // PRIORITASKAN SESSION FLASH (setelah update)
                 if (Session::has('new_profile_photo')) {
                     $profile = [
                         'photo' => Session::get('new_profile_photo'),
@@ -65,11 +65,14 @@ class AppServiceProvider extends ServiceProvider
                     try {
                         $response = Http::withToken($token)->get('https://dms-pdu-api.up.railway.app/api/user');
                         if ($response->successful()) {
-                            $data = $response->json('data') ?? $response->json();
+                            $resJson = $response->json();
+                            $data = $resJson['data'] ?? $resJson;
 
-                            if (!empty($data['photo_profile_path'])) {
-                                $photoUrl = 'https://dms-pdu-api.up.railway.app/storage/profile_photos/' . $data['photo_profile_path'];
-                                $photoUrl .= '?t=' . time(); // cache buster
+                            // Pastikan data tidak kosong
+                            if ($data) {
+                                $photoUrl = !empty($data['photo_profile_path'])
+                                    ? $r2BaseUrl . '/profile_photos/' . $data['photo_profile_path'] . '?t=' . time()
+                                    : asset('images/profile-pict.jpg');
 
                                 $profile = [
                                     'fullname' => $data['fullname'] ?? 'Unknown',
@@ -77,7 +80,6 @@ class AppServiceProvider extends ServiceProvider
                                     'photo' => $photoUrl,
                                 ];
 
-                                // Simpan ke session
                                 Session::put('user', $profile);
                             }
                         }
@@ -85,14 +87,6 @@ class AppServiceProvider extends ServiceProvider
                         Log::warning('API user profile failed', ['error' => $e->getMessage()]);
                     }
                 }
-            }
-
-            $defaultPhoto = asset('storage/images/profile-pict.jpg') . '?v=' . time();
-
-            if (empty($data['photo_profile_path'])) {
-                $profile['photo'] = $defaultPhoto;
-            } else {
-                $profile['photo'] = 'https://dms-pdu-api.up.railway.app/storage/profile_photos/' . $data['photo_profile_path'] . '?v=' . time();
             }
 
             $view->with('profile', $profile);

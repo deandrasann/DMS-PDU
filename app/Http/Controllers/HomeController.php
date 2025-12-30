@@ -68,9 +68,11 @@ class HomeController extends Controller
                 $json = $response->json();
                 $newPath = $json['data']['photo_profile_path'] ?? null;
 
+                $r2BaseUrl = rtrim(env('R2_URL'), '/');
+
                 $newPhotoUrl = $newPath
-                    ? 'https://dms-pdu-api.up.railway.app/storage/profile_photos/' . $newPath . '?v=' . time()
-                    : asset('storage/images/profile-pict.jpg') . '?v=' . time();
+                    ? $r2BaseUrl . '/profile_photos/' . $newPath . '?v=' . time()
+                    : asset('images/profile-pict.jpg');
 
                 $fullname = $request->fullname;
 
