@@ -212,7 +212,7 @@
                         <img id="mobileProfilePhoto"
                             src="{{ session('new_profile_photo') ??
                                 (session('user.photo_profile_path')
-                                    ? 'https://pdu-dms.my.id/storage/profile_photos/' . session('user.photo_profile_path')
+                                    ? 'https://dms-pdu-api.up.railway.app/storage/profile_photos/' . session('user.photo_profile_path')
                                     : asset('storage/images/profile-pict.jpg')) }}?v={{ time() }}"
                             alt="Profile" class="rounded-circle object-fit-cover" style="width:48px;height:48px;">
                     </div>
@@ -269,7 +269,7 @@
                         <img id="modalProfilePhoto"
                              src="{{ session('new_profile_photo') ??
                                    (session('user.photo_profile_path')
-                                       ? 'https://pdu-dms.my.id/storage/profile_photos/' . session('user.photo_profile_path')
+                                       ? 'https://dms-pdu-api.up.railway.app/storage/profile_photos/' . session('user.photo_profile_path')
                                        : asset('storage/images/profile-pict.jpg')) }}?v={{ time() }}"
                              class="rounded-circle object-fit-cover"
                              width="110" height="110">

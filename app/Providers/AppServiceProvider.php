@@ -68,7 +68,7 @@ class AppServiceProvider extends ServiceProvider
                             $data = $response->json('data') ?? $response->json();
 
                             if (!empty($data['photo_profile_path'])) {
-                                $photoUrl = 'https://pdu-dms.my.id/storage/profile_photos/' . $data['photo_profile_path'];
+                                $photoUrl = 'https://dms-pdu-api.up.railway.app/storage/profile_photos/' . $data['photo_profile_path'];
                                 $photoUrl .= '?t=' . time(); // cache buster
 
                                 $profile = [
@@ -92,7 +92,7 @@ class AppServiceProvider extends ServiceProvider
             if (empty($data['photo_profile_path'])) {
                 $profile['photo'] = $defaultPhoto;
             } else {
-                $profile['photo'] = 'https://pdu-dms.my.id/storage/profile_photos/' . $data['photo_profile_path'] . '?v=' . time();
+                $profile['photo'] = 'https://dms-pdu-api.up.railway.app/storage/profile_photos/' . $data['photo_profile_path'] . '?v=' . time();
             }
 
             $view->with('profile', $profile);

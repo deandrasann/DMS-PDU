@@ -226,7 +226,7 @@ hideLoading() {
             else {
                 // Default: My Files / Folder Browsing
                 const path = this.currentPath ? `api/my-files/${this.currentPath}` : "api/my-files";
-                baseUrl = `https://pdu-dms.my.id/${path}`;
+                baseUrl = `https://dms-pdu-api.up.railway.app/${path}`;
                 transformData = false;
             }
 
@@ -2128,7 +2128,7 @@ class ShareManager {
                 item.className = 'suggestion-item d-flex align-items-center gap-3 p-3 rounded-3 hover-bg-light cursor-pointer';
                 item.innerHTML = `
                     <img src="${user.photo_profile_path
-                    ? 'https://pdu-dms.my.id/storage/profile_photos/' + user.photo_profile_path
+                    ? 'https://dms-pdu-api.up.railway.app/storage/profile_photos/' + user.photo_profile_path
                     : '/images/profile-pict.jpg'}"
                     class="rounded-circle object-fit-cover flex-shrink-0" width="36" height="36"
                     onerror="this.src='/images/profile-pict.jpg'">
@@ -2166,7 +2166,7 @@ class ShareManager {
         pill.className = 'd-inline-flex align-items-center bg-white border rounded-pill px-3 py-1 gap-2 shadow-sm';
         pill.innerHTML = `
             <img src="${user.photo_profile_path
-            ? 'https://pdu-dms.my.id/storage/profile_photos/' + user.photo_profile_path
+            ? 'https://dms-pdu-api.up.railway.app/storage/profile_photos/' + user.photo_profile_path
             : '/images/profile-pict.jpg'}"
              class="rounded-circle object-fit-cover flex-shrink-0" width="22" height="22"
              onerror="this.src='/images/profile-pict.jpg'">

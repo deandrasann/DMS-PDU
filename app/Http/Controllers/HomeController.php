@@ -69,7 +69,7 @@ class HomeController extends Controller
                 $newPath = $json['data']['photo_profile_path'] ?? null;
 
                 $newPhotoUrl = $newPath
-                    ? 'https://pdu-dms.my.id/storage/profile_photos/' . $newPath . '?v=' . time()
+                    ? 'https://dms-pdu-api.up.railway.app/storage/profile_photos/' . $newPath . '?v=' . time()
                     : asset('storage/images/profile-pict.jpg') . '?v=' . time();
 
                 $fullname = $request->fullname;
