@@ -13,7 +13,7 @@ class HomeController extends Controller
     public function dashboard()
     {
         $response = Http::withCookies(request()->cookies->all(), config('session.domain'))
-            ->get("https://pdu-dms.my.id/api/user");
+            ->get("https://dms-pdu-api.up.railway.app/api/user");
 
         if (!$response->successful()) {
             return redirect("/signin");
@@ -56,7 +56,7 @@ class HomeController extends Controller
             $http = $http->attach('_method', 'PATCH');
 
             // POST tanpa payload kedua
-            $response = $http->post('https://pdu-dms.my.id/api/update-profile');
+            $response = $http->post('https://dms-pdu-api.up.railway.app/api/update-profile');
 
             Log::info('Profile Update API', [
                 'status' => $response->status(),
@@ -108,7 +108,7 @@ class HomeController extends Controller
         try {
             // Request ke API backend
             $response = Http::withToken($token)->post(
-                'https://pdu-dms.my.id/api/delete-photo-profile'
+                'https://dms-pdu-api.up.railway.app/api/delete-photo-profile'
             );
 
             if ($response->successful()) {
@@ -150,7 +150,7 @@ class HomeController extends Controller
         }
 
         try {
-            $response = Http::withToken($token)->post('https://pdu-dms.my.id/api/change-password', [
+            $response = Http::withToken($token)->post('https://dms-pdu-api.up.railway.app/api/change-password', [
                 'current_password' => $request->current_password,
                 'new_password' => $request->new_password,
                 'new_password_confirmation' => $request->new_password_confirmation,

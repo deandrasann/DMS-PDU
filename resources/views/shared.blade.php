@@ -105,7 +105,7 @@
 
                     if (!this.currentPath) {
                         // MODE ROOT: /api/shared-with-me
-                        const res = await fetch("https://pdu-dms.my.id/api/shared-with-me", {
+                        const res = await fetch("https://dms-pdu-api.up.railway.app/api/shared-with-me", {
                             headers: {
                                 "Authorization": "Bearer " + this.token,
                                 "Accept": "application/json"
@@ -123,7 +123,7 @@
                     } else {
                         // MODE SUBFOLDER: /api/my-files/{id}
                         const folderId = this.getLastSegmentFromPath();
-                        const res = await fetch(`https://pdu-dms.my.id/api/my-files/${folderId}`, {
+                        const res = await fetch(`https://dms-pdu-api.up.railway.app/api/my-files/${folderId}`, {
                             headers: {
                                 "Authorization": "Bearer " + this.token,
                                 "Accept": "application/json"
@@ -160,7 +160,7 @@
                         size: f.size || '—',
                         created_at: f.created_at || 'Unknown',
                         updated_at: f.updated_at || 'Unknown',
-                        url: f.file_path ? `https://pdu-dms.my.id/api/view-file/${f.file_id}` : null,
+                        url: f.file_path ? `https://dms-pdu-api.up.railway.app/api/view-file/${f.file_id}` : null,
                         shared_by_name: f.shared_by?.name || f.shared_by_name || f.owner?.name || 'Someone'
                     }));
 
@@ -308,7 +308,7 @@
                 } = this.getFileIcon(file.mime);
                 // const openUrl = file.mime?.includes('pdf') ? `/files/${file.id}` : `/file-view/${file.id}`;
                 const openUrl = file.is_folder ?
-                    `https://pdu-dms.my.id/api/my-files/${file.id}` :
+                    `https://dms-pdu-api.up.railway.app/api/my-files/${file.id}` :
                     (file.mime?.includes('pdf') ? `/files/${file.id}` : `/file-view/${file.id}`);
 
                 const labelsHTML = this.createLabelsHTML(file.labels || []);
@@ -457,7 +457,7 @@
                     const id = btn.dataset.id,
                         name = btn.dataset.name;
                     try {
-                        const res = await fetch(`https://pdu-dms.my.id/api/view-file/${id}`, {
+                        const res = await fetch(`https://dms-pdu-api.up.railway.app/api/view-file/${id}`, {
                             headers: {
                                 Authorization: "Bearer " + this.token
                             }

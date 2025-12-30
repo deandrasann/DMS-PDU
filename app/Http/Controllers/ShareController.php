@@ -20,7 +20,7 @@ class ShareController extends Controller
 
         if (!$userToken) {
             return redirect()->route('signin', [
-                'redirect' => "https://dms-pdu-production-ee0e.up.railway.app/share/$token"
+                'redirect' => "https://dms-pdu.up.railway.app/share/$token"
             ]);
         }
 
@@ -33,7 +33,7 @@ class ShareController extends Controller
                 ->withHeaders([
                 'Authorization' => 'Bearer ' . $userToken,
                     'Accept' => 'application/json',
-                ])->get("https://pdu-dms.my.id/api/share/$token");
+                ])->get("https://dms-pdu-api.up.railway.app/api/share/$token");
 
             if ($response->successful()) {
                 $data = $response->json();

@@ -28,7 +28,7 @@ class MySpaceController extends Controller
 
         try {
             // Build URL
-            $url = $currentPath ? "https://pdu-dms.my.id/api/my-files/{$currentPath}" : 'https://pdu-dms.my.id/api/my-files';
+            $url = $currentPath ? "https://dms-pdu-api.up.railway.app/api/my-files/{$currentPath}" : 'https://dms-pdu-api.up.railway.app/api/my-files';
 
             Log::info('Calling API', ['url' => $url]);
 
@@ -113,7 +113,7 @@ class MySpaceController extends Controller
         Log::info('Accessing Last Opened Page');
 
         try {
-            $url = 'https://pdu-dms.my.id/api/last-opened-files';
+            $url = 'https://dms-pdu-api.up.railway.app/api/last-opened-files';
 
             $response = Http::withToken($token)
                 ->withOptions([
@@ -272,7 +272,7 @@ class MySpaceController extends Controller
         Log::info('Accessing Recommended Files Page');
 
         try {
-            $url = 'https://pdu-dms.my.id/api/recommended-files';
+            $url = 'https://dms-pdu-api.up.railway.app/api/recommended-files';
 
             $response = Http::withToken($token)
                 ->withOptions([
@@ -417,7 +417,7 @@ private function isEmail($name)
         }
 
         try {
-            $response = Http::withToken($token)->get('https://pdu-dms.my.id/api/my-files');
+            $response = Http::withToken($token)->get('https://dms-pdu-api.up.railway.app/api/my-files');
 
             if ($response->successful()) {
                 return response()->json($response->json());
@@ -444,7 +444,7 @@ private function isEmail($name)
                 'Authorization' => 'Bearer ' . $token,
             ])
             ->timeout(30)
-            ->get("https://pdu-dms.my.id/api/view-file/{$fileId}");
+            ->get("https://dms-pdu-api.up.railway.app/api/view-file/{$fileId}");
 
             if ($response->successful()) {
                 // Return file dengan content type yang sesuai
@@ -485,7 +485,7 @@ private function isEmail($name)
                 'Authorization' => 'Bearer ' . $token,
             ])
             ->timeout(30)
-            ->get("https://pdu-dms.my.id/api/file-info/{$fileId}");
+            ->get("https://dms-pdu-api.up.railway.app/api/file-info/{$fileId}");
 
             if (!$listResponse->successful()) {
                 Log::error('Failed to fetch files for file view', [
@@ -550,7 +550,7 @@ private function isEmail($name)
             }
 
             // Kirim ke API
-            $response = Http::withToken($token)->asMultipart()->post('https://pdu-dms.my.id/api/upload', $multipartData);
+            $response = Http::withToken($token)->asMultipart()->post('https://dms-pdu-api.up.railway.app/api/upload', $multipartData);
 
             if ($response->successful()) {
                 return response()->json($response->json());
@@ -591,7 +591,7 @@ private function isEmail($name)
                 'Accept' => 'application/json',
             ])
                 ->timeout(30)
-                ->get("https://pdu-dms.my.id/api/folders/{$folderId}");
+                ->get("https://dms-pdu-api.up.railway.app/api/folders/{$folderId}");
 
             if ($response->successful()) {
                 return response()->json($response->json());
@@ -621,7 +621,7 @@ private function isEmail($name)
         }
 
         try {
-            $url = "https://pdu-dms.my.id/api/{$endpoint}";
+            $url = "https://dms-pdu-api.up.railway.app/api/{$endpoint}";
 
             // Forward method dan headers
             $response = Http::withToken($token)
@@ -656,7 +656,7 @@ private function isEmail($name)
             // Get file details
             $fileResponse = Http::withToken($token)
                 ->withOptions(['verify' => false])
-                ->get('https://pdu-dms.my.id/api/my-files');
+                ->get('https://dms-pdu-api.up.railway.app/api/my-files');
 
             if (!$fileResponse->successful()) {
                 return response()->json(['error' => 'Failed to fetch file'], 500);
@@ -673,7 +673,7 @@ private function isEmail($name)
             // Get all labels
             $labelsResponse = Http::withToken($token)
                 ->withOptions(['verify' => false])
-                ->get('https://pdu-dms.my.id/api/labels');
+                ->get('https://dms-pdu-api.up.railway.app/api/labels');
 
             $labels = $labelsResponse->successful() ? $labelsResponse->json()['data'] ?? [] : [];
 
@@ -713,7 +713,7 @@ private function isEmail($name)
             $response = Http::withToken($token)
                 ->withOptions(['verify' => false])
                 ->timeout(30)
-                ->put("https://pdu-dms.my.id/api/update-file/{$fileId}", $updateData);
+                ->put("https://dms-pdu-api.up.railway.app/api/update-file/{$fileId}", $updateData);
 
             if ($response->successful()) {
                 return response()->json([

@@ -37,7 +37,7 @@ class MySpaceManager {
     // Fungsi untuk mengambil data labels dari API
 async fetchLabels() {
     try {
-        const response = await fetch(`https://pdu-dms.my.id/api/labels`, {
+        const response = await fetch(`https://dms-pdu-api.up.railway.app/api/labels`, {
             headers: {
                 "Authorization": "Bearer " + this.token,
                 "Accept": "application/json"
@@ -216,11 +216,11 @@ hideLoading() {
 
             // 1. TENTUKAN BASE URL BERDASARKAN HALAMAN
             if (this.isRecommendedPage) {
-                baseUrl = "https://pdu-dms.my.id/api/recommended-files";
+                baseUrl = "https://dms-pdu-api.up.railway.app/api/recommended-files";
                 transformData = true;
             }
             else if (this.isLastOpenedPage) {
-                baseUrl = "https://pdu-dms.my.id/api/last-opened-files";
+                baseUrl = "https://dms-pdu-api.up.railway.app/api/last-opened-files";
                 transformData = true;
             }
             else {
@@ -353,7 +353,7 @@ hideLoading() {
         const folderPromises = folders.map(async (folder) => {
             try {
                 // Fetch data untuk setiap folder secara individual
-                const response = await fetch(`https://pdu-dms.my.id/api/my-files/${folder.id}`, {
+                const response = await fetch(`https://dms-pdu-api.up.railway.app/api/my-files/${folder.id}`, {
                     headers: {
                         "Authorization": "Bearer " + this.token,
                         "Accept": "application/json"
@@ -866,7 +866,7 @@ getMappedTextColor(backgroundColor) {
         let url = null;
 
         try {
-            const response = await fetch(`https://pdu-dms.my.id/api/view-file/${fileId}`, {
+            const response = await fetch(`https://dms-pdu-api.up.railway.app/api/view-file/${fileId}`, {
                 headers: {
                     'Authorization': 'Bearer ' + this.token
                 }
@@ -1044,7 +1044,7 @@ getMappedTextColor(backgroundColor) {
             buttonElement.innerHTML = '<i class="ph ph-spinner ph-spin fs-5"></i> Duplicating...';
             buttonElement.disabled = true;
 
-            const response = await fetch("https://pdu-dms.my.id/api/duplicate-file", {
+            const response = await fetch("https://dms-pdu-api.up.railway.app/api/duplicate-file", {
                 method: "POST",
                 headers: {
                     "Accept": "application/json",
@@ -1416,7 +1416,7 @@ document.addEventListener('click', (e) => {
             // if (!confirm("Yakin mau menghapus file ini?")) return;
 
             try {
-                const response = await fetch(`https://pdu-dms.my.id/api/delete-file/${fileId}`, {
+                const response = await fetch(`https://dms-pdu-api.up.railway.app/api/delete-file/${fileId}`, {
                     method: "DELETE",
                     headers: {
                         "Accept": "application/json",
@@ -1478,7 +1478,7 @@ document.addEventListener('click', (e) => {
             }
 
             try {
-                const response = await fetch(`https://pdu-dms.my.id/api/view-file/${fileId}`, {
+                const response = await fetch(`https://dms-pdu-api.up.railway.app/api/view-file/${fileId}`, {
                     method: "GET",
                     headers: {
                         "Authorization": "Bearer " + this.token,
@@ -1526,7 +1526,7 @@ document.addEventListener('click', (e) => {
             // if (!confirm("Yakin mau menghapus file ini?")) return;
 
             try {
-                const response = await fetch(`https://pdu-dms.my.id/api/delete-file/${fileId}`, {
+                const response = await fetch(`https://dms-pdu-api.up.railway.app/api/delete-file/${fileId}`, {
                     method: "DELETE",
                     headers: {
                         "Accept": "application/json",
@@ -1608,7 +1608,7 @@ document.addEventListener('click', (e) => {
         //             all: ""
         //         };
 
-        //         const response = await fetch(`https://pdu-dms.my.id/api/delete-file/${fileId}`, {
+        //         const response = await fetch(`https://dms-pdu-api.up.railway.app/api/delete-file/${fileId}`, {
         //             method: "DELETE",
         //             headers: {
         //                 "Accept": "application/json",
@@ -1667,7 +1667,7 @@ document.addEventListener('click', (e) => {
                 btn.innerHTML = '<i class="ph ph-spinner ph-spin fs-5"></i> Downloading...';
                 btn.disabled = true;
 
-                const response1 = await fetch("https://pdu-dms.my.id/api/download", {
+                const response1 = await fetch("https://dms-pdu-api.up.railway.app/api/download", {
                     method: "POST",
                     headers: {
                         "Authorization": "Bearer " + this.token,
@@ -1811,7 +1811,7 @@ document.addEventListener('click', (e) => {
             renameBtn.innerHTML = '<i class="ph ph-spinner ph-spin fs-5"></i> Renaming...';
             renameBtn.disabled = true;
 
-            const response = await fetch(`https://pdu-dms.my.id/api/update-file/${folderId}`, {
+            const response = await fetch(`https://dms-pdu-api.up.railway.app/api/update-file/${folderId}`, {
                 method: "PATCH",
                 headers: {
                     "Accept": "application/json",
@@ -1895,7 +1895,7 @@ document.addEventListener('click', (e) => {
         if (!locationElement) return;
 
         try {
-            const fileResponse = await fetch(`https://pdu-dms.my.id/api/my-files`, {
+            const fileResponse = await fetch(`https://dms-pdu-api.up.railway.app/api/my-files`, {
                 headers: {
                     "Authorization": "Bearer " + this.token
                 }
@@ -1945,7 +1945,7 @@ document.addEventListener('click', (e) => {
             let currentId = parentId;
 
             for (let i = 0; i < 10; i++) {
-                const response = await fetch(`https://pdu-dms.my.id/api/folders/${currentId}`, {
+                const response = await fetch(`https://dms-pdu-api.up.railway.app/api/folders/${currentId}`, {
                     headers: {
                         "Authorization": "Bearer " + this.token
                     }
@@ -1981,7 +1981,7 @@ document.addEventListener('click', (e) => {
             let currentId = folderId;
 
             for (let i = 0; i < 10; i++) {
-                const response = await fetch(`https://pdu-dms.my.id/api/folders/${currentId}`, {
+                const response = await fetch(`https://dms-pdu-api.up.railway.app/api/folders/${currentId}`, {
                     headers: {
                         "Authorization": "Bearer " + this.token
                     }
@@ -2112,7 +2112,7 @@ class ShareManager {
             list.innerHTML = '<div class="text-center py-3"><small class="text-muted">Searching...</small></div>';
             suggestions.style.display = 'block';
 
-            const res = await fetch(`https://pdu-dms.my.id/api/search-users?q=${encodeURIComponent(query)}`, {
+            const res = await fetch(`https://dms-pdu-api.up.railway.app/api/search-users?q=${encodeURIComponent(query)}`, {
                 headers: { 'Authorization': 'Bearer ' + this.token }
             });
 
@@ -2208,7 +2208,7 @@ class ShareManager {
             // TIDAK USAH KIRIM file_id / folder_id → sudah ada di URL: /share-file/{id}
         };
 
-        const response = await fetch(`https://pdu-dms.my.id/api/share-file/${this.itemId}`, {
+        const response = await fetch(`https://dms-pdu-api.up.railway.app/api/share-file/${this.itemId}`, {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer ' + this.token,

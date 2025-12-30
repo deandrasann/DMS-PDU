@@ -459,7 +459,7 @@
 //         }
 
 //         try {
-//             const res = await fetch("https://pdu-dms.my.id/api/labels", {
+//             const res = await fetch("https://dms-pdu-api.up.railway.app/api/labels", {
 //                 headers: {
 //                     "Authorization": "Bearer " + token
 //                 }
@@ -736,7 +736,7 @@
 //             const color = labelColors[Math.floor(Math.random() * labelColors.length)];
 
 //             try {
-//                 const res = await fetch("https://pdu-dms.my.id/api/create-label", {
+//                 const res = await fetch("https://dms-pdu-api.up.railway.app/api/create-label", {
 //                     method: "POST",
 //                     headers: {
 //                         "Content-Type": "application/json",
@@ -908,7 +908,7 @@
 //             submitBtn.disabled = true;
 //             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading...';
 
-//             const res = await fetch("https://pdu-dms.my.id/api/upload-files", {
+//             const res = await fetch("https://dms-pdu-api.up.railway.app/api/upload-files", {
 //                 method: "POST",
 //                 headers: {
 //                     "Authorization": "Bearer " + token
@@ -994,7 +994,7 @@
 //             this.disabled = true;
 //             this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
 
-//             const res = await fetch("https://pdu-dms.my.id/api/create-folder", {
+//             const res = await fetch("https://dms-pdu-api.up.railway.app/api/create-folder", {
 //                 method: "POST",
 //                 headers: {
 //                     "Content-Type": "application/json",
@@ -1292,7 +1292,7 @@
 
 //                 try {
 //                     const token = getToken();
-//                     const res = await fetch("https://pdu-dms.my.id/api/create-label", {
+//                     const res = await fetch("https://dms-pdu-api.up.railway.app/api/create-label", {
 //                         method: "POST",
 //                         headers: {
 //                             "Content-Type": "application/json",
@@ -1420,7 +1420,7 @@
 //             console.log('File ID:', fileId);
 
 //             // GUNAKAN METHOD PATCH sesuai dokumentasi API
-//             const res = await fetch(`https://pdu-dms.my.id/api/update-file/${fileId}`, {
+//             const res = await fetch(`https://dms-pdu-api.up.railway.app/api/update-file/${fileId}`, {
 //                 method: "PATCH",
 //                 headers: {
 //                     "Authorization": "Bearer " + token,
@@ -1527,7 +1527,7 @@
 //         buttonElement.innerHTML = '<i class="ph ph-spinner ph-spin fs-5"></i> Deleting...';
 //         buttonElement.disabled = true;
 
-//         const response = await fetch(`https://pdu-dms.my.id/api/delete-label/${labelId}`, {
+//         const response = await fetch(`https://dms-pdu-api.up.railway.app/api/delete-label/${labelId}`, {
 //             method: 'DELETE',
 //             headers: {
 //                 'Authorization': 'Bearer ' + token,

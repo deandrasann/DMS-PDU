@@ -45,7 +45,7 @@ class DashboardController extends Controller
             try {
                 $res = Http::withToken($token)
                     ->timeout(10)
-                    ->get("https://pdu-dms.my.id/api/my-files/{$lastSegmentId}");
+                    ->get("https://dms-pdu-api.up.railway.app/api/my-files/{$lastSegmentId}");
 
                 if ($res->successful()) {
                     $data = $res->json();

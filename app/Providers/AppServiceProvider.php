@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
             $user = null;
 
             if ($token) {
-                $response = Http::withToken($token)->get('https://pdu-dms.my.id/api/user');
+                $response = Http::withToken($token)->get('https://dms-pdu-api.up.railway.app/api/user');
                 $user = $response->json();
             }
 
@@ -63,7 +63,7 @@ class AppServiceProvider extends ServiceProvider
                     ];
                 } else {
                     try {
-                        $response = Http::withToken($token)->get('https://pdu-dms.my.id/api/user');
+                        $response = Http::withToken($token)->get('https://dms-pdu-api.up.railway.app/api/user');
                         if ($response->successful()) {
                             $data = $response->json('data') ?? $response->json();
 
